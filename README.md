@@ -39,7 +39,7 @@ python segmentator_main.py
 
 You should see something like this soon after:
 
-![image_test](https://github.com/ofgulban/segmentator/blob/master/images/image_test.png)
+![image_test](images/image_test.png)
 
 More documentation is work in progress...
 
