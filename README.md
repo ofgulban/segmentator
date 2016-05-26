@@ -1,7 +1,3 @@
-# Marian added a line
-
-
-
 # Segmentator (work in progress)
 Segmentator is an open-source package for multi-dimensional data exploration and segmentation purposes. This application is mainly developed for magnetic resonance imaging (MRI) brain data.
 
