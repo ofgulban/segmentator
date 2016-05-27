@@ -112,21 +112,26 @@ def update(val):
     histVMax = np.power(10, sHistC.val)
     plt.clim(vmax=histVMax)
 
-    # Set X & Y extend
-#    ax.set_xlim(dataMin, percDataMax)
-#    ax.set_ylim(0, percDataMax)
-
-    # Set circle parameters
-    volHistMask = sector_mask((nrBins, nrBins),
-                              (sCircI.val, sCircJ.val), sCircR.val,
-                              (sThetaMin.val, sThetaMax.val)
-                              )
+    # # Set circle parameters
+    # volHistMask = sector_mask((nrBins, nrBins),
+    #                           (sCircI.val, sCircJ.val), sCircR.val,
+    #                           (sThetaMin.val, sThetaMax.val)
+    #                           )
     circ.set_data(volHistMask)
 
     # 2D mask is for fast visualization
     imaMask = VolHist2ImaMapping(invHistVolume[:, :, sliceNr], volHistMask)
     ovl.set_data(imaMask)
     fig.canvas.draw_idle()  # TODO:How to do properly? (massive speed up)
+
+
+def updateSectorMask(val):
+    global volHistMask
+    # Set circle parameters
+    volHistMask = sector_mask((nrBins, nrBins),
+                              (sCircI.val, sCircJ.val), sCircR.val,
+                              (sThetaMin.val, sThetaMax.val)
+                              )
 
 
 def updateDataBrowser(val):
@@ -226,11 +231,11 @@ def resetMask(event):
 """Updates"""
 sSliceNr.on_changed(updateDataBrowser)
 sHistC.on_changed(update)
-sCircI.on_changed(update)
-sCircJ.on_changed(update)
-sCircR.on_changed(update)
-sThetaMin.on_changed(update)
-sThetaMax.on_changed(update)
+sCircI.on_changed(updateSectorMask), sCircI.on_changed(update)
+sCircJ.on_changed(updateSectorMask), sCircJ.on_changed(update)
+sCircR.on_changed(updateSectorMask), sCircR.on_changed(update)
+sThetaMin.on_changed(updateSectorMask), sThetaMin.on_changed(update)
+sThetaMax.on_changed(updateSectorMask), sThetaMax.on_changed(update)
 bCycle.on_clicked(cycleView)
 bCycle.on_clicked(update)
 bCycle.on_clicked(updateDataBrowser)
