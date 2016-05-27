@@ -20,13 +20,13 @@ import matplotlib
 # matplotlib.use('TKAgg')
 import numpy as np
 import matplotlib.pyplot as plt
+from __future__ import division
 from nibabel import load, save, Nifti1Image
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, RadioButtons, LassoSelector
 from matplotlib import path
 from sector_mask import sector_mask
 from utils import sub2ind, Ima2VolHistMapping, VolHist2ImaMapping
-
 
 #
 """Load Data"""
@@ -36,6 +36,15 @@ nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/MPRAGE_T1.nii')
 """Data Processing"""
 ima = np.squeeze(nii.get_data())
 
+# auto-scaling for faster interface (0-500 or 600 seems fine)
+ima = ima - ima.min()
+dataMin = ima.min()
+percDataMax = np.percentile(ima, 99.5)
+ima[np.where(ima > percDataMax)] = percDataMax
+if ima.max() > 500:
+    ima = 500/ima.max() * ima
+    percDataMax = ima.max()
+
 # gradient magnitude (using L2 norm of the vector)
 gra = np.gradient(ima)
 gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
@@ -44,26 +53,19 @@ gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
 
-# to crop rare values (TODO: Parametrize this part)
-percDataMax = np.percentile(ima, 99.9)
-percDataMin = 0
-ima[np.where(ima > percDataMax)] = percDataMax
-ima[np.where(ima < 0)] = 0
-gra[np.where(gra > percDataMax)] = percDataMax  # TODO: Can be bound to gra
-
 #
 """Plots"""
 # Plot 2D histogram
 fig = plt.figure()
 ax = plt.subplot(121)
-nrBins = int(percDataMax - percDataMin + 2)  # TODO: variable name fix
-binVals = np.arange(percDataMin, percDataMax)
+nrBins = int(percDataMax - dataMin + 2)  # TODO: variable name fix
+binVals = np.arange(dataMin, percDataMax)
 _, xedges, yedges, _ = plt.hist2d(ima, gra,
                                   bins=binVals,
                                   norm=LogNorm(vmax=10000),
                                   cmap='Greys'
                                   )
-ax.set_xlim(percDataMin, percDataMax)
+ax.set_xlim(dataMin, percDataMax)
 ax.set_ylim(0, percDataMax)
 plt.subplots_adjust(bottom=0.40)
 plt.colorbar()
@@ -72,14 +74,14 @@ plt.ylabel("Gradient Magnitude f'(x)")
 plt.title("2D Histogram")
 
 # plot 3D ima by default
-orig = nii.get_data()
+orig = np.squeeze(nii.get_data())
 ax2 = plt.subplot(122)
 fig2 = plt.gcf()  # NOTE: Removes a warning
 slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  cmap=plt.cm.gray, vmin=0, vmax=500,
                  interpolation='none'
                  )
-imaMask = np.ones(nii.shape[0:2])  # TODO: Magic numbers
+imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 ovl = ax2.imshow(imaMask,
                  cmap=plt.cm.Reds, vmin=0.1,
                  interpolation='none',
@@ -96,11 +98,11 @@ volHistMask = sector_mask((nrBins, nrBins), (0, 0), 300, (0, 360))
 circ = ax.imshow(volHistMask, cmap='Reds', alpha=0.2, vmin=0.1,
                  interpolation='nearest',
                  origin='lower',
-                 extent=[percDataMin, percDataMax, gra.min(), percDataMax])
+                 extent=[dataMin, percDataMax, gra.min(), percDataMax])
 
 # Histogram to volume, volume to histogram mappings
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binVals)
-invHistVolume = np.reshape(ima2volHistMap, nii.shape)
+invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 
 def update(val):
@@ -113,7 +115,7 @@ def update(val):
     plt.clim(vmax=histVMax)
 
     # Set X & Y extend
-#    ax.set_xlim(percDataMin, percDataMax)
+#    ax.set_xlim(dataMin, percDataMax)
 #    ax.set_ylim(0, percDataMax)
 
     # Set circle parameters
