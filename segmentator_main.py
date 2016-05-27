@@ -55,6 +55,12 @@ gra = np.ndarray.flatten(gra)
 
 #
 """Plots"""
+# Set up a colormap:
+palette = plt.cm.Reds
+palette.set_over('r', 1.0)
+palette.set_under('w', 0)
+palette.set_bad('m', 1.0)
+
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
@@ -82,7 +88,7 @@ slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 ovl = ax2.imshow(imaMask,
-                 cmap=plt.cm.Reds, vmin=0.1,
+                 cmap=palette, vmin=0.1,
                  interpolation='none',
                  alpha=0.5
                  )
@@ -90,11 +96,11 @@ ovl = ax2.imshow(imaMask,
 plt.axis('off')
 
 #
-"""Mostly Function Definitions (Now they are in utilities)"""
+"""Update Functions"""
 # Default circle parameters
 volHistMask = sector_mask((nrBins, nrBins), (0, 0), 300, (0, 360))
 
-circ = ax.imshow(volHistMask, cmap='Reds', alpha=0.2, vmin=0.1,
+circ = ax.imshow(volHistMask, cmap=palette, alpha=0.2, vmin=0.1,
                  interpolation='nearest',
                  origin='lower',
                  extent=[dataMin, percDataMax, gra.min(), percDataMax])
@@ -112,13 +118,6 @@ def update(val):
     histVMax = np.power(10, sHistC.val)
     plt.clim(vmax=histVMax)
 
-    # # Set circle parameters
-    # volHistMask = sector_mask((nrBins, nrBins),
-    #                           (sCircI.val, sCircJ.val), sCircR.val,
-    #                           (sThetaMin.val, sThetaMax.val)
-    #                           )
-    circ.set_data(volHistMask)
-
     # 2D mask is for fast visualization
     imaMask = VolHist2ImaMapping(invHistVolume[:, :, sliceNr], volHistMask)
     ovl.set_data(imaMask)
@@ -132,6 +131,7 @@ def updateSectorMask(val):
                               (sCircI.val, sCircJ.val), sCircR.val,
                               (sThetaMin.val, sThetaMax.val)
                               )
+    circ.set_data(volHistMask)
 
 
 def updateDataBrowser(val):
