@@ -1,7 +1,7 @@
 # Segmentator (work in progress)
 Segmentator is an open-source package for multi-dimensional data exploration and segmentation purposes. This application is mainly developed for magnetic resonance imaging (MRI) brain data.
 
-The goal is to provide a complementary tool to the already available tissue segmentation methods (to the best of out knowledge) in other softwares (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap).
+The goal is to provide a complementary tool to the already available tissue segmentation methods (to the best of our knowledge) in other softwares (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap).
 
 This application is based the following work:
 
@@ -24,11 +24,11 @@ This application is based the following work:
 
 ## How to use
 
-Edit *"Load Data"* section in *segmentator_main.py* by giving the absolute path to your nifti data:
+Edit *"Load Data"* section in *segmentator_main.py* by giving the absolute path to your nifti data (Beware: int8 data types are not recommended):
 
 ```
 """Load Data"""
-nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/MPRAGE_T1.nii')
+nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Test_Data.nii')
 ```
 
 then open a terminal, navigate to Segmentator's folder (for instance: `cd /home/john/segmentator/` ) and type:
@@ -41,9 +41,16 @@ You should see something like this soon after:
 
 ![image_test](images/image_test.png)
 
-More documentation is work in progress...
+To be continued...
 
-## Contributors
+## Support
 
-- Omer Faruk Gulban
-- Marian Schneider
+(WIP)
+
+## Contribute
+
+(WIP)
+
+## License
+
+The project is licensed under GNU GENERAL PUBLIC LICENSE Version 3.
