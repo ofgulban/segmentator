@@ -169,7 +169,7 @@ sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5, valfmt='%0.3f')
 """Buttons"""
 # cycle button
 cycleax = plt.axes([0.6, 0.125, 0.075, 0.075])
-bCycle = Button(cycleax, 'Cycle\nView\n(WIP)',
+bCycle = Button(cycleax, 'Cycle\nView',
                 color=axcolor, hovercolor='0.975')
 cycleCount = 0
 
@@ -187,14 +187,13 @@ bExport = Button(aExport, 'Export\nNifti', color=axcolor, hovercolor='0.975')
 
 
 def exportNifti(event):
-    global volHistMask, nrBins, invHistVolume, cycleCount
+    global volHistMask, nrBins, orig, invHistVolume, cycleCount
 
     # put the permuted indices back to their original format
-    invHistVolume = np.transpose(invHistVolume, (cycleCount,
-                                                 (cycleCount+1)%3,
-                                                 (cycleCount+2)%3
-                                                 )
-                                 )
+    cycBackPerm = (cycleCount, (cycleCount+1) % 3, (cycleCount+2) % 3)
+    orig = np.transpose(orig, cycBackPerm)
+    invHistVolume = np.transpose(invHistVolume, cycBackPerm)
+    cycleCount = 0
 
     linIdx = np.arange(0, nrBins*nrBins)
     idxMask = linIdx[volHistMask.flatten()]
