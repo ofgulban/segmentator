@@ -30,22 +30,24 @@ from utils import sub2ind, Ima2VolHistMapping, VolHist2ImaMapping
 
 #
 """Load Data"""
-nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/INTEN.nii')
+nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/T1.nii')
 
 #
 """Data Processing"""
-ima = np.squeeze(nii.get_data())
+orig = np.squeeze(nii.get_data())
 
 # auto-scaling for faster interface (0-500 or 600 seems fine)
-ima = ima - ima.min()
-dataMin = ima.min()
-percDataMax = np.percentile(ima, 99.5)
-ima[np.where(ima > percDataMax)] = percDataMax
-if ima.max() > 500:
-    ima = 500/ima.max() * ima
-    percDataMax = ima.max()
+percDataMin = np.percentile(orig, 0.01)
+orig[np.where(orig < percDataMin)] = percDataMin
+orig = orig - orig.min()
+dataMin = orig.min()
+percDataMax = np.percentile(orig, 99.9)
+orig[np.where(orig > percDataMax)] = percDataMax
+orig = 500/orig.max() * orig
+percDataMax = orig.max()
 
 # gradient magnitude (using L2 norm of the vector)
+ima = orig.copy()
 gra = np.gradient(ima)
 gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 
@@ -80,10 +82,9 @@ plt.ylabel("Gradient Magnitude f'(x)")
 plt.title("2D Histogram")
 
 # plot 3D ima by default
-orig = np.squeeze(nii.get_data())
 ax2 = fig.add_subplot(122)
 slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
-                 cmap=plt.cm.gray, vmin=0, vmax=500,
+                 cmap=plt.cm.gray, vmin=ima.min(), vmax=ima.max(),
                  interpolation='none'
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
