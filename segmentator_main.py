@@ -30,7 +30,7 @@ from utils import sub2ind, Ima2VolHistMapping, VolHist2ImaMapping
 
 #
 """Load Data"""
-nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/MPRAGE_T1.nii')
+nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/INTEN.nii')
 
 #
 """Data Processing"""
@@ -57,7 +57,7 @@ gra = np.ndarray.flatten(gra)
 """Plots"""
 # Plot 2D histogram
 fig = plt.figure()
-ax = plt.subplot(121)
+ax = fig.add_subplot(121)
 nrBins = int(percDataMax - dataMin + 2)  # TODO: variable name fix
 binVals = np.arange(dataMin, percDataMax)
 _, xedges, yedges, _ = plt.hist2d(ima, gra,
@@ -75,8 +75,7 @@ plt.title("2D Histogram")
 
 # plot 3D ima by default
 orig = np.squeeze(nii.get_data())
-ax2 = plt.subplot(122)
-fig2 = plt.gcf()  # NOTE: Removes a warning
+ax2 = fig.add_subplot(122)
 slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  cmap=plt.cm.gray, vmin=0, vmax=500,
                  interpolation='none'
@@ -108,7 +107,6 @@ invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 def update(val):
     global imaMask, volHistMask
     sliceNr = int(sSliceNr.val*orig.shape[2])
-    # slc.set_data(orig[:,:,sliceNr])
 
     # Scale slider value for the log colorbar
     histVMax = np.power(10, sHistC.val)
@@ -136,9 +134,11 @@ def updateDataBrowser(val):
     # Scale slider value [0,1) to dimension index to allow variation in shape
     sliceNr = int(sSliceNr.val*orig.shape[2])
     slc.set_data(orig[:, :, sliceNr])
+    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
     # 2D mask is for fast visualization
     imaMask = VolHist2ImaMapping(invHistVolume[:, :, sliceNr], volHistMask)
     ovl.set_data(imaMask)
+    ovl.set_extent((0, imaMask.shape[1]-1, imaMask.shape[0]-1, 0))
     fig.canvas.draw_idle()
 
 #
@@ -171,15 +171,15 @@ sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5, valfmt='%0.3f')
 cycleax = plt.axes([0.6, 0.125, 0.075, 0.075])
 bCycle = Button(cycleax, 'Cycle\nView\n(WIP)',
                 color=axcolor, hovercolor='0.975')
+cycleCount = 0
 
 
 # change view (TODO: Not working properly for now)
 def cycleView(event):
-    global orig, imaMask
+    global orig, imaMask, cycleCount, invHistVolume
+    cycleCount = (cycleCount+1) % 3
     orig = np.transpose(orig, (2, 0, 1))
-    slc.set_extent((0, orig.shape[1]-1, 0, orig.shape[0]-1))
-    imaMask = np.transpose(imaMask, (2, 0, 1))
-    ovl.set_extent((0, imaMask.shape[1]-1, 0, imaMask.shape[0]-1))
+    invHistVolume = np.transpose(invHistVolume, (2, 0, 1))
 
 # export button
 aExport = plt.axes([0.75, 0.025, 0.075, 0.075])
@@ -187,7 +187,15 @@ bExport = Button(aExport, 'Export\nNifti', color=axcolor, hovercolor='0.975')
 
 
 def exportNifti(event):
-    global volHistMask, nrBins, invHistVolume
+    global volHistMask, nrBins, invHistVolume, cycleCount
+
+    # put the permuted indices back to their original format
+    invHistVolume = np.transpose(invHistVolume, (cycleCount,
+                                                 (cycleCount+1)%3,
+                                                 (cycleCount+2)%3
+                                                 )
+                                 )
+
     linIdx = np.arange(0, nrBins*nrBins)
     idxMask = linIdx[volHistMask.flatten()]
 
@@ -224,7 +232,9 @@ sCircJ.on_changed(update)
 sCircR.on_changed(update)
 sThetaMin.on_changed(update)
 sThetaMax.on_changed(update)
-bCycle.on_clicked(cycleView)  # TODO: must be reworked to fit with 2Dmask
+bCycle.on_clicked(cycleView)
+bCycle.on_clicked(update)
+bCycle.on_clicked(updateDataBrowser)
 bExport.on_clicked(exportNifti)
 bReset.on_clicked(resetMask)
 
