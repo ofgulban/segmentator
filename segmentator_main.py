@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Segmentator main."""
+
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
 #
@@ -16,21 +18,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import matplotlib
-# matplotlib.use('TKAgg')
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-from __future__ import division
 from nibabel import load, save, Nifti1Image
 from matplotlib.colors import LogNorm
-from matplotlib.widgets import Slider, Button, RadioButtons, LassoSelector
+from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from sector_mask import sector_mask
-from utils import sub2ind, Ima2VolHistMapping, VolHist2ImaMapping
+from utils import Ima2VolHistMapping, VolHist2ImaMapping
 
-#
 """Load Data"""
-nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Ingo/T1.nii')
+#
+nii = load('/home/faruk/Data/T1.nii.gz')
 
 #
 """Data Processing"""
@@ -43,7 +43,7 @@ orig = orig - orig.min()
 dataMin = orig.min()
 percDataMax = np.percentile(orig, 99.9)
 orig[np.where(orig > percDataMax)] = percDataMax
-orig = 500/orig.max() * orig
+orig = 500./orig.max() * orig
 percDataMax = orig.max()
 
 # gradient magnitude (using L2 norm of the vector)
@@ -180,7 +180,6 @@ bCycle = Button(cycleax, 'Cycle\nView',
 cycleCount = 0
 
 
-# change view (TODO: Not working properly for now)
 def cycleView(event):
     global orig, imaMask, cycleCount, invHistVolume
     cycleCount = (cycleCount+1) % 3
