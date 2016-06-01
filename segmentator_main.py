@@ -18,7 +18,6 @@
 
 
 import matplotlib
-matplotlib.use('TKAgg')
 from nibabel import load, save, Nifti1Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,8 +35,7 @@ from draggable import DraggableSector
 
 #%%
 """Load Data"""
-#/media/marian/DATADRIVE1/MotionQuartet/Analysis/P3/Anatomy_BBR/P03_T1_divPD_IIHC_v16_s1p2.nii.gz
-img = load('/media/sf_D_DRIVE/MotionQuartet/Analysis/P7/Anatomy_BBR/P07_T1w_divPD_IIHC.nii')
+img = load('/media/sf_D_DRIVE/Segmentator/ExampleNii/P06_T1w_divPD_IIHC_v16.nii')
 
 #%%
 """Data Processing"""
@@ -121,7 +119,7 @@ sectorFig, pixMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2, vmin=0.1,
                  origin='lower',
                  extent=[percDataMin, percDataMax, gra.min(), percDataMax])
 
-# pass on some necessary evil
+# pass on some properties
 sectorObj.figure = ax.figure
 sectorObj.axes = ax.axes
 sectorObj.axes2 = ax2.axes
