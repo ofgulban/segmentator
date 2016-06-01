@@ -28,6 +28,8 @@ class sector_mask:
         self.x,self.y = np.ogrid[:shape[0],:shape[1]]
         self.cx,self.cy = centre
         self.tmin,self.tmax = np.deg2rad(angle_range)
+        self.tmin4mouth = self.tmin
+        self.tmax4mouth = self.tmax
         # ensure stop angle > start angle
         if self.tmax < self.tmin: 
             self.tmax += 2*np.pi
@@ -81,31 +83,45 @@ class sector_mask:
         rad = np.deg2rad(degree)
         self.tmin += rad
         self.tmax += rad
+#        print 'tmin:'
+#        print self.tmin
+#        print 'tmax:'
+#        print self.tmax
+        #
+        self.tmin4mouth = self.tmin
+        self.tmax4mouth = self.tmax        
+        
+        # ensure stop angle > start angle
+        if self.tmax < self.tmin: 
+            self.tmax += 2*np.pi
+
+        # update polar coordinates
+        self.set_polCrd()
+        
+    def mouthChange(self,degree):
+
+        rad = np.deg2rad(degree)
+    
+        self.tmin = self.tmin4mouth + rad
+        self.tmax = self.tmax4mouth - rad
+
+        
+#        self.tmin,self.tmax = np.deg2rad((self.tmin,self.tmax))
         # ensure stop angle > start angle
         if self.tmax < self.tmin: 
             self.tmax += 2*np.pi
         # update polar coordinates
         self.set_polCrd()
         
-    def mouthOpen(self,degree):
-        rad = np.deg2rad(degree)
-        self.tmin += rad
-        self.tmax -= rad
-        # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
-            self.tmax += 2*np.pi
-        # update polar coordinates
-        self.set_polCrd()
-        
-    def mouthClose(self,degree):
-        rad = np.deg2rad(degree)
-        self.tmin -= rad
-        self.tmax += rad
-        # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
-            self.tmax += 2*np.pi
-        # update polar coordinates
-        self.set_polCrd()
+#    def mouthClose(self,degree):
+#        rad = np.deg2rad(degree)
+#        self.tmin -= rad
+#        self.tmax += rad
+#        # ensure stop angle > start angle
+#        if self.tmax < self.tmin: 
+#            self.tmax += 2*np.pi
+#        # update polar coordinates
+#        self.set_polCrd()
            
     def set_r(self,radius):
         self.radius = radius
@@ -134,7 +150,7 @@ class sector_mask:
         xbin = np.floor(event.xdata)
         ybin = np.floor(event.ydata)
         Mask = self.binaryMask()
-        if Mask[ybin][xbin] == True: #switch a and ybin cause pixMask not Cart!
+        if Mask[ybin][xbin] == True: #switch a and ybin cause volHistMask not Cart!
             return True
         else:
             return False

@@ -19,7 +19,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import pix2vox_hist2D
+from utils import VolHist2ImaMapping
 
 class DraggableSector:
     def __init__(self, sector):
@@ -42,17 +42,12 @@ class DraggableSector:
             'key_release_event', self.on_key_release)            
     
     def on_key_press(self, event):
-        if event.key == 'shift':
+        if event.key == 'control':
             self.shiftHeld = True
-        if event.key == 'control':
-            self.ctrlHeld = True
-
-            
+     
     def on_key_release(self, event):
-        if event.key == 'shift':
-            self.shiftHeld = False
         if event.key == 'control':
-            self.ctrlHeld = False
+            self.shiftHeld = False
 
     def on_press(self, event):
         if event.button == 1: # left button
@@ -89,82 +84,60 @@ class DraggableSector:
         elif event.button == 2: # scroll button
             'on scroll button press, check if mouse is in fig'
             if event.inaxes != self.sector.axes: return
-            if self.shiftHeld == False and self.ctrlHeld == False: # shift no
+            if self.shiftHeld == False: # shift no
                 self.sector.scale_r(1.05)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
+                # update volHistMask  
+                self.volHistMask = self.sector.binaryMask()
+                self.sector.FigObj.set_data(self.volHistMask)
+                # update imaMask
+                self.mask = VolHist2ImaMapping(
                     self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
+                    self.volHistMask)
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()  
-            elif self.ctrlHeld == True: # shift yes
+            elif self.shiftHeld == True: # shift yes
                 self.sector.rotate(10.0)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
+                # update volHistMask  
+                self.volHistMask = self.sector.binaryMask()
+                self.sector.FigObj.set_data(self.volHistMask)
+                # update imaMask
+                self.mask = VolHist2ImaMapping(
                     self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
+                    self.volHistMask)
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
-            elif self.shiftHeld == True:
-                self.sector.mouthOpen(5.0)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
-                # draw to canvas
-                self.sector.figure.canvas.draw()
+
             
         elif event.button == 3: # right button
             'on right button press, check if mouse is in fig'
             if event.inaxes != self.sector.axes: return
-            if self.shiftHeld == False and self.ctrlHeld == False:
+            if self.shiftHeld == False: # shift no
                 self.sector.scale_r(0.95)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
+                # update volHistMask  
+                self.volHistMask = self.sector.binaryMask()
+                self.sector.FigObj.set_data(self.volHistMask)
+                # update imaMask
+                self.mask = VolHist2ImaMapping(
                     self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
+                    self.volHistMask)
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw() 
-            elif self.ctrlHeld == True:
+            elif self.shiftHeld == True: # shift yes
                 self.sector.rotate(-10.0)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
+                # update volHistMask  
+                self.volHistMask = self.sector.binaryMask()
+                self.sector.FigObj.set_data(self.volHistMask)
+                # update imaMask
+                self.mask = VolHist2ImaMapping(
                     self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
+                    self.volHistMask)
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
-            elif self.shiftHeld == True:
-                self.sector.mouthClose(5.0)
-                # update pix mask  
-                self.pixMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.pixMask)
-                # update brain mask
-                self.mask = pix2vox_hist2D(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
-                    self.pixMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
-                # draw to canvas
-                self.sector.figure.canvas.draw()
+
             
             
     def on_motion(self, event):
@@ -176,20 +149,20 @@ class DraggableSector:
         # get sector centre x and y positions, cursor x and y positions
         x0, y0, xpress, ypress = self.press
         # calculate difference betw cursor pos on click and new pos dur motion
-        dy = event.xdata - xpress #switch x0 and y0 because pixMask not Cart!!!
-        dx = event.ydata - ypress #switch x0 and y0 because pixMask not Cart!!!
+        dy = event.xdata - xpress #switch x0 and y0 because volHistMask not Cart!!!
+        dx = event.ydata - ypress #switch x0 and y0 because volHistMask not Cart!!!
         
         # update x and y position of sector, based on past motion of cursor 
         self.sector.set_x(x0+dx) 
         self.sector.set_y(y0+dy)
         
-        # update pix mask  
-        self.pixMask = self.sector.binaryMask()
-        self.sector.FigObj.set_data(self.pixMask)
-        # update brain mask
-        self.mask = pix2vox_hist2D(
+        # update volHistMask  
+        self.volHistMask = self.sector.binaryMask()
+        self.sector.FigObj.set_data(self.volHistMask)
+        # update imaMask
+        self.mask = VolHist2ImaMapping(
             self.sector.invHistVolume[:,:,self.sector.sliceNr],
-            self.pixMask)
+            self.volHistMask)
         self.sector.brainMaskFigHandle.set_data(self.mask)                
         # draw to canvas
         self.sector.figure.canvas.draw() 

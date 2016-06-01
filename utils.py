@@ -23,18 +23,18 @@ import numpy as np
 def sub2ind(array_shape, rows, cols):
     # return (rows*array_shape + cols)
     return (cols*array_shape + rows)
-
+    
 # Kind of inverse histogram
-def Vox2PixMapping(xinput, yinput, binsArray):
+def Ima2VolHistMapping(xinput, yinput, binsArray):
     dgtzData = np.digitize(xinput, binsArray)-1
-    dgtzGra  = np.digitize(yinput, binsArray)-1
-    vox2pixMap = sub2ind(binsArray.shape, dgtzData, dgtzGra)  #returns 1D voxels
-    return vox2pixMap
+    dgtzGra = np.digitize(yinput, binsArray)-1
+    vox2pixMap = sub2ind(binsArray.shape, dgtzData, dgtzGra)  # 1D
+    return vox2pixMap    
 
-def pix2vox_hist2D(data2D, pixMask):
+def VolHist2ImaMapping(data2D, volHistMask):
 
-    linIndices = np.arange(0, pixMask.size)
-    idxMask = linIndices[pixMask.flatten()]
+    linIndices = np.arange(0, volHistMask.size)
+    idxMask = linIndices[volHistMask.flatten()]
 
     # return logical array with length equal to nr of voxels
     voxMask = np.in1d(data2D.flatten(), idxMask)

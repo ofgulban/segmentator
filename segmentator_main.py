@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import matplotlib
 from nibabel import load, save, Nifti1Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,12 +24,8 @@ from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from sector_mask import sector_mask
-from utils import Vox2PixMapping, pix2vox_hist2D
+from utils import Ima2VolHistMapping, VolHist2ImaMapping
 from draggable import DraggableSector
-
-## different masks - inconsistent naming: change mask to sliceMask?
-# mask := mask the voxels on a slice of brain (right side, 3D data)
-# pixMask := mask the pixels in the 2D histogram (left side)
 
 
 #%%
@@ -88,8 +83,8 @@ slc = ax2.imshow(orig[:,:,int(orig.shape[2]/2)],
                  interpolation='none'
                  )
 # plot brain mask on top
-mask = np.ones(img.shape[0:2]) # TODO: Magic numbers
-ovl = ax2.imshow(mask,
+imaMask = np.ones(img.shape[0:2]) # TODO: Magic numbers
+ovl = ax2.imshow(imaMask,
                  cmap=plt.cm.Reds, vmin=0.1,
                  interpolation='none',
                  alpha = 0.5
@@ -99,9 +94,9 @@ plt.axis('off')
 
 #%%
 """Functions and Init"""
-# define a volume (vox) to histogram (pix) map
-vox2PixMap = Vox2PixMapping(xinput=data, yinput=gra, binsArray=binVals)
-invHistVolume = np.reshape(vox2PixMap, img.shape)
+# define a image to volume histogram map
+ima2volHistMap = Ima2VolHistMapping(xinput=data, yinput=gra, binsArray=binVals)
+invHistVolume = np.reshape(ima2volHistMap, img.shape)
 
 # initialise scliceNr
 sliceNr = int(0.5*orig.shape[2])
@@ -114,7 +109,7 @@ theta = (0,360)
 sectorObj = sector_mask(shape, centre, radius, theta)
 
 # draw sector mask for the first time
-sectorFig, pixMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2, vmin=0.1,
+sectorFig, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2, vmin=0.1,
                  interpolation='nearest',
                  origin='lower',
                  extent=[percDataMin, percDataMax, gra.min(), percDataMax])
@@ -130,7 +125,7 @@ sectorObj.nrOfBins = len(binVals)
 
 # make sector draggable                 
 drSectorObj = DraggableSector(sectorObj)
-drSectorObj.pixMask = pixMask
+drSectorObj.volHistMask = volHistMask
 drSectorObj.connect() 
 
 # define what should happen if update is called
@@ -146,12 +141,30 @@ def updateBrainBrowser(val):
     slc.set_data(orig[:,:,sliceNr])
     # update slice number for draggable sector mask
     drSectorObj.sector.sliceNr = sliceNr
-    # get current pixMask
-    pixMask = drSectorObj.pixMask
+    # get current volHistMask
+    volHistMask = drSectorObj.volHistMask
     # update the mask (2D mask is for fast visualization)
-    mask = pix2vox_hist2D(invHistVolume[:,:,sliceNr],pixMask)
-    ovl.set_data(mask)
+    imaMask = VolHist2ImaMapping(invHistVolume[:,:,sliceNr],volHistMask)
+    ovl.set_data(imaMask)
     fig.canvas.draw_idle() # TODO:How to do properly? (massive speed up)
+    
+    
+def updateTheta(val):
+    # get theta value slider
+    thetaVal = sTheta.val
+    print thetaVal 
+    # update mouth of sector mask
+    drSectorObj.sector.mouthChange(thetaVal)
+    # update volHistMask    
+    drSectorObj.pixMask = drSectorObj.sector.binaryMask()
+    drSectorObj.sector.FigObj.set_data(drSectorObj.pixMask)
+    # update imaMask
+    drSectorObj.mask = VolHist2ImaMapping(
+        drSectorObj.sector.invHistVolume[:,:,drSectorObj.sector.sliceNr],
+        drSectorObj.pixMask)
+    drSectorObj.sector.brainMaskFigHandle.set_data(drSectorObj.mask)                
+    # draw to canvas
+    drSectorObj.sector.figure.canvas.draw()
 
 #%%
 """Sliders"""
@@ -160,34 +173,41 @@ axcolor = 'lightgoldenrodyellow'
 axHistC = plt.axes([0.15, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
 sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
 
-# brain browser slider
+# circle slider
+aTheta = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
+sTheta = Slider(aTheta, 'Theta Min', 0, 180, valinit=0, valfmt='%0.1f')
+
+# ima browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
 sSliceNr  = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5, valfmt='%0.3f')
 
-#%%
+
+#
 """Buttons"""
-#%% cycle button
+# cycle button
 cycleax = plt.axes([0.6, bottom-0.275, 0.075, 0.075])
-bCycle  = Button(cycleax, 'Cycle\nView', color=axcolor, hovercolor='0.975')
+bCycle = Button(cycleax, 'Cycle\nView',
+                color=axcolor, hovercolor='0.975')
+cycleCount = 0
 
-# change view (TODO: Not working properly for now)
 def cycleView(event):
-    global orig, mask
-    orig = np.transpose(orig, (2,0,1))
-    slc.set_extent((0, orig.shape[1]-1, 0, orig.shape[0]-1))
-    mask = np.transpose(mask, (2,0,1))
-    ovl.set_extent((0, mask.shape[1]-1, 0, mask.shape[0]-1))
+    global orig, imaMask, cycleCount, invHistVolume
+    cycleCount = (cycleCount+1) % 3
+    orig = np.transpose(orig, (2, 0, 1))
+    invHistVolume = np.transpose(invHistVolume, (2, 0, 1))  
+     
 
-#%% export button
+# export button
 exportax = plt.axes([0.8, bottom-0.275, 0.075, 0.075])
-bExport  = Button(exportax, 'Export\nNifti', color=axcolor, hovercolor='0.975')
+bExport  = Button(exportax, 'Export\nNifti',
+                  color=axcolor, hovercolor='0.975')
 
 def exportNifti(event):
     linIndices = np.arange(0, nrBins*nrBins)
-    # get current pixMask
-    pixMask = drSectorObj.pixMask
+    # get current volHistMask
+    volHistMask = drSectorObj.volHistMask
     # get linear indices
-    idxMask = linIndices[pixMask.flatten()]
+    idxMask = linIndices[volHistMask.flatten()]
     # return logical array with length equal to nr of voxels
     voxMask = np.in1d(drSectorObj.sector.invHistVolume.flatten(), idxMask)
     # reset mask and apply logical indexing
@@ -202,7 +222,7 @@ def exportNifti(event):
         save(new_image, img.get_filename()[:-7]+'_OUT.nii.gz')
         
         
-#%% reset button
+# reset button
 resetax = plt.axes([0.7, bottom-0.275, 0.075, 0.075])
 bReset  = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
@@ -218,20 +238,21 @@ def resetMask(event):
     # revert to initial sector mask paramters 
     drSectorObj.sector.update(shape, centre, radius, theta)
     # update pix mask (histogram)  
-    pixMask = drSectorObj.sector.binaryMask()
-    drSectorObj.sector.FigObj.set_data(pixMask)
+    volHistMask = drSectorObj.sector.binaryMask()
+    drSectorObj.sector.FigObj.set_data(volHistMask)
     # update brain mask
-    mask = pix2vox_hist2D(
+    imaMask = VolHist2ImaMapping(
         drSectorObj.sector.invHistVolume[:,:,sliceNr],
-        pixMask)
-    drSectorObj.sector.brainMaskFigHandle.set_data(mask)   
+        volHistMask)
+    drSectorObj.sector.brainMaskFigHandle.set_data(imaMask)   
              
 
 #%%
 """Updates"""
 sSliceNr.on_changed(updateBrainBrowser)
 sHistC.on_changed(updateHistBrowser)
-bCycle.on_clicked(cycleView)  #TODO: must be reworked to fit with 2Dmask
+sTheta.on_changed(updateTheta)
+bCycle.on_clicked(cycleView)  
 bExport.on_clicked(exportNifti)
 bReset.on_clicked(resetMask)
 
@@ -273,22 +294,22 @@ def updateArray(array, indices):
 
 OnSelectCounter = 0
 def onselect(verts):
-    global pixMask, pix, OnSelectCounter
+    global volHistMask, pix, OnSelectCounter
     p = path.Path(verts)
     ind = p.contains_points(pix, radius=1.5)
     # update pix mask (histogram)
     # PROBLEM: it gets pix mask from dr every time (lasso from previous time gets lost )
     if OnSelectCounter == 0:
-        pixMask = drSectorObj.sector.binaryMask()
+        volHistMask = drSectorObj.sector.binaryMask()
     OnSelectCounter +=1
-    pixMask = updateArray(pixMask, ind)
-    drSectorObj.sector.FigObj.set_data(pixMask)    
+    volHistMask = updateArray(volHistMask, ind)
+    drSectorObj.sector.FigObj.set_data(volHistMask)    
     # update brain mask
     sliceNr = drSectorObj.sector.sliceNr
-    mask = pix2vox_hist2D(
+    imaMask = VolHist2ImaMapping(
         drSectorObj.sector.invHistVolume[:,:,sliceNr],
-        pixMask)
-    drSectorObj.sector.brainMaskFigHandle.set_data(mask) 
+        volHistMask)
+    drSectorObj.sector.brainMaskFigHandle.set_data(imaMask) 
 
     fig.canvas.draw_idle()
 
