@@ -307,7 +307,6 @@ def lassoSwitch(event):
     lasso = []
     switchCounter += 1
     switchStatus = switchCounter % 2
-    print switchStatus
     if switchStatus == 0:
         # disable drag function of sector mask
         drSectorObj.disconnect()

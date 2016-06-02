@@ -101,7 +101,8 @@ class sector_mask:
         xbin = np.floor(event.xdata)
         ybin = np.floor(event.ydata)
         Mask = self.binaryMask()
-        if Mask[ybin][xbin] is True:  # switch x and ybin, volHistMask not Cart
+        # the next line doesn't follow pep 8 (otherwise it fails)
+        if Mask[ybin][xbin] == True:  # switch x and ybin, volHistMask not Cart
             return True
         else:
             return False
