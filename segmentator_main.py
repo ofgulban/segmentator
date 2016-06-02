@@ -30,41 +30,52 @@ from draggable import DraggableSector
 
 #%%
 """Load Data"""
-img = load('/media/sf_D_DRIVE/Segmentator/ExampleNii/P06_T1w_divPD_IIHC_v16.nii')
+#
+nii = load('/media/sf_D_DRIVE/Segmentator/ExampleNii/P06_T1w_divPD_IIHC_v16.nii')
 
-#%%
+#
 """Data Processing"""
-data = np.squeeze( img.get_data() )
+orig = np.squeeze(nii.get_data())
+
+# auto-scaling for faster interface (0-500 or 600 seems fine)
+percDataMin = np.percentile(orig, 0.01)
+orig[np.where(orig < percDataMin)] = percDataMin
+orig = orig - orig.min()
+dataMin = orig.min()
+percDataMax = np.percentile(orig, 99.9)
+orig[np.where(orig > percDataMax)] = percDataMax
+orig = 500./orig.max() * orig
+percDataMax = orig.max()
 
 # gradient magnitude (using L2 norm of the vector)
-gra = np.gradient(data)
-gra = np.sqrt( np.power(gra[0],2) + np.power(gra[1],2) + np.power(gra[2],2) )
+ima = orig.copy()
+gra = np.gradient(ima)
+gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 
-# reshape data (more intuitive for voxel-wise operations)
-data = np.ndarray.flatten(data)
+# reshape ima (more intuitive for voxel-wise operations)
+ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
 
-# to crop rare values (TODO: Parametrize this part)
-percDataMax = np.percentile(data, 99.9)
-percDataMin = 0
-data[np.where(data>percDataMax)] = percDataMax
-data[np.where(data<0)] = 0
-gra[np.where(gra>percDataMax)] = percDataMax  # TODO: Can be bound to gra itself
-
 #%%
+#
 """Plots"""
-# plot volume histogram (left side)
+# Set up a colormap:
+palette = plt.cm.Reds
+palette.set_over('r', 1.0)
+palette.set_under('w', 0)
+palette.set_bad('m', 1.0)
+
+# Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-nrBins = int(percDataMax - percDataMin + 2 )  #TODO: variable name fix
-binVals = np.arange(percDataMin, percDataMax)
-_, xedges, yedges, _ = plt.hist2d(data, gra,
+nrBins = int(percDataMax - dataMin + 2)  # TODO: variable name fix
+binVals = np.arange(dataMin, percDataMax)
+_, xedges, yedges, _ = plt.hist2d(ima, gra,
                                   bins=binVals,
                                   norm=LogNorm(vmax=10000),
                                   cmap='Greys'
                                   )
-# label and set axes                                      
-ax.set_xlim(percDataMin, percDataMax)
+ax.set_xlim(dataMin, percDataMax)
 ax.set_ylim(0, percDataMax)
 bottom = 0.30
 plt.subplots_adjust(bottom=bottom)
@@ -74,29 +85,29 @@ plt.ylabel("Gradient Magnitude f'(x)")
 plt.title("2D Histogram")
 
 
-# plot image browser (right side)
+# plot 3D ima by default
 ax2 = fig.add_subplot(122)
-# plot brain data
-orig = img.get_data()
-slc = ax2.imshow(orig[:,:,int(orig.shape[2]/2)],
-                 cmap=plt.cm.gray, vmin=0, vmax=500,
+slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
+                 cmap=plt.cm.gray, vmin=ima.min(), vmax=ima.max(),
                  interpolation='none'
                  )
-# plot brain mask on top
-imaMask = np.ones(img.shape[0:2]) # TODO: Magic numbers
+imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 ovl = ax2.imshow(imaMask,
-                 cmap=plt.cm.Reds, vmin=0.1,
+                 cmap=palette, vmin=0.1,
                  interpolation='none',
-                 alpha = 0.5
+                 alpha=0.5
                  )
 # plt.subplots_adjust(left=0.25, bottom=0.25)
 plt.axis('off')
 
+
+
 #%%
+#
 """Functions and Init"""
 # define a image to volume histogram map
-ima2volHistMap = Ima2VolHistMapping(xinput=data, yinput=gra, binsArray=binVals)
-invHistVolume = np.reshape(ima2volHistMap, img.shape)
+ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binVals)
+invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 # initialise scliceNr
 sliceNr = int(0.5*orig.shape[2])
@@ -104,7 +115,7 @@ sliceNr = int(0.5*orig.shape[2])
 # create first instance of sector mask
 shape = (nrBins,nrBins)
 centre = (0,0)
-radius = 300
+radius = 200
 theta = (0,360)
 sectorObj = sector_mask(shape, centre, radius, theta)
 
@@ -114,7 +125,7 @@ sectorFig, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2, vmin=0.1,
                  origin='lower',
                  extent=[percDataMin, percDataMax, gra.min(), percDataMax])
 
-# pass on some properties
+# pass on some properties to the sector object
 sectorObj.figure = ax.figure
 sectorObj.axes = ax.axes
 sectorObj.axes2 = ax2.axes
@@ -150,11 +161,12 @@ def updateBrainBrowser(val):
     
     
 def updateTheta(val):
-    # get theta value slider
+    # get current theta value from slider
     thetaVal = sTheta.val
-    print thetaVal 
     # update mouth of sector mask
-    drSectorObj.sector.mouthChange(thetaVal)
+    diff = thetaVal-drSectorObj.thetaInit
+    drSectorObj.sector.mouthChange(diff)
+
     # update volHistMask    
     drSectorObj.pixMask = drSectorObj.sector.binaryMask()
     drSectorObj.sector.FigObj.set_data(drSectorObj.pixMask)
@@ -165,6 +177,7 @@ def updateTheta(val):
     drSectorObj.sector.brainMaskFigHandle.set_data(drSectorObj.mask)                
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
+    drSectorObj.thetaInit = thetaVal
 
 #%%
 """Sliders"""
@@ -175,7 +188,9 @@ sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
 
 # circle slider
 aTheta = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
-sTheta = Slider(aTheta, 'Theta Min', 0, 180, valinit=0, valfmt='%0.1f')
+thetaInit = 0 
+drSectorObj.thetaInit = thetaInit
+sTheta = Slider(aTheta, 'Theta', 0, 359.99, valinit=thetaInit, valfmt='%0.1f')
 
 # ima browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
@@ -215,11 +230,11 @@ def exportNifti(event):
     mask3D[voxMask] = 1
     mask3D = mask3D.reshape(drSectorObj.sector.invHistVolume.shape)
     # save image, check whether nii or nii.gz
-    new_image = Nifti1Image(mask3D, header=img.get_header() ,affine=img.get_affine())
-    if img.get_filename()[-4:] == '.nii':
-        save(new_image, img.get_filename()[:-4]+'_OUT.nii.gz')
-    elif img.get_filename()[-7:] == '.nii.gz':
-        save(new_image, img.get_filename()[:-7]+'_OUT.nii.gz')
+    new_image = Nifti1Image(mask3D, header=orig.get_header() ,affine=orig.get_affine())
+    if orig.get_filename()[-4:] == '.nii':
+        save(new_image, orig.get_filename()[:-4]+'_OUT.nii.gz')
+    elif orig.get_filename()[-7:] == '.nii.gz':
+        save(new_image, orig.get_filename()[:-7]+'_OUT.nii.gz')
         
         
 # reset button

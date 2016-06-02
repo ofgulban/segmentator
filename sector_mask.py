@@ -28,12 +28,9 @@ class sector_mask:
         self.x,self.y = np.ogrid[:shape[0],:shape[1]]
         self.cx,self.cy = centre
         self.tmin,self.tmax = np.deg2rad(angle_range)
-        self.tmin4mouth = self.tmin
-        self.tmax4mouth = self.tmax
         # ensure stop angle > start angle
         if self.tmax < self.tmin: 
             self.tmax += 2*np.pi
-        
         # convert cartesian --> polar coordinates
         self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
             self.y-self.cy)*(self.y-self.cy)
@@ -49,7 +46,8 @@ class sector_mask:
         self.theta = np.arctan2(self.x-self.cx,self.y-self.cy) - self.tmin
         # wrap angles between 0 and 2*pi
         self.theta %= (2*np.pi)
-            
+     
+# ONLY USED FOR RESET BUTTON, DELETE THIS FUNCTION?        
     def update(self, shape, centre, radius, angle_range):
         self.radius = radius
         self.x,self.y = np.ogrid[:shape[0],:shape[1]]
@@ -71,57 +69,30 @@ class sector_mask:
         # update polar coordinates
         self.set_polCrd()
         
-    def set_angle_range(self,angle_range):
-        self.tmin,self.tmax = np.deg2rad(angle_range)
-        # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
-            self.tmax += 2*np.pi
-        # update polar coordinates
-        self.set_polCrd()
-        
     def rotate(self,degree):
         rad = np.deg2rad(degree)
         self.tmin += rad
         self.tmax += rad
-#        print 'tmin:'
-#        print self.tmin
-#        print 'tmax:'
-#        print self.tmax
-        #
-        self.tmin4mouth = self.tmin
-        self.tmax4mouth = self.tmax        
-        
-        # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
-            self.tmax += 2*np.pi
-
-        # update polar coordinates
         self.set_polCrd()
         
     def mouthChange(self,degree):
-
         rad = np.deg2rad(degree)
-    
-        self.tmin = self.tmin4mouth + rad
-        self.tmax = self.tmax4mouth - rad
-
-        
-#        self.tmin,self.tmax = np.deg2rad((self.tmin,self.tmax))
+        self.tmin += rad
+        self.tmax -= rad
         # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
+        if self.tmax <= self.tmin: 
             self.tmax += 2*np.pi
+        # ensure stop angle- 2*np.pi NOT > start angle
+        if self.tmax - 2*np.pi >= self.tmin: 
+            self.tmax -= 2*np.pi            
+            
+        print 'theta min:'
+        print np.rad2deg(self.tmin)
+        print 'theta max:'
+        print np.rad2deg(self.tmax)
+            
         # update polar coordinates
         self.set_polCrd()
-        
-#    def mouthClose(self,degree):
-#        rad = np.deg2rad(degree)
-#        self.tmin -= rad
-#        self.tmax += rad
-#        # ensure stop angle > start angle
-#        if self.tmax < self.tmin: 
-#            self.tmax += 2*np.pi
-#        # update polar coordinates
-#        self.set_polCrd()
            
     def set_r(self,radius):
         self.radius = radius
@@ -165,18 +136,3 @@ class sector_mask:
         self.FigObj = FigObj
         return (FigObj, BinMask)
                          
-
-
-
-
-
-# #%% Example usage:
-# from matplotlib import pyplot as pp
-# from scipy.misc import lena
-#
-# matrix = lena()
-# mask = sector_mask(matrix.shape,(256,256),200,(0,90))
-# matrix[~mask] = 0
-# pp.imshow(matrix)
-# pp.show()
-

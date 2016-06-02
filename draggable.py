@@ -25,7 +25,6 @@ class DraggableSector:
     def __init__(self, sector):
         self.sector = sector
         self.press = None
-        self.shiftHeld = False
         self.ctrlHeld = False
 
     def connect(self): # this will make the object responsive
@@ -43,17 +42,17 @@ class DraggableSector:
     
     def on_key_press(self, event):
         if event.key == 'control':
-            self.shiftHeld = True
+            self.ctrlHeld = True
      
     def on_key_release(self, event):
         if event.key == 'control':
-            self.shiftHeld = False
+            self.ctrlHeld = False
 
     def on_press(self, event):
         if event.button == 1: # left button
             'on left button press, check if mouse is in fig and on Sector'
             if event.inaxes == self.sector.axes:
-                if self.shiftHeld == False: # shift no
+                if self.ctrlHeld == False: # ctrl no
                     contains = self.sector.contains(event)
                     if not contains: print 'cursor outside circle mask'
                     if not contains: return
@@ -62,7 +61,6 @@ class DraggableSector:
                     y0 = self.sector.cy
                     # also get cursor x and y position and safe al vrbls to press
                     self.press = x0, y0, event.xdata, event.ydata
-#                elif self.shiftHeld == True: # shift yes
             elif event.inaxes == self.sector.axes2:
                 print "Subplot 2: x and y pos"
                 print event.xdata, event.ydata
@@ -84,7 +82,7 @@ class DraggableSector:
         elif event.button == 2: # scroll button
             'on scroll button press, check if mouse is in fig'
             if event.inaxes != self.sector.axes: return
-            if self.shiftHeld == False: # shift no
+            if self.ctrlHeld == False: # ctrl no
                 self.sector.scale_r(1.05)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
@@ -96,8 +94,8 @@ class DraggableSector:
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()  
-            elif self.shiftHeld == True: # shift yes
-                self.sector.rotate(10.0)
+            elif self.ctrlHeld == True: # ctrl yes
+                self.sector.rotate(5.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
@@ -113,7 +111,7 @@ class DraggableSector:
         elif event.button == 3: # right button
             'on right button press, check if mouse is in fig'
             if event.inaxes != self.sector.axes: return
-            if self.shiftHeld == False: # shift no
+            if self.ctrlHeld == False: # ctrl no
                 self.sector.scale_r(0.95)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
@@ -125,8 +123,8 @@ class DraggableSector:
                 self.sector.brainMaskFigHandle.set_data(self.mask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw() 
-            elif self.shiftHeld == True: # shift yes
-                self.sector.rotate(-10.0)
+            elif self.ctrlHeld == True: # ctrl yes
+                self.sector.rotate(-5.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
@@ -146,11 +144,11 @@ class DraggableSector:
         if self.press is None: return
         # ... cursor is in figure
         if event.inaxes != self.sector.axes: return
-        # get sector centre x and y positions, cursor x and y positions
+        # get former sector centre x and y positions, cursor x and y positions
         x0, y0, xpress, ypress = self.press
         # calculate difference betw cursor pos on click and new pos dur motion
-        dy = event.xdata - xpress #switch x0 and y0 because volHistMask not Cart!!!
-        dx = event.ydata - ypress #switch x0 and y0 because volHistMask not Cart!!!
+        dy = event.xdata - xpress #switch x0 & y0 because volHistMask not Cart!
+        dx = event.ydata - ypress #switch x0 & y0 because volHistMask not Cart!
         
         # update x and y position of sector, based on past motion of cursor 
         self.sector.set_x(x0+dx) 
