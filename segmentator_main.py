@@ -17,16 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from nibabel import load, save, Nifti1Image
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
+from nibabel import load, save, Nifti1Image
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, VolHist2ImaMapping
 from draggable import DraggableSector
-
 
 #%%
 """Load Data"""
@@ -91,7 +91,7 @@ slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  interpolation='none'
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
-imaMaskFigHandle = ax2.imshow(imaMask,
+imaMaskFigHand = ax2.imshow(imaMask,
                  cmap=palette, vmin=0.1,
                  interpolation='none',
                  alpha=0.5
@@ -110,9 +110,8 @@ theta = (0,360)
 sectorObj = sector_mask(shape, centre, radius, theta)
 
 # draw sector mask for the first time
-FigObj, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2, vmin=0.1,
-                 interpolation='nearest',
-                 origin='lower',
+volHistMaskFigHand, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2,
+                 vmin=0.1, interpolation='nearest', origin='lower',
                  extent=[percDataMin, percDataMax, gra.min(), percDataMax])
 
 # pass on some properties to sector object
@@ -121,8 +120,8 @@ sectorObj.axes = ax.axes
 sectorObj.axes2 = ax2.axes
 sectorObj.nrOfBins = len(binVals)
 sectorObj.sliceNr = int(0.5*orig.shape[2])
-sectorObj.imaMaskFigHandle = imaMaskFigHandle
-sectorObj.FigObj = FigObj
+sectorObj.imaMaskFigHand = imaMaskFigHand
+sectorObj.volHistMaskFigHand = volHistMaskFigHand
 
 # make sector draggable object, pass on properties                 
 drSectorObj = DraggableSector(sectorObj)
@@ -153,11 +152,13 @@ def updateImaBrowser(val):
     # Scale slider value [0,1) to dimension index to allow variation in shape
     drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
     slc.set_data(orig[:,:,drSectorObj.sector.sliceNr])
+    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
+
     # update imaMask
     drSectorObj.imaMask = VolHist2ImaMapping(
                 drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
                 drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHandle.set_data(drSectorObj.imaMask)
+    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
     drSectorObj.sector.figure.canvas.draw()
    
 # theta slider
@@ -176,12 +177,12 @@ def updateTheta(val):
     drSectorObj.thetaInit = thetaVal    
     # update volHistMask    
     drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
-    drSectorObj.sector.FigObj.set_data(drSectorObj.volHistMask)
+    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)
     # update imaMask
     drSectorObj.imaMask = VolHist2ImaMapping(
         drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
         drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHandle.set_data(drSectorObj.imaMask)                
+    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)                
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
@@ -199,30 +200,40 @@ def cycleView(event):
     cycleCount = (cycleCount+1) % 3
     # transpose data
     orig = np.transpose(orig, (2, 0, 1))
-    # plot new data
-    slc.set_data(orig)
     # transpose ima2volHistMap
     drSectorObj.invHistVolume = np.transpose(
         drSectorObj.invHistVolume, (2, 0, 1))
+    # plot new data
+    slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
+    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
     # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
-                                 drSectorObj.volHistMask)
-    # plot new imaMask
-    drSectorObj.sector.imaMaskFigHandle.set_data(drSectorObj.imaMask)
-    fig.canvas.draw_idle() # TODO:How to do properly? (massive speed up)
+    drSectorObj.imaMask = VolHist2ImaMapping(
+        drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
+        drSectorObj.volHistMask)
+    # plot new imaMask    
+    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
+    drSectorObj.sector.imaMaskFigHand.set_extent(
+            (0, drSectorObj.imaMask.shape[1]-1,
+             drSectorObj.imaMask.shape[0]-1, 0))
+    # draw to canvas
+    drSectorObj.sector.figure.canvas.draw()
         
-
-    orig = np.transpose(orig, (2, 0, 1))
-    drSectorObj.invHistVolume = np.transpose(drSectorObj.invHistVolume, (2, 0, 1))
-      
+        
 # export button
 exportax = plt.axes([0.8, bottom-0.275, 0.075, 0.075])
 bExport  = Button(exportax, 'Export\nNifti',
                   color=axcolor, hovercolor='0.975')
 
 def exportNifti(event):
-    linIndices = np.arange(0, nrBins*nrBins)
+    global cycleCount, orig
+    # put the permuted indices back to their original format
+    cycBackPerm = (cycleCount, (cycleCount+1) % 3, (cycleCount+2) % 3)
+    orig = np.transpose(orig, cycBackPerm)
+    drSectorObj.invHistVolume = np.transpose(drSectorObj.invHistVolume,
+                                             cycBackPerm)
+    cycleCount = 0  
     # get linear indices
+    linIndices = np.arange(0, nrBins*nrBins)
     idxMask = linIndices[drSectorObj.volHistMask.flatten()]
     # return logical array with length equal to nr of voxels
     voxMask = np.in1d(drSectorObj.invHistVolume.flatten(), idxMask)
@@ -231,12 +242,14 @@ def exportNifti(event):
     mask3D[voxMask] = 1
     mask3D = mask3D.reshape(drSectorObj.invHistVolume.shape)
     # save image, check whether nii or nii.gz
-    new_image = Nifti1Image(mask3D, header=orig.get_header() ,affine=orig.get_affine())
-    if orig.get_filename()[-4:] == '.nii':
-        save(new_image, orig.get_filename()[:-4]+'_OUT.nii.gz')
-    elif orig.get_filename()[-7:] == '.nii.gz':
-        save(new_image, orig.get_filename()[:-7]+'_OUT.nii.gz')
-           
+    new_image = Nifti1Image(mask3D, header=nii.get_header(),
+                        affine=nii.get_affine()
+                        )
+    if nii.get_filename()[-4:] == '.nii':
+        save(new_image, nii.get_filename()[:-4]+'_OUT.nii.gz')
+    elif nii.get_filename()[-7:] == '.nii.gz':
+        save(new_image, nii.get_filename()[:-7]+'_OUT.nii.gz')
+                   
 # reset button
 resetax = plt.axes([0.7, bottom-0.275, 0.075, 0.075])
 bReset  = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
@@ -248,7 +261,8 @@ def resetGlobal(event):
     sSliceNr.reset()
     # reset slice number
     drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
-    slc.set_data(orig[:,:,drSectorObj.sector.sliceNr])
+    slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
+    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))    
     # reset theta 
     drSectorObj.thetaInit = thetaInit
     sTheta.reset()
@@ -259,12 +273,12 @@ def resetGlobal(event):
     drSectorObj.sector.tmin, drSectorObj.sector.tmax = np.deg2rad(theta)
     # update volHistMask  
     drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
-    drSectorObj.sector.FigObj.set_data(drSectorObj.volHistMask)
+    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)
     # update imaMask
     drSectorObj.imaMask = VolHist2ImaMapping(
         drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
         drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHandle.set_data(drSectorObj.imaMask)   
+    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)   
              
 
 #%%
@@ -279,7 +293,7 @@ bReset.on_clicked(resetGlobal)
 #%%
 """New stuff: Lasso (Experimental)"""
 # Lasso button
-lassoax = plt.axes([0.15, bottom-0.275, 0.1, 0.075])
+lassoax = plt.axes([0.15, bottom-0.275, 0.075, 0.075])
 bLasso  = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
 
 # define switch of Lasso option
@@ -323,21 +337,17 @@ def onselect(verts):
         drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
     OnSelectCounter +=1
     drSectorObj.volHistMask = updateArray(drSectorObj.volHistMask, ind)
-    drSectorObj.sector.FigObj.set_data(drSectorObj.volHistMask)    
+    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)    
     # update imaMask
     drSectorObj.imaMask = VolHist2ImaMapping(
         drSectorObj.invHistVolume[:,:,drSectorObj.sector.sliceNr],
         drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHandle.set_data(drSectorObj.imaMask) 
+    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask) 
 
     fig.canvas.draw_idle()
 
 bLasso.on_clicked(lassoSwitch)
 
-## does not work
-#LassoSelector(ax, onselect)
-## works
-#lasso = LassoSelector(ax, onselect)
 
 plt.show()
 #plt.close()

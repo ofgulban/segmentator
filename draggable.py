@@ -86,24 +86,24 @@ class DraggableSector:
                 self.sector.scale_r(1.05)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.volHistMask)
+                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
                 # update imaMask
                 self.imaMask = VolHist2ImaMapping(
                     self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
+                self.sector.imaMaskFigHand.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()  
             elif self.ctrlHeld == True: # ctrl yes
                 self.sector.rotate(10.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.volHistMask)
+                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
                 # update imaMask
                 self.imaMask = VolHist2ImaMapping(
                     self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
+                self.sector.imaMaskFigHand.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -115,24 +115,24 @@ class DraggableSector:
                 self.sector.scale_r(0.95)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.volHistMask)
+                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
                 # update imaMask
                 self.imaMask = VolHist2ImaMapping(
                     self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
+                self.sector.imaMaskFigHand.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw() 
             elif self.ctrlHeld == True: # ctrl yes
                 self.sector.rotate(-10.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
-                self.sector.FigObj.set_data(self.volHistMask)
+                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
                 # update imaMask
                 self.imaMask = VolHist2ImaMapping(
                     self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
+                self.sector.imaMaskFigHand.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -156,12 +156,12 @@ class DraggableSector:
         
         # update volHistMask  
         self.volHistMask = self.sector.binaryMask()
-        self.sector.FigObj.set_data(self.volHistMask)
+        self.sector.volHistMaskFigHand.set_data(self.volHistMask)
         # update imaMask
         self.imaMask = VolHist2ImaMapping(
             self.invHistVolume[:,:,self.sector.sliceNr],
             self.volHistMask)
-        self.sector.imaMaskFigHandle.set_data(self.imaMask)                
+        self.sector.imaMaskFigHand.set_data(self.imaMask)                
         # draw to canvas
         self.sector.figure.canvas.draw() 
 
