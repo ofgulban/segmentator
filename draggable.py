@@ -67,9 +67,11 @@ class DraggableSector:
             elif event.inaxes == self.sector.axes2:
                 print "Subplot 2: x and y pos"
                 print event.xdata, event.ydata
-                self.press = event.xdata, event.ydata
+                self.press = event.xdata + 0.5, event.ydata + 0.5
                 xvoxel = np.floor(event.xdata)
                 yvoxel = np.floor(event.ydata)
+                print "Subplot 2: x and y pos after flooring"
+                print xvoxel, yvoxel
                 # SWITCH x and y voxel to get linear index since NOT Cartes.!!!
                 pixelLin = self.invHistVolume[
                     yvoxel, xvoxel, self.sector.sliceNr]
@@ -78,7 +80,7 @@ class DraggableSector:
                 ypix = (pixelLin % self.sector.nrOfBins)
                 # SWITCH x and y for circle centre since back TO Cartesian!!!
                 self.sector.circle1 = plt.Circle(
-                    (ypix, xpix), radius=10, color='b')
+                    (ypix, xpix), radius=5, color='b')
                 self.sector.axes.add_artist(self.sector.circle1)
                 self.sector.figure.canvas.draw()
             else:

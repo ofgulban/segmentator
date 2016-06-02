@@ -96,7 +96,10 @@ imaMaskFigHand = ax2.imshow(imaMask,
                             interpolation='none',
                             alpha=0.5
                             )
-# plt.subplots_adjust(left=0.25, bottom=0.25)
+#ax2.set_xlim(0, orig.shape[0])
+#ax2.set_ylim(0, orig.shape[1])
+#ax2.xticks(x
+#ax2.yticks(x
 plt.axis('off')
 
 #%%
