@@ -68,7 +68,7 @@ class DraggableSector:
                 xvoxel = np.floor(event.xdata)
                 yvoxel = np.floor(event.ydata)
                 # SWITCH x and y voxel to get linear index since NOT Cartes.!!!
-                pixelLin = self.sector.invHistVolume[
+                pixelLin = self.invHistVolume[
                         yvoxel,xvoxel,self.sector.sliceNr]
                 # ind2sub        
                 xpix = (pixelLin / self.sector.nrOfBins)
@@ -88,22 +88,22 @@ class DraggableSector:
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
                 # update imaMask
-                self.mask = VolHist2ImaMapping(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
+                self.imaMask = VolHist2ImaMapping(
+                    self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
+                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()  
             elif self.ctrlHeld == True: # ctrl yes
-                self.sector.rotate(5.0)
+                self.sector.rotate(10.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
                 # update imaMask
-                self.mask = VolHist2ImaMapping(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
+                self.imaMask = VolHist2ImaMapping(
+                    self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
+                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -117,22 +117,22 @@ class DraggableSector:
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
                 # update imaMask
-                self.mask = VolHist2ImaMapping(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
+                self.imaMask = VolHist2ImaMapping(
+                    self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
+                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw() 
             elif self.ctrlHeld == True: # ctrl yes
-                self.sector.rotate(-5.0)
+                self.sector.rotate(-10.0)
                 # update volHistMask  
                 self.volHistMask = self.sector.binaryMask()
                 self.sector.FigObj.set_data(self.volHistMask)
                 # update imaMask
-                self.mask = VolHist2ImaMapping(
-                    self.sector.invHistVolume[:,:,self.sector.sliceNr],
+                self.imaMask = VolHist2ImaMapping(
+                    self.invHistVolume[:,:,self.sector.sliceNr],
                     self.volHistMask)
-                self.sector.brainMaskFigHandle.set_data(self.mask)                
+                self.sector.imaMaskFigHandle.set_data(self.imaMask)                
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -158,10 +158,10 @@ class DraggableSector:
         self.volHistMask = self.sector.binaryMask()
         self.sector.FigObj.set_data(self.volHistMask)
         # update imaMask
-        self.mask = VolHist2ImaMapping(
-            self.sector.invHistVolume[:,:,self.sector.sliceNr],
+        self.imaMask = VolHist2ImaMapping(
+            self.invHistVolume[:,:,self.sector.sliceNr],
             self.volHistMask)
-        self.sector.brainMaskFigHandle.set_data(self.mask)                
+        self.sector.imaMaskFigHandle.set_data(self.imaMask)                
         # draw to canvas
         self.sector.figure.canvas.draw() 
 

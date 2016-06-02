@@ -35,7 +35,6 @@ class sector_mask:
         self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
             self.y-self.cy)*(self.y-self.cy)
         self.theta = np.arctan2(self.x-self.cx,self.y-self.cy) - self.tmin
-    
         # wrap angles between 0 and 2*pi
         self.theta %= (2*np.pi)
         
@@ -46,19 +45,7 @@ class sector_mask:
         self.theta = np.arctan2(self.x-self.cx,self.y-self.cy) - self.tmin
         # wrap angles between 0 and 2*pi
         self.theta %= (2*np.pi)
-     
-# ONLY USED FOR RESET BUTTON, DELETE THIS FUNCTION?        
-    def update(self, shape, centre, radius, angle_range):
-        self.radius = radius
-        self.x,self.y = np.ogrid[:shape[0],:shape[1]]
-        self.cx,self.cy = centre
-        self.tmin,self.tmax = np.deg2rad(angle_range)
-        # ensure stop angle > start angle
-        if self.tmax < self.tmin: 
-            self.tmax += 2*np.pi
-        # update polar coordinates   
-        self.set_polCrd()
-         
+              
     def set_x(self,x):
         self.cx = x
         # update polar coordinates
@@ -68,6 +55,13 @@ class sector_mask:
         self.cy = y
         # update polar coordinates
         self.set_polCrd()
+        
+    def set_r(self,radius):
+        self.radius = radius
+           
+    def scale_r(self, scale):
+        self.radius = self.radius * scale
+        self.radius = self.radius * scale
         
     def rotate(self,degree):
         rad = np.deg2rad(degree)
@@ -85,26 +79,14 @@ class sector_mask:
         # ensure stop angle- 2*np.pi NOT > start angle
         if self.tmax - 2*np.pi >= self.tmin: 
             self.tmax -= 2*np.pi            
-            
-        print 'theta min:'
-        print np.rad2deg(self.tmin)
-        print 'theta max:'
-        print np.rad2deg(self.tmax)
-            
         # update polar coordinates
         self.set_polCrd()
            
-    def set_r(self,radius):
-        self.radius = radius
-           
-    def scale_r(self, scale):
-        self.radius = self.radius * scale
-        self.radius = self.radius * scale
+
         
 
     """
     Define function that returns a boolean mask for a circular sector. 
-    The start/stop angles in `angle_range` should be given in clockwise order.
     """    
     def binaryMask(self):
         # circular mask
@@ -133,6 +115,5 @@ class sector_mask:
         FigObj = ax.imshow(BinMask, cmap=cmap, alpha=alpha, vmin=vmin,
                         interpolation=interpolation,origin=origin,
                         extent=extent)
-        self.FigObj = FigObj
         return (FigObj, BinMask)
                          
