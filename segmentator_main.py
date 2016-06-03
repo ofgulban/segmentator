@@ -28,7 +28,7 @@ from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, VolHist2ImaMapping
 from draggable import DraggableSector
 
-#%%
+#
 """Load Data"""
 #
 nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/P06_T1w_divPD_IIHC_v16.nii')
@@ -56,7 +56,7 @@ gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
 
-#%%
+
 #
 """Plots"""
 # Set up a colormap:
@@ -91,18 +91,11 @@ slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  interpolation='none'
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
-imaMaskFigHand = ax2.imshow(imaMask,
-                            cmap=palette, vmin=0.1,
-                            interpolation='none',
-                            alpha=0.5
-                            )
-#ax2.set_xlim(0, orig.shape[0])
-#ax2.set_ylim(0, orig.shape[1])
-#ax2.xticks(x
-#ax2.yticks(x
+imaMaskHandle = ax2.imshow(imaMask, cmap=palette, vmin=0.1,
+                           interpolation='none', alpha=0.5)
 plt.axis('off')
 
-#%%
+
 #
 """Initialisation"""
 # create first instance of sector mask
@@ -113,7 +106,7 @@ theta = (0, 360)
 sectorObj = sector_mask(shape, centre, radius, theta)
 
 # draw sector mask for the first time
-volHistMaskFigHand, volHistMask = sectorObj.draw(
+volHistMaskHandle, volHistMask = sectorObj.draw(
     ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
     origin='lower', extent=[percDataMin, percDataMax, gra.min(), percDataMax])
 
@@ -123,8 +116,8 @@ sectorObj.axes = ax.axes
 sectorObj.axes2 = ax2.axes
 sectorObj.nrOfBins = len(binVals)
 sectorObj.sliceNr = int(0.5*orig.shape[2])
-sectorObj.imaMaskFigHand = imaMaskFigHand
-sectorObj.volHistMaskFigHand = volHistMaskFigHand
+sectorObj.imaMaskHandle = imaMaskHandle
+sectorObj.volHistMaskHandle = volHistMaskHandle
 
 # make sector draggable object, pass on properties
 drSectorObj = DraggableSector(sectorObj)
@@ -134,8 +127,7 @@ drSectorObj.imaMask = imaMask
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binVals)
 drSectorObj.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
-
-#%%
+#
 """Sliders"""
 # colorbar slider
 axcolor = 'lightgoldenrodyellow'
@@ -158,12 +150,9 @@ def updateImaBrowser(val):
     drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
     slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
-
-    # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(
-        drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
-        drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
+    # update
+    drSectorObj.update()
+    # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
 # theta slider
@@ -176,23 +165,17 @@ sTheta = Slider(aTheta, 'Theta', 0, 359.99, valinit=thetaInit, valfmt='%0.1f')
 def updateTheta(val):
     # get current theta value from slider
     thetaVal = sTheta.val
-    # update mouth of sector mask
+    # update mouth of sector mask by difference
     diff = thetaVal-drSectorObj.thetaInit
     drSectorObj.sector.mouthChange(diff)
     # adjust thetaInit
     drSectorObj.thetaInit = thetaVal
-    # update volHistMask
-    drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
-    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)
-    # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(
-        drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
-        drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
+    # update
+    drSectorObj.update()
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
-#%%
+
 """Buttons"""
 # cycle button
 cycleax = plt.axes([0.6, bottom-0.275, 0.075, 0.075])
@@ -200,7 +183,7 @@ bCycle = Button(cycleax, 'Cycle\nView',
                 color=axcolor, hovercolor='0.975')
 cycleCount = 0
 
-  
+
 def cycleView(event):
     global orig, cycleCount
     cycleCount = (cycleCount+1) % 3
@@ -212,13 +195,10 @@ def cycleView(event):
     # plot new data
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
     slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
-    # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(
-        drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
-        drSectorObj.volHistMask)
-    # plot new imaMask
-    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
-    drSectorObj.sector.imaMaskFigHand.set_extent(
+    # update
+    drSectorObj.update()
+    # set extent
+    drSectorObj.sector.imaMaskHandle.set_extent(
         (0, drSectorObj.imaMask.shape[1]-1,
          drSectorObj.imaMask.shape[0]-1, 0))
     # draw to canvas
@@ -278,17 +258,15 @@ def resetGlobal(event):
     drSectorObj.sector.set_y(centre[1])
     drSectorObj.sector.set_r(radius)
     drSectorObj.sector.tmin, drSectorObj.sector.tmax = np.deg2rad(theta)
-    # update volHistMask
-    drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
-    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)
-    # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(
-        drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
-        drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
+    # update
+    drSectorObj.update()
+    drSectorObj.sector.imaMaskHandle.set_extent(
+        (0, drSectorObj.imaMask.shape[1]-1,
+         drSectorObj.imaMask.shape[0]-1, 0))
+    # draw to canvas
+    drSectorObj.sector.figure.canvas.draw()
 
-
-#%%
+#
 """Updates"""
 sHistC.on_changed(updateColorBar)
 sSliceNr.on_changed(updateImaBrowser)
@@ -297,7 +275,7 @@ bCycle.on_clicked(cycleView)
 bExport.on_clicked(exportNifti)
 bReset.on_clicked(resetGlobal)
 
-#%%
+#
 """New stuff: Lasso (Experimental)"""
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.275, 0.075, 0.075])
@@ -305,6 +283,8 @@ bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
 
 # define switch for Lasso option
 switchCounter = 1
+
+
 def lassoSwitch(event):
     global lasso, switchCounter, OnSelectCounter
     lasso = []
@@ -334,6 +314,8 @@ def updateArray(array, indices):
     return newArray.reshape(array.shape)
 
 OnSelectCounter = 0
+
+
 def onselect(verts):
     global pix, OnSelectCounter
     p = path.Path(verts)
@@ -343,12 +325,12 @@ def onselect(verts):
         drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
     OnSelectCounter += 1
     drSectorObj.volHistMask = updateArray(drSectorObj.volHistMask, ind)
-    drSectorObj.sector.volHistMaskFigHand.set_data(drSectorObj.volHistMask)
+    drSectorObj.sector.volHistMaskHandle.set_data(drSectorObj.volHistMask)
     # update imaMask
     drSectorObj.imaMask = VolHist2ImaMapping(
         drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
         drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskFigHand.set_data(drSectorObj.imaMask)
+    drSectorObj.sector.imaMaskHandle.set_data(drSectorObj.imaMask)
     fig.canvas.draw_idle()
 
 bLasso.on_clicked(lassoSwitch)

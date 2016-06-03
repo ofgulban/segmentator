@@ -28,6 +28,16 @@ class DraggableSector:
         self.press = None
         self.ctrlHeld = False
 
+    def update(self):  # determine what should happen during an update
+        # update volHistMask
+        self.volHistMask = self.sector.binaryMask()
+        self.sector.volHistMaskHandle.set_data(self.volHistMask)
+        # update imaMask
+        self.imaMask = VolHist2ImaMapping(
+            self.invHistVolume[:, :, self.sector.sliceNr],
+            self.volHistMask)
+        self.sector.imaMaskHandle.set_data(self.imaMask)
+
     def connect(self):  # this will make the object responsive
         'connect to all the events we need'
         self.cidpress = self.sector.figure.canvas.mpl_connect(
@@ -92,26 +102,14 @@ class DraggableSector:
                 return
             if self.ctrlHeld is False:  # ctrl no
                 self.sector.scale_r(1.05)
-                # update volHistMask
-                self.volHistMask = self.sector.binaryMask()
-                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
-                # update imaMask
-                self.imaMask = VolHist2ImaMapping(
-                    self.invHistVolume[:, :, self.sector.sliceNr],
-                    self.volHistMask)
-                self.sector.imaMaskFigHand.set_data(self.imaMask)
+                # update
+                self.update()
                 # draw to canvas
                 self.sector.figure.canvas.draw()
             elif self.ctrlHeld is True:  # ctrl yes
                 self.sector.rotate(10.0)
-                # update volHistMask
-                self.volHistMask = self.sector.binaryMask()
-                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
-                # update imaMask
-                self.imaMask = VolHist2ImaMapping(
-                    self.invHistVolume[:, :, self.sector.sliceNr],
-                    self.volHistMask)
-                self.sector.imaMaskFigHand.set_data(self.imaMask)
+                # update
+                self.update()
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -121,26 +119,14 @@ class DraggableSector:
                 return
             if self.ctrlHeld is False:  # ctrl no
                 self.sector.scale_r(0.95)
-                # update volHistMask
-                self.volHistMask = self.sector.binaryMask()
-                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
-                # update imaMask
-                self.imaMask = VolHist2ImaMapping(
-                    self.invHistVolume[:, :, self.sector.sliceNr],
-                    self.volHistMask)
-                self.sector.imaMaskFigHand.set_data(self.imaMask)
+                # update
+                self.update()
                 # draw to canvas
                 self.sector.figure.canvas.draw()
             elif self.ctrlHeld is True:  # ctrl yes
                 self.sector.rotate(-10.0)
-                # update volHistMask
-                self.volHistMask = self.sector.binaryMask()
-                self.sector.volHistMaskFigHand.set_data(self.volHistMask)
-                # update imaMask
-                self.imaMask = VolHist2ImaMapping(
-                    self.invHistVolume[:, :, self.sector.sliceNr],
-                    self.volHistMask)
-                self.sector.imaMaskFigHand.set_data(self.imaMask)
+                # update
+                self.update()
                 # draw to canvas
                 self.sector.figure.canvas.draw()
 
@@ -162,14 +148,8 @@ class DraggableSector:
         self.sector.set_x(x0+dx)
         self.sector.set_y(y0+dy)
 
-        # update volHistMask
-        self.volHistMask = self.sector.binaryMask()
-        self.sector.volHistMaskFigHand.set_data(self.volHistMask)
-        # update imaMask
-        self.imaMask = VolHist2ImaMapping(
-            self.invHistVolume[:, :, self.sector.sliceNr],
-            self.volHistMask)
-        self.sector.imaMaskFigHand.set_data(self.imaMask)
+        # update
+        self.update()
         # draw to canvas
         self.sector.figure.canvas.draw()
 
