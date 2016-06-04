@@ -77,7 +77,7 @@ class DraggableSector:
             elif event.inaxes == self.sector.axes2:
                 print "Subplot 2: x and y pos"
                 print event.xdata, event.ydata
-                self.press = event.xdata + 0.5, event.ydata + 0.5
+                self.press = event.xdata, event.ydata
                 xvoxel = np.floor(event.xdata)
                 yvoxel = np.floor(event.ydata)
                 print "Subplot 2: x and y pos after flooring"

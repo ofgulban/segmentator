@@ -31,7 +31,7 @@ from draggable import DraggableSector
 #
 """Load Data"""
 #
-nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/P06_T1w_divPD_IIHC_v16.nii')
+nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
 
 #
 """Data Processing"""
@@ -68,8 +68,8 @@ palette.set_bad('m', 1.0)
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-nrBins = int(percDataMax - dataMin + 2)  # TODO: variable name fix
 binVals = np.arange(dataMin, percDataMax)
+nrBins = len(binVals)
 _, xedges, yedges, _ = plt.hist2d(ima, gra,
                                   bins=binVals,
                                   norm=LogNorm(vmax=10000),
@@ -88,11 +88,11 @@ plt.title("2D Histogram")
 ax2 = fig.add_subplot(122)
 slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  cmap=plt.cm.gray, vmin=ima.min(), vmax=ima.max(),
-                 interpolation='none'
+                 interpolation='none', extent=[0, orig.shape[1], orig.shape[0], 0]
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 imaMaskHandle = ax2.imshow(imaMask, cmap=palette, vmin=0.1,
-                           interpolation='none', alpha=0.5)
+                           interpolation='none', alpha=0.5, extent=[0, orig.shape[1], orig.shape[0], 0])
 plt.axis('off')
 
 
@@ -118,6 +118,7 @@ sectorObj.nrOfBins = len(binVals)
 sectorObj.sliceNr = int(0.5*orig.shape[2])
 sectorObj.imaMaskHandle = imaMaskHandle
 sectorObj.volHistMaskHandle = volHistMaskHandle
+sectorObj.origShape = orig.shape
 
 # make sector draggable object, pass on properties
 drSectorObj = DraggableSector(sectorObj)
@@ -149,9 +150,13 @@ def updateImaBrowser(val):
     # Scale slider value [0,1) to dimension index to allow variation in shape
     drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
-    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
+    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # update
     drSectorObj.update()
+    # set extent
+    drSectorObj.sector.imaMaskHandle.set_extent(
+        (0, drSectorObj.imaMask.shape[1],
+         drSectorObj.imaMask.shape[0], 0))
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
@@ -181,9 +186,9 @@ def updateTheta(val):
 cycleax = plt.axes([0.6, bottom-0.275, 0.075, 0.075])
 bCycle = Button(cycleax, 'Cycle\nView',
                 color=axcolor, hovercolor='0.975')
+
+
 cycleCount = 0
-
-
 def cycleView(event):
     global orig, cycleCount
     cycleCount = (cycleCount+1) % 3
@@ -194,13 +199,13 @@ def cycleView(event):
         drSectorObj.invHistVolume, (2, 0, 1))
     # plot new data
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
-    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
+    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # update
     drSectorObj.update()
     # set extent
     drSectorObj.sector.imaMaskHandle.set_extent(
-        (0, drSectorObj.imaMask.shape[1]-1,
-         drSectorObj.imaMask.shape[0]-1, 0))
+        (0, drSectorObj.imaMask.shape[1],
+         drSectorObj.imaMask.shape[0], 0))
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
@@ -249,7 +254,7 @@ def resetGlobal(event):
     # reset slice number
     drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
-    slc.set_extent((0, orig.shape[1]-1, orig.shape[0]-1, 0))
+    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # reset theta
     drSectorObj.thetaInit = thetaInit
     sTheta.reset()
@@ -261,8 +266,8 @@ def resetGlobal(event):
     # update
     drSectorObj.update()
     drSectorObj.sector.imaMaskHandle.set_extent(
-        (0, drSectorObj.imaMask.shape[1]-1,
-         drSectorObj.imaMask.shape[0]-1, 0))
+        (0, drSectorObj.imaMask.shape[1],
+         drSectorObj.imaMask.shape[0], 0))
     # draw to canvas
     drSectorObj.sector.figure.canvas.draw()
 
@@ -281,10 +286,9 @@ bReset.on_clicked(resetGlobal)
 lassoax = plt.axes([0.15, bottom-0.275, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
 
+
 # define switch for Lasso option
 switchCounter = 1
-
-
 def lassoSwitch(event):
     global lasso, switchCounter, OnSelectCounter
     lasso = []
@@ -313,9 +317,8 @@ def updateArray(array, indices):
     newArray[lin[indices]] = 1
     return newArray.reshape(array.shape)
 
+
 OnSelectCounter = 0
-
-
 def onselect(verts):
     global pix, OnSelectCounter
     p = path.Path(verts)
