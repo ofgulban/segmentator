@@ -88,11 +88,13 @@ plt.title("2D Histogram")
 ax2 = fig.add_subplot(122)
 slc = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
                  cmap=plt.cm.gray, vmin=ima.min(), vmax=ima.max(),
-                 interpolation='none', extent=[0, orig.shape[1], orig.shape[0], 0]
+                 interpolation='none', extent=[0, orig.shape[1],
+                                               orig.shape[0], 0]
                  )
 imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 imaMaskHandle = ax2.imshow(imaMask, cmap=palette, vmin=0.1,
-                           interpolation='none', alpha=0.5, extent=[0, orig.shape[1], orig.shape[0], 0])
+                           interpolation='none', alpha=0.5,
+                           extent=[0, orig.shape[1], orig.shape[0], 0])
 plt.axis('off')
 
 
