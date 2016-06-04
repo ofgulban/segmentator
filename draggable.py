@@ -80,8 +80,6 @@ class DraggableSector:
                 self.press = event.xdata, event.ydata
                 xvoxel = np.floor(event.xdata)
                 yvoxel = np.floor(event.ydata)
-                print "Subplot 2: x and y pos after flooring"
-                print xvoxel, yvoxel
                 # SWITCH x and y voxel to get linear index since NOT Cartes.!!!
                 pixelLin = self.invHistVolume[
                     yvoxel, xvoxel, self.sector.sliceNr]
