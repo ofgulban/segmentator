@@ -66,7 +66,7 @@ palette.set_bad('m', 1.0)
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-nrBins = int(percDataMax - dataMin + 2)  # TODO: variable name fix
+nrBins = int(percDataMax - dataMin + 1)
 binVals = np.arange(dataMin, percDataMax)
 _, xedges, yedges, _ = plt.hist2d(ima, gra,
                                   bins=binVals,
