@@ -110,7 +110,7 @@ sectorObj = sector_mask(shape, centre, radius, theta)
 # draw sector mask for the first time
 volHistMaskHandle, volHistMask = sectorObj.draw(
     ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
-    origin='lower', extent=[percDataMin, percDataMax, gra.min(), percDataMax])
+    origin='lower', extent=[dataMin, percDataMax, gra.min(), percDataMax])
 
 # pass on some properties to sector object
 sectorObj.figure = ax.figure
