@@ -53,4 +53,4 @@ To be continued...
 
 ## License
 
-The project is licensed under [GNU GENERAL PUBLIC LICENSE Version 3](http://www.gnu.org/licenses/).
+The project is licensed under [GNU Geneal Public License Version 3](http://www.gnu.org/licenses/gpl.html).
