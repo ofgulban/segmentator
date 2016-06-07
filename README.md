@@ -3,7 +3,7 @@ Segmentator is an open-source package for multi-dimensional data exploration and
 
 The goal is to provide a complementary tool to the already available tissue segmentation methods (to the best of our knowledge) in other softwares (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap).
 
-This application is based the following work:
+This application is based on the following work:
 
 * Kindlmann, G., & Durkin, J. W. (1998). Semi-automatic generation of transfer functions for direct volume rendering. In Proceedings of the 1998 IEEE symposium on Volume visualization - VVS ’98 (pp. 79–86). New York, New York, USA: ACM Press. http://doi.org/10.1145/288126.288167
 
@@ -37,19 +37,15 @@ then open a terminal, navigate to Segmentator's folder (for instance: `cd /home/
 python segmentator_main.py
 ```
 
-You should see something like this soon after:
+You should see a window appearing soon after. Try manipulating the sliders and even directly drawing on the 2D Histogram:
 
-![image_test](images/image_test.png)
+![demo](images/animated.gif)
 
-To be continued...
 
 ## Support
 
-(WIP)
+Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for bug reports and feature requests.
 
-## Contribute
-
-(WIP)
 
 ## License
 
