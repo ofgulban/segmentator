@@ -31,8 +31,8 @@ from draggable import DraggableSector
 #
 """Load Data"""
 #
-#nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
-nii = load('/home/marian/Documents/Testing/20151130_02_seg_v30.nii.gz')
+nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
+
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
