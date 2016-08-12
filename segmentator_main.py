@@ -31,8 +31,8 @@ from draggable import DraggableSector
 #
 """Load Data"""
 #
-nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
-
+#nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
+nii = load('/home/marian/Documents/Testing/20151130_02_seg_v30.nii.gz')
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
@@ -199,6 +199,8 @@ def cycleView(event):
     # transpose ima2volHistMap
     drSectorObj.invHistVolume = np.transpose(
         drSectorObj.invHistVolume, (2, 0, 1))
+    # update slice number
+    drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
     # plot new data
     slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
     slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
