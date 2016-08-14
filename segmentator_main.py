@@ -20,13 +20,14 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-from nibabel import load, save, Nifti1Image
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
+from nibabel import load
+from segmentator_functions import MakeFigureInteractive
 from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, VolHist2ImaMapping
-from draggable import DraggableSector
+import config as cfg
 
 #
 """Load Data"""
@@ -109,11 +110,8 @@ plt.axis('off')
 #
 """Initialisation"""
 # create first instance of sector mask
-shape = (nrBins, nrBins)
-centre = (0, 0)
-radius = 200
-theta = (0, 360)
-sectorObj = sector_mask(shape, centre, radius, theta)
+sectorObj = sector_mask((nrBins, nrBins), cfg.init_centre,
+                        cfg.init_radius, cfg.init_theta)
 
 # draw sector mask for the first time
 volHistMaskHandle, volHistMask = sectorObj.draw(
@@ -122,175 +120,65 @@ volHistMaskHandle, volHistMask = sectorObj.draw(
 
 
 # initiate a flexible figure object, pass to it usefull properties
-flexFig = DraggableSector(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
-                          sliceNr=int(0.5*orig.shape[2]),
-                          sectorObj=sectorObj,
-                          origShape=orig.shape,
-                          nrOfBins=nrBins,
-                          imaMask=imaMask,
-                          imaMaskHandle=imaMaskHandle,
-                          volHistMask=volHistMask,
-                          volHistMaskHandle=volHistMaskHandle,
-                          contains=volHistMaskHandle.contains)
+flexFig = MakeFigureInteractive(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
+                                orig=orig,
+                                nii=nii,
+                                sectorObj=sectorObj,
+                                nrOfBins=nrBins,
+                                sliceNr=int(0.5*orig.shape[2]),
+                                slc=slc,
+                                imaMask=imaMask,
+                                imaMaskHandle=imaMaskHandle,
+                                volHistMask=volHistMask,
+                                volHistMaskHandle=volHistMaskHandle,
+                                contains=volHistMaskHandle.contains)
 
-# make sector draggable object, pass on properties
+# make the figure responsive to clicks
 flexFig.connect()
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 #
-"""Sliders"""
+"""Sliders and Buttons"""
 # colorbar slider
 axcolor = 'lightgoldenrodyellow'
 axHistC = plt.axes([0.15, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
-sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
-
-
-def updateColorBar(val):
-    # update slider for scaling log colorbar in 2D hist
-    histVMax = np.power(10, sHistC.val)
-    plt.clim(vmax=histVMax)
+flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
 
 # ima browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
-sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5, valfmt='%0.3f')
-
-
-def updateImaBrowser(val):
-    # Scale slider value [0,1) to dimension index to allow variation in shape
-    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
-    slc.set_data(orig[:, :, flexFig.sliceNr])
-    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
-    # update
-    flexFig.update()
-    # set extent
-    flexFig.imaMaskHandle.set_extent(
-        (0, flexFig.imaMask.shape[1],
-         flexFig.imaMask.shape[0], 0))
-    # draw to canvas
-    flexFig.figure.canvas.draw()
+flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
+                          valfmt='%0.3f')
 
 # theta slider
 aTheta = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
-thetaInit = 0
-flexFig.thetaInit = thetaInit
-sTheta = Slider(aTheta, 'Theta', 0, 359.99, valinit=thetaInit, valfmt='%0.1f')
+flexFig.thetaInit = 0
+flexFig.sTheta = Slider(aTheta, 'Theta', 0, 359.99,
+                        valinit=flexFig.thetaInit, valfmt='%0.1f')
 
-
-def updateTheta(val):
-    # get current theta value from slider
-    thetaVal = sTheta.val
-    # update mouth of sector mask by difference
-    diff = thetaVal-flexFig.thetaInit
-    flexFig.sectorObj.mouthChange(diff)
-    # adjust thetaInit
-    flexFig.thetaInit = thetaVal
-    # update
-    flexFig.update()
-    # draw to canvas
-    flexFig.figure.canvas.draw()
-
-
-"""Buttons"""
 # cycle button
 cycleax = plt.axes([0.6, bottom-0.275, 0.075, 0.075])
-bCycle = Button(cycleax, 'Cycle\nView',
-                color=axcolor, hovercolor='0.975')
-
-
-cycleCount = 0
-def cycleView(event):
-    global orig, cycleCount
-    cycleCount = (cycleCount+1) % 3
-    # transpose data
-    orig = np.transpose(orig, (2, 0, 1))
-    # transpose ima2volHistMap
-    flexFig.invHistVolume = np.transpose(
-        flexFig.invHistVolume, (2, 0, 1))
-    # update slice number
-    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
-    # plot new data
-    slc.set_data(orig[:, :, flexFig.sliceNr])
-    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
-    # update
-    flexFig.update()
-    # set extent
-    flexFig.imaMaskHandle.set_extent(
-        (0, flexFig.imaMask.shape[1],
-         flexFig.imaMask.shape[0], 0))
-    # draw to canvas
-    flexFig.figure.canvas.draw()
-
+flexFig.bCycle = Button(cycleax, 'Cycle\nView',
+                        color=axcolor, hovercolor='0.975')
+flexFig.cycleCount = 0
 
 # export button
 exportax = plt.axes([0.8, bottom-0.275, 0.075, 0.075])
-bExport = Button(exportax, 'Export\nNifti',
-                 color=axcolor, hovercolor='0.975')
-
-
-def exportNifti(event):
-    global cycleCount, orig
-    # put the permuted indices back to their original format
-    cycBackPerm = (cycleCount, (cycleCount+1) % 3, (cycleCount+2) % 3)
-    orig = np.transpose(orig, cycBackPerm)
-    flexFig.invHistVolume = np.transpose(flexFig.invHistVolume,
-                                             cycBackPerm)
-    cycleCount = 0
-    # get linear indices
-    linIndices = np.arange(0, nrBins*nrBins)
-    idxMask = linIndices[flexFig.volHistMask.flatten()]
-    # return logical array with length equal to nr of voxels
-    voxMask = np.in1d(flexFig.invHistVolume.flatten(), idxMask)
-    # reset mask and apply logical indexing
-    mask3D = np.zeros(flexFig.invHistVolume.flatten().shape)
-    mask3D[voxMask] = 1
-    mask3D = mask3D.reshape(flexFig.invHistVolume.shape)
-    # save image, check whether nii or nii.gz
-    new_image = Nifti1Image(
-        mask3D, header=nii.get_header(), affine=nii.get_affine())
-    if nii.get_filename()[-4:] == '.nii':
-        save(new_image, nii.get_filename()[:-4]+'_OUT.nii.gz')
-    elif nii.get_filename()[-7:] == '.nii.gz':
-        save(new_image, nii.get_filename()[:-7]+'_OUT.nii.gz')
+flexFig.bExport = Button(exportax, 'Export\nNifti',
+                         color=axcolor, hovercolor='0.975')
 
 # reset button
 resetax = plt.axes([0.7, bottom-0.275, 0.075, 0.075])
-bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
-
-
-def resetGlobal(event):
-    # reset color bar
-    sHistC.reset()
-    # reset ima browser slider
-    sSliceNr.reset()
-    # reset slice number
-    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
-    slc.set_data(orig[:, :, flexFig.sliceNr])
-    slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
-    # reset theta
-    flexFig.thetaInit = thetaInit
-    sTheta.reset()
-    # reset values for mask
-    flexFig.set_x(centre[0])
-    flexFig.set_y(centre[1])
-    flexFig.set_r(radius)
-    flexFig.tmin, flexFig.tmax = np.deg2rad(theta)
-    # update
-    flexFig.update()
-    flexFig.imaMaskHandle.set_extent(
-        (0, flexFig.imaMask.shape[1],
-         flexFig.imaMask.shape[0], 0))
-    # draw to canvas
-    flexFig.figure.canvas.draw()
+flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
 #
 """Updates"""
-sHistC.on_changed(updateColorBar)
-sSliceNr.on_changed(updateImaBrowser)
-sTheta.on_changed(updateTheta)
-bCycle.on_clicked(cycleView)
-bExport.on_clicked(exportNifti)
-bReset.on_clicked(resetGlobal)
+flexFig.sHistC.on_changed(flexFig.updateColorBar)
+flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
+flexFig.sTheta.on_changed(flexFig.updateTheta)
+flexFig.bCycle.on_clicked(flexFig.cycleView)
+flexFig.bExport.on_clicked(flexFig.exportNifti)
+flexFig.bReset.on_clicked(flexFig.resetGlobal)
 
 #
 """New stuff: Lasso (Experimental)"""
@@ -337,7 +225,7 @@ def onselect(verts):
     ind = p.contains_points(pix, radius=1.5)
     # update volHistMask
     if OnSelectCounter == 0:
-        flexFig.volHistMask = flexFig.binaryMask()
+        flexFig.volHistMask = flexFig.sectorObj.binaryMask()
     OnSelectCounter += 1
     flexFig.volHistMask = updateArray(flexFig.volHistMask, ind)
     flexFig.volHistMaskHandle.set_data(flexFig.volHistMask)
@@ -352,4 +240,3 @@ bLasso.on_clicked(lassoSwitch)
 
 
 plt.show()
-

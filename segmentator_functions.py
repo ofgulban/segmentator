@@ -21,10 +21,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import VolHist2ImaMapping
 from nibabel import save, Nifti1Image
-import config
+import config as cfg
 
 
-class DraggableSector:
+class MakeFigureInteractive:
     def __init__(self, **kwargs):
         self.press = None
         self.ctrlHeld = False
@@ -258,11 +258,11 @@ class DraggableSector:
         # reset theta
         self.sTheta.reset()
         # reset values for mask
-        self.sectorObj.set_x(config.init_centre[0])
-        self.sectorObj.set_y(config.init_centre[1])
-        self.sectorObj.set_r(config.init_radius)
+        self.sectorObj.set_x(cfg.init_centre[0])
+        self.sectorObj.set_y(cfg.init_centre[1])
+        self.sectorObj.set_r(cfg.init_radius)
         self.sectorObj.tmin, self.sectorObj.tmax = np.deg2rad(
-            config.init_theta)
+            cfg.init_theta)
         # update
         self.update()
         self.imaMaskHandle.set_extent((0, self.imaMask.shape[1],
