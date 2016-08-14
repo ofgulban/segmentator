@@ -120,23 +120,23 @@ volHistMaskHandle, volHistMask = sectorObj.draw(
     ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
     origin='lower', extent=[dataMin, percDataMax, gra.min(), percDataMax])
 
-# pass on some properties to sector object
-sectorObj.figure = ax.figure
-sectorObj.axes = ax.axes
-sectorObj.axes2 = ax2.axes
-sectorObj.nrOfBins = nrBins
-sectorObj.sliceNr = int(0.5*orig.shape[2])
-sectorObj.imaMaskHandle = imaMaskHandle
-sectorObj.volHistMaskHandle = volHistMaskHandle
-sectorObj.origShape = orig.shape
+
+# initiate a flexible figure object, pass to it usefull properties
+flexFig = DraggableSector(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
+                          sliceNr=int(0.5*orig.shape[2]),
+                          sectorObj=sectorObj,
+                          origShape=orig.shape,
+                          nrOfBins=nrBins,
+                          imaMask=imaMask,
+                          imaMaskHandle=imaMaskHandle,
+                          volHistMask=volHistMask,
+                          volHistMaskHandle=volHistMaskHandle,
+                          contains=volHistMaskHandle.contains)
 
 # make sector draggable object, pass on properties
-drSectorObj = DraggableSector(sectorObj)
-drSectorObj.connect()
-drSectorObj.volHistMask = volHistMask
-drSectorObj.imaMask = imaMask
+flexFig.connect()
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
-drSectorObj.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
+flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 #
 """Sliders"""
@@ -158,22 +158,22 @@ sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5, valfmt='%0.3f')
 
 def updateImaBrowser(val):
     # Scale slider value [0,1) to dimension index to allow variation in shape
-    drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
-    slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
+    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
+    slc.set_data(orig[:, :, flexFig.sliceNr])
     slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # update
-    drSectorObj.update()
+    flexFig.update()
     # set extent
-    drSectorObj.sector.imaMaskHandle.set_extent(
-        (0, drSectorObj.imaMask.shape[1],
-         drSectorObj.imaMask.shape[0], 0))
+    flexFig.imaMaskHandle.set_extent(
+        (0, flexFig.imaMask.shape[1],
+         flexFig.imaMask.shape[0], 0))
     # draw to canvas
-    drSectorObj.sector.figure.canvas.draw()
+    flexFig.figure.canvas.draw()
 
 # theta slider
 aTheta = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
 thetaInit = 0
-drSectorObj.thetaInit = thetaInit
+flexFig.thetaInit = thetaInit
 sTheta = Slider(aTheta, 'Theta', 0, 359.99, valinit=thetaInit, valfmt='%0.1f')
 
 
@@ -181,14 +181,14 @@ def updateTheta(val):
     # get current theta value from slider
     thetaVal = sTheta.val
     # update mouth of sector mask by difference
-    diff = thetaVal-drSectorObj.thetaInit
-    drSectorObj.sector.mouthChange(diff)
+    diff = thetaVal-flexFig.thetaInit
+    flexFig.sectorObj.mouthChange(diff)
     # adjust thetaInit
-    drSectorObj.thetaInit = thetaVal
+    flexFig.thetaInit = thetaVal
     # update
-    drSectorObj.update()
+    flexFig.update()
     # draw to canvas
-    drSectorObj.sector.figure.canvas.draw()
+    flexFig.figure.canvas.draw()
 
 
 """Buttons"""
@@ -205,21 +205,21 @@ def cycleView(event):
     # transpose data
     orig = np.transpose(orig, (2, 0, 1))
     # transpose ima2volHistMap
-    drSectorObj.invHistVolume = np.transpose(
-        drSectorObj.invHistVolume, (2, 0, 1))
+    flexFig.invHistVolume = np.transpose(
+        flexFig.invHistVolume, (2, 0, 1))
     # update slice number
-    drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
+    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
     # plot new data
-    slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
+    slc.set_data(orig[:, :, flexFig.sliceNr])
     slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # update
-    drSectorObj.update()
+    flexFig.update()
     # set extent
-    drSectorObj.sector.imaMaskHandle.set_extent(
-        (0, drSectorObj.imaMask.shape[1],
-         drSectorObj.imaMask.shape[0], 0))
+    flexFig.imaMaskHandle.set_extent(
+        (0, flexFig.imaMask.shape[1],
+         flexFig.imaMask.shape[0], 0))
     # draw to canvas
-    drSectorObj.sector.figure.canvas.draw()
+    flexFig.figure.canvas.draw()
 
 
 # export button
@@ -233,18 +233,18 @@ def exportNifti(event):
     # put the permuted indices back to their original format
     cycBackPerm = (cycleCount, (cycleCount+1) % 3, (cycleCount+2) % 3)
     orig = np.transpose(orig, cycBackPerm)
-    drSectorObj.invHistVolume = np.transpose(drSectorObj.invHistVolume,
+    flexFig.invHistVolume = np.transpose(flexFig.invHistVolume,
                                              cycBackPerm)
     cycleCount = 0
     # get linear indices
     linIndices = np.arange(0, nrBins*nrBins)
-    idxMask = linIndices[drSectorObj.volHistMask.flatten()]
+    idxMask = linIndices[flexFig.volHistMask.flatten()]
     # return logical array with length equal to nr of voxels
-    voxMask = np.in1d(drSectorObj.invHistVolume.flatten(), idxMask)
+    voxMask = np.in1d(flexFig.invHistVolume.flatten(), idxMask)
     # reset mask and apply logical indexing
-    mask3D = np.zeros(drSectorObj.invHistVolume.flatten().shape)
+    mask3D = np.zeros(flexFig.invHistVolume.flatten().shape)
     mask3D[voxMask] = 1
-    mask3D = mask3D.reshape(drSectorObj.invHistVolume.shape)
+    mask3D = mask3D.reshape(flexFig.invHistVolume.shape)
     # save image, check whether nii or nii.gz
     new_image = Nifti1Image(
         mask3D, header=nii.get_header(), affine=nii.get_affine())
@@ -264,24 +264,24 @@ def resetGlobal(event):
     # reset ima browser slider
     sSliceNr.reset()
     # reset slice number
-    drSectorObj.sector.sliceNr = int(sSliceNr.val*orig.shape[2])
-    slc.set_data(orig[:, :, drSectorObj.sector.sliceNr])
+    flexFig.sliceNr = int(sSliceNr.val*orig.shape[2])
+    slc.set_data(orig[:, :, flexFig.sliceNr])
     slc.set_extent((0, orig.shape[1], orig.shape[0], 0))
     # reset theta
-    drSectorObj.thetaInit = thetaInit
+    flexFig.thetaInit = thetaInit
     sTheta.reset()
     # reset values for mask
-    drSectorObj.sector.set_x(centre[0])
-    drSectorObj.sector.set_y(centre[1])
-    drSectorObj.sector.set_r(radius)
-    drSectorObj.sector.tmin, drSectorObj.sector.tmax = np.deg2rad(theta)
+    flexFig.set_x(centre[0])
+    flexFig.set_y(centre[1])
+    flexFig.set_r(radius)
+    flexFig.tmin, flexFig.tmax = np.deg2rad(theta)
     # update
-    drSectorObj.update()
-    drSectorObj.sector.imaMaskHandle.set_extent(
-        (0, drSectorObj.imaMask.shape[1],
-         drSectorObj.imaMask.shape[0], 0))
+    flexFig.update()
+    flexFig.imaMaskHandle.set_extent(
+        (0, flexFig.imaMask.shape[1],
+         flexFig.imaMask.shape[0], 0))
     # draw to canvas
-    drSectorObj.sector.figure.canvas.draw()
+    flexFig.figure.canvas.draw()
 
 #
 """Updates"""
@@ -308,14 +308,14 @@ def lassoSwitch(event):
     switchStatus = switchCounter % 2
     if switchStatus == 0:
         # disable drag function of sector mask
-        drSectorObj.disconnect()
+        flexFig.disconnect()
         # enable lasso
         lasso = LassoSelector(ax, onselect)
     elif switchStatus == 1:
         OnSelectCounter = 0
         lasso = []
         # enable drag function of sector mask
-        drSectorObj.connect()
+        flexFig.connect()
 
 # Pixel coordinates
 pix = np.arange(nrBins)
@@ -337,15 +337,15 @@ def onselect(verts):
     ind = p.contains_points(pix, radius=1.5)
     # update volHistMask
     if OnSelectCounter == 0:
-        drSectorObj.volHistMask = drSectorObj.sector.binaryMask()
+        flexFig.volHistMask = flexFig.binaryMask()
     OnSelectCounter += 1
-    drSectorObj.volHistMask = updateArray(drSectorObj.volHistMask, ind)
-    drSectorObj.sector.volHistMaskHandle.set_data(drSectorObj.volHistMask)
+    flexFig.volHistMask = updateArray(flexFig.volHistMask, ind)
+    flexFig.volHistMaskHandle.set_data(flexFig.volHistMask)
     # update imaMask
-    drSectorObj.imaMask = VolHist2ImaMapping(
-        drSectorObj.invHistVolume[:, :, drSectorObj.sector.sliceNr],
-        drSectorObj.volHistMask)
-    drSectorObj.sector.imaMaskHandle.set_data(drSectorObj.imaMask)
+    flexFig.imaMask = VolHist2ImaMapping(
+        flexFig.invHistVolume[:, :, flexFig.sliceNr],
+        flexFig.volHistMask)
+    flexFig.imaMaskHandle.set_data(flexFig.imaMask)
     fig.canvas.draw_idle()
 
 bLasso.on_clicked(lassoSwitch)
