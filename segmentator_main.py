@@ -36,19 +36,22 @@ nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
-
-# auto-scaling for faster interface (0-500 or 600 seems fine)
+# truncate too low and too high values
 percDataMin = np.percentile(orig, 0.01)
-orig[np.where(orig < percDataMin)] = percDataMin
-orig = orig - orig.min()
-dataMin = orig.min()
+orig[orig < percDataMin] = percDataMin
 percDataMax = np.percentile(orig, 99.9)
-orig[np.where(orig > percDataMax)] = percDataMax
-orig = 500./orig.max() * orig
-percDataMax = orig.max()
+orig[orig > percDataMax] = percDataMax
+# auto-scaling for faster interface (0-500 or 600 seems fine)
+scaleFactor = 500
+orig = orig - orig.min()
+orig = scaleFactor/orig.max() * orig
+# define dataMin and dataMax for later use
+dataMin = np.round(orig.min())
+dataMax = np.round(orig.max())
 
-# gradient magnitude (using L2 norm of the vector)
+# copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
+# calculate gradient magnitude (using L2 norm of the vector)
 gra = np.gradient(ima)
 gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 
@@ -66,23 +69,25 @@ palette.set_under('w', 0)
 palette.set_bad('m', 1.0)
 
 # Plot 2D histogram
+# Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-binVals = np.arange(dataMin, percDataMax)
-nrBins = len(binVals)
-_, xedges, yedges, _ = plt.hist2d(ima, gra,
-                                  bins=binVals,
-                                  norm=LogNorm(vmax=10000),
-                                  cmap='Greys'
-                                  )
-ax.set_xlim(dataMin, percDataMax)
-ax.set_ylim(0, percDataMax)
-bottom = 0.30
-plt.subplots_adjust(bottom=bottom)
-plt.colorbar()
-plt.xlabel("Intensity f(x)")
-plt.ylabel("Gradient Magnitude f'(x)")
-plt.title("2D Histogram")
+binEdges = np.arange(dataMin, dataMax+1)
+nrBins = len(binEdges)-1
+counts, xedges, yedges, volHistH = plt.hist2d(ima, gra,
+                                              bins=binEdges,
+                                              cmap='Greys'
+                                              )
+
+ax.set_xlim(dataMin, dataMax)
+ax.set_ylim(0, dataMax)
+ax.set_xlabel("Intensity f(x)")
+ax.set_ylabel("Gradient Magnitude f'(x)")
+ax.set_title("2D Histogram")
+
+# plot colorbar for 2d hist
+volHistH.set_norm(LogNorm(vmax=1000))
+plt.colorbar(volHistH)
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
@@ -95,6 +100,9 @@ imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
 imaMaskHandle = ax2.imshow(imaMask, cmap=palette, vmin=0.1,
                            interpolation='none', alpha=0.5,
                            extent=[0, orig.shape[1], orig.shape[0], 0])
+# adjust subplots on figure
+bottom = 0.30
+fig.subplots_adjust(bottom=bottom)
 plt.axis('off')
 
 
@@ -116,7 +124,7 @@ volHistMaskHandle, volHistMask = sectorObj.draw(
 sectorObj.figure = ax.figure
 sectorObj.axes = ax.axes
 sectorObj.axes2 = ax2.axes
-sectorObj.nrOfBins = len(binVals)
+sectorObj.nrOfBins = nrBins
 sectorObj.sliceNr = int(0.5*orig.shape[2])
 sectorObj.imaMaskHandle = imaMaskHandle
 sectorObj.volHistMaskHandle = volHistMaskHandle
@@ -127,7 +135,7 @@ drSectorObj = DraggableSector(sectorObj)
 drSectorObj.connect()
 drSectorObj.volHistMask = volHistMask
 drSectorObj.imaMask = imaMask
-ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binVals)
+ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
 drSectorObj.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 #
@@ -344,3 +352,4 @@ bLasso.on_clicked(lassoSwitch)
 
 
 plt.show()
+
