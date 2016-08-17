@@ -31,8 +31,12 @@ import config as cfg
 
 #
 """Load Data"""
+import openSegmentator
+
+
 #
-nii = load('/media/sf_D_DRIVE/Segmentator/ExpNii/TEST2.nii.gz')
+
+nii = load(openSegmentator.test.path)
 
 #
 """Data Processing"""
