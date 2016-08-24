@@ -33,16 +33,14 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
     return vox2pixMap
 
 
-def VolHist2ImaMapping(data2D, volHistMask):
-
-    linIndices = np.arange(0, volHistMask.size)
-    idxMask = linIndices[volHistMask.flatten()]
-
-    # return logical array with length equal to nr of voxels
-    voxMask = np.in1d(data2D.flatten(), idxMask)
-
-    # reset mask and apply logical indexing
-    mask2D = np.zeros(data2D.flatten().shape)
-    mask2D[voxMask] = 1
-    mask2D = mask2D.reshape(data2D.shape)
-    return mask2D
+def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
+    imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
+    idxUnique = np.unique(volHistMask)
+    for idx in idxUnique:
+        linIndices = np.where(volHistMask.flatten() == idx)[0]
+        # return logical array with length equal to nr of voxels
+        voxMask = np.in1d(imaSlc2volHistMap.flatten(), linIndices)
+        # reset mask and apply logical indexing
+        imaSlcMask[voxMask] = idx
+    imaSlcMask = imaSlcMask.reshape(imaSlc2volHistMap.shape)
+    return imaSlcMask

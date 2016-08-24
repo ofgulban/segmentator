@@ -70,10 +70,9 @@ class sector_mask:
         self.tmax += rad
         self.set_polCrd()
 
-    def mouthChange(self, degree):
+    def updateThetaMin(self, degree):
         rad = np.deg2rad(degree)
-        self.tmin += rad
-        self.tmax -= rad
+        self.tmin = rad
         # ensure stop angle > start angle
         if self.tmax <= self.tmin:
             self.tmax += 2*np.pi
@@ -83,10 +82,22 @@ class sector_mask:
         # update polar coordinates
         self.set_polCrd()
 
-    """
-    Define function that returns a boolean mask for a circular sector.
-    """
+    def updateThetaMax(self, degree):
+        rad = np.deg2rad(degree)
+        self.tmax = rad
+        # ensure stop angle > start angle
+        if self.tmax <= self.tmin:
+            self.tmax += 2*np.pi
+        # ensure stop angle- 2*np.pi NOT > start angle
+        if self.tmax - 2*np.pi >= self.tmin:
+            self.tmax -= 2*np.pi
+        # update polar coordinates
+        self.set_polCrd()
+
     def binaryMask(self):
+        """
+        Define function that returns a boolean mask for a circular sector.
+        """
         # circular mask
         self.circmask = self.r2 <= self.radius*self.radius
         # angular mask
@@ -94,10 +105,11 @@ class sector_mask:
         # return binary mask
         return self.circmask*self.anglemask
 
-    """
-    Develop logical test to check if a cursor pointer is inside the sector mask
-    """
     def contains(self, event):
+        """
+        Develop logical test to check if a cursor pointer is inside the
+        sector mask
+        """
         xbin = np.floor(event.xdata)
         ybin = np.floor(event.ydata)
         Mask = self.binaryMask()

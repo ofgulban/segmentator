@@ -16,10 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('filename',
+                    help="path to nii file with image data",)
+parser.add_argument("--ncut", '-l',
+                    required=False,
+                    help="path to nyp file with ncut labels",)
+args = parser.parse_args()
 
-# this script contains variables that are shared by several modules
 
-# define variables used to initialise the sector mask
-init_centre = (0, 0)
-init_radius = 200
-init_theta = (0, 360)
+if args.ncut:
+    import segmentator_ncut
+else:
+    import segmentator_main
+
+print('data is loading...')
