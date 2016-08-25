@@ -134,7 +134,8 @@ flexFig = responsiveObj(figure=ax.figure,
                         imaMaskH=imaMaskH,
                         volHistMask=volHistMask,
                         volHistMaskH=volHistMaskH,
-                        contains=volHistMaskH.contains)
+                        contains=volHistMaskH.contains,
+                        counts=counts)
 
 # make the figure responsive to clicks
 flexFig.connect()
@@ -162,18 +163,23 @@ flexFig.sThetaMax = Slider(aThetaMax, 'ThetaMax', 0, 359.9,
                            valinit=cfg.init_theta[1]-0.1, valfmt='%0.1f')
 
 # cycle button
-cycleax = plt.axes([0.6, bottom-0.285, 0.075, 0.075])
+cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
 flexFig.bCycle = Button(cycleax, 'Cycle\nView',
                         color=axcolor, hovercolor='0.975')
 flexFig.cycleCount = 0
 
-# export button
-exportax = plt.axes([0.8, bottom-0.285, 0.075, 0.075])
+# export nii button
+exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
 flexFig.bExport = Button(exportax, 'Export\nNifti',
                          color=axcolor, hovercolor='0.975')
 
+# export nyp button
+exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
+flexFig.bExportNyp = Button(exportax, 'Export\nNyp',
+                            color=axcolor, hovercolor='0.975')
+
 # reset button
-resetax = plt.axes([0.7, bottom-0.285, 0.075, 0.075])
+resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
 #
@@ -184,6 +190,7 @@ flexFig.sThetaMin.on_changed(flexFig.updateThetaMin)
 flexFig.sThetaMax.on_changed(flexFig.updateThetaMax)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
+flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
 
 #

@@ -31,4 +31,4 @@ if args.ncut:
 else:
     import segmentator_main
 
-print('data is loading...')
+print('initializing...')

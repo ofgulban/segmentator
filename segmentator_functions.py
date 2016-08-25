@@ -316,8 +316,10 @@ class responsiveObj:
 
     def exportNyp(self, event):
         if self.segmType == 'ncut':
-            np.save(self.basename + 'volHistLabels', self.volHistMask)
-        else:
+            np.save(self.basename + '_volHistLabels', self.volHistMask)
+        elif self.segmType == 'main':
+            np.save(self.basename + '_volHist', self.counts)
+            
             return
 
     def updateLabels(self, val):
