@@ -41,7 +41,7 @@ class responsiveObj:
             self.volHistMaskH.set_data(self.volHistMask)
         elif self.segmType == 'ncut':
             self.volHistMaskH.set_data(self.volHistMask)
-            self.volHistMaskH.set_extent((0, self.nrBins+1, self.nrBins+1, 0))
+            self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
         # update imaMask
         self.imaMask = VolHist2ImaMapping(
             self.invHistVolume[:, :, self.sliceNr], self.volHistMask)

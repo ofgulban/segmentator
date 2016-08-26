@@ -139,7 +139,7 @@ volHistMaskH = ax.imshow(volHistMask, interpolation='none',
                          alpha=0.2, cmap=plt.cm.gist_rainbow,
                          vmin=np.min(ncut_labels),
                          vmax=lMax+varNumAddLabel,
-                         extent=[0, nrBins+1, nrBins+1, 0])
+                         extent=[0, nrBins, nrBins, 0])
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)

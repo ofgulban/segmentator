@@ -115,7 +115,7 @@ sectorObj = sector_mask((nrBins, nrBins), cfg.init_centre,
 # draw sector mask for the first time
 volHistMaskH, volHistMask = sectorObj.draw(
     ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
-    origin='lower', extent=[dataMin, percDataMax, gra.min(), percDataMax])
+    origin='lower', extent=[0, nrBins, 0, nrBins])
 
 
 # initiate a flexible figure object, pass to it usefull properties
