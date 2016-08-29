@@ -33,7 +33,7 @@ import config as cfg
 """Load Data"""
 import segmentator
 nii = load(segmentator.args.filename)
-#nii = load('/media/sf_D_DRIVE/Segmentator/Segmentator_local/#nii/sub-11_T1wDivPD_bet_cdfMatch.nii.gz')
+#nii = load('/media/sf_D_DRIVE/Segmentator/Segmentator_local/nii/sub-11_T1wDivPD_bet_cdfMatch.nii.gz')
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
@@ -42,8 +42,9 @@ percDataMin = np.percentile(orig, 0.01)
 orig[orig < percDataMin] = percDataMin
 percDataMax = np.percentile(orig, 99.9)
 orig[orig > percDataMax] = percDataMax
+gamma = 0.0001  # ensures that the max data points fall inside the last bin
 # auto-scaling for faster interface (0-500 or 600 seems fine)
-scaleFactor = 500
+scaleFactor = 500 - gamma
 orig = orig - orig.min()
 orig = scaleFactor/orig.max() * orig
 # define dataMin and dataMax for later use
@@ -55,7 +56,6 @@ ima = orig.copy()
 # calculate gradient magnitude (using L2 norm of the vector)
 gra = np.gradient(ima)
 gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
-
 # reshape ima (more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
@@ -72,15 +72,17 @@ palette.set_bad('m', 1.0)
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
+nrBins = int(dataMax - dataMin)
 binEdges = np.arange(dataMin, dataMax+1)
-nrBins = len(binEdges)-1
-counts, xedges, yedges, volHistH = plt.hist2d(ima, gra,
-                                              bins=binEdges,
-                                              cmap='Greys'
-                                              )
+counts, xedges, yedges, volHistH = plt.hist2d(
+    ima,
+    gra,
+    bins=binEdges,
+    cmap='Greys'
+    )
 
 ax.set_xlim(dataMin, dataMax)
-ax.set_ylim(0, dataMax)
+ax.set_ylim(dataMin, dataMax)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
@@ -91,32 +93,49 @@ plt.colorbar(volHistH)
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
-slcH = ax2.imshow(orig[:, :, int(orig.shape[2]/2)],
-                  cmap=plt.cm.gray, vmin=ima.min(), vmax=ima.max(),
-                  interpolation='none', extent=[0, orig.shape[1],
-                                                orig.shape[0], 0]
-                  )
-imaMask = np.ones(orig.shape[0:2])  # TODO: Magic numbers
-imaMaskH = ax2.imshow(imaMask, cmap=palette, vmin=0.1,
-                      interpolation='none', alpha=0.5,
-                      extent=[0, orig.shape[1], orig.shape[0], 0])
+slcH = ax2.imshow(
+    orig[:, :, int(orig.shape[2]/2)],
+    cmap=plt.cm.gray,
+    vmin=ima.min(),
+    vmax=ima.max(),
+    interpolation='none',
+    extent=[0, orig.shape[1], orig.shape[0], 0]
+    )
+
+imaMask = np.ones(orig.shape[0:2])
+imaMaskH = ax2.imshow(
+    imaMask,
+    cmap=palette,
+    vmin=0.1,
+    interpolation='none',
+    alpha=0.5,
+    extent=[0, orig.shape[1], orig.shape[0], 0]
+    )
 # adjust subplots on figure
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
 plt.axis('off')
 
-
 #
 """Initialisation"""
 # create first instance of sector mask
-sectorObj = sector_mask((nrBins, nrBins), cfg.init_centre,
-                        cfg.init_radius, cfg.init_theta)
+sectorObj = sector_mask(
+    (nrBins, nrBins),
+    cfg.init_centre,
+    cfg.init_radius,
+    cfg.init_theta
+    )
 
 # draw sector mask for the first time
 volHistMaskH, volHistMask = sectorObj.draw(
-    ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
-    origin='lower', extent=[0, nrBins, 0, nrBins])
-
+    ax,
+    cmap='Reds',
+    alpha=0.2,
+    vmin=0.1,
+    interpolation='nearest',
+    origin='lower',
+    extent=[0, nrBins, 0, nrBins]
+    )
 
 # initiate a flexible figure object, pass to it usefull properties
 segmType = 'main'

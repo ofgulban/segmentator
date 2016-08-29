@@ -29,7 +29,8 @@ def sub2ind(array_shape, rows, cols):
 def Ima2VolHistMapping(xinput, yinput, binsArray):
     dgtzData = np.digitize(xinput, binsArray)-1
     dgtzGra = np.digitize(yinput, binsArray)-1
-    vox2pixMap = sub2ind(binsArray.shape, dgtzData, dgtzGra)  # 1D
+    nrBins = len(binsArray)-1  # subtract 1 (more borders than containers)
+    vox2pixMap = sub2ind(nrBins, dgtzData, dgtzGra)  # 1D
     return vox2pixMap
 
 

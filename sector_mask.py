@@ -62,7 +62,6 @@ class sector_mask:
 
     def scale_r(self, scale):
         self.radius = self.radius * scale
-        self.radius = self.radius * scale
 
     def rotate(self, degree):
         rad = np.deg2rad(degree)
@@ -119,11 +118,22 @@ class sector_mask:
         else:
             return False
 
-    def draw(self, ax,
-             cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
-             origin='lower', extent=[0, 100, 0, 100]):
+    def draw(self,
+             ax,
+             cmap='Reds',
+             alpha=0.2,
+             vmin=0.1,
+             interpolation='nearest',
+             origin='lower',
+             extent=[0, 100, 0, 100]
+             ):
         BinMask = self.binaryMask()
-        FigObj = ax.imshow(BinMask, cmap=cmap, alpha=alpha, vmin=vmin,
-                           interpolation=interpolation, origin=origin,
-                           extent=extent)
+        FigObj = ax.imshow(
+            BinMask,
+            cmap=cmap,
+            alpha=alpha,
+            vmin=vmin,
+            interpolation=interpolation,
+            origin=origin,
+            extent=extent)
         return (FigObj, BinMask)

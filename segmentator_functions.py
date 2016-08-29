@@ -78,8 +78,6 @@ class responsiveObj:
             self.ctrlHeld = False
 
     def findVoxInHist(self, event):
-        print "Subplot 2: x and y pos"
-        print event.xdata, event.ydata
         self.press = event.xdata, event.ydata
         xvoxel = int(np.floor(event.xdata))
         yvoxel = int(np.floor(event.ydata))
@@ -143,8 +141,6 @@ class responsiveObj:
         elif self.segmType == 'ncut':
             if event.button == 1:  # left button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
-                    print "Subplot 1: x and y pos"
-                    print event.xdata, event.ydata
                     xbin = int(np.floor(event.xdata))
                     ybin = int(np.floor(event.ydata))
                     val = self.volHistMask[ybin][xbin]
@@ -171,8 +167,6 @@ class responsiveObj:
                     return
             elif event.button == 3:  # right button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
-                    print "Subplot 1: x and y pos"
-                    print event.xdata, event.ydata
                     xbin = np.floor(event.xdata)
                     ybin = np.floor(event.ydata)
                     val = self.volHistMask[ybin][xbin]
