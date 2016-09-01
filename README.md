@@ -43,7 +43,9 @@ You should see a window appearing soon after. Try dragging the red circle around
 
 ## Support
 
-Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for bug reports and feature requests.
+For guides and tips you can visit our [github wiki](https://github.com/ofgulban/segmentator/wiki).
+
+Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
 
 
 ## License
