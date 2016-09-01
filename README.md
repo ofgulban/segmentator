@@ -1,4 +1,5 @@
-# Segmentator (work in progress)
+# Segmentator (work in progress) [![DOI](https://zenodo.org/badge/24138/ofgulban/segmentator.svg)](https://zenodo.org/badge/latestdoi/24138/ofgulban/segmentator)
+
 Segmentator is an open-source package for multi-dimensional data exploration and segmentation. This application is mainly developed for ultra-high field magnetic resonance imaging (MRI) brain data.
 
 The goal is to provide a complementary tool to the already available tissue segmentation methods (to the best of our knowledge) in other softwares (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
