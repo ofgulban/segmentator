@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+"""Processing input and plotting, for experimental ncut feature.
+
+Lots of code repetition, will be integrated better in the future.
+"""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -25,17 +28,13 @@ from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button
 from utils import Ima2VolHistMapping
 from segmentator_functions import responsiveObj
+import segmentator
 
 # %%
 """Load Data"""
 #
-import segmentator
 nii = load(segmentator.args.filename)
-#
-#nii = load('/media/sf_D_DRIVE/Segmentator/Segmentator_local/#nii/sub-11_T1wDivPD_bet_cdfMatch.nii.gz')
-
 ncut_labels = np.load(segmentator.args.ncut)
-#ncut_labels = np.load('/media/sf_D_DRIVE/Segmentator/Segmentator_local/nii/multi-level_ncut_output_6recursion_S11.npy')
 
 # transpose the labels
 ncut_labels = np.transpose(ncut_labels, (1, 0, 2))

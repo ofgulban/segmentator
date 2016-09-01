@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Functions mostly written by Marian."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -25,6 +25,8 @@ import config as cfg
 
 
 class responsiveObj:
+    """Stuff to interact in the user interface."""
+
     def __init__(self, **kwargs):
         if kwargs is not None:
             for key, value in kwargs.iteritems():
@@ -35,7 +37,7 @@ class responsiveObj:
         self.labelNr = 0
 
     def updateMsks(self):
-        # update volHistMask
+        """Update volume histogram mask."""
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
             self.volHistMaskH.set_data(self.volHistMask)
@@ -56,8 +58,8 @@ class responsiveObj:
         self.slcH.set_data(self.orig[:, :, self.sliceNr])
         self.slcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
 
-    # this will make the object responsive
     def connect(self):
+        """Make the object responsive"""
         self.cidpress = self.figure.canvas.mpl_connect(
             'button_press_event', self.on_press)
         self.cidrelease = self.figure.canvas.mpl_connect(
@@ -209,26 +211,26 @@ class responsiveObj:
             return
         self.figure.canvas.draw()
 
-    # this will make the object unresponsive
     def disconnect(self):
+        """Make the object unresponsive."""
         self.figure.canvas.mpl_disconnect(self.cidpress)
         self.figure.canvas.mpl_disconnect(self.cidrelease)
         self.figure.canvas.mpl_disconnect(self.cidmotion)
 
     def updateColorBar(self, val):
-        # update slider for scaling log colorbar in 2D hist
+        """Update slider for scaling log colorbar in 2D hist."""
         histVMax = np.power(10, self.sHistC.val)
         plt.clim(vmax=histVMax)
 
     def updateImaBrowser(self, val):
+        """Update image browse."""
         # scale slider value [0,1) to dimension index
         self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        # update brain slice
-        self.updateSlc()
-        # update masks
+        self.updateSlc()  # update brain slice
         self.updateMsks()
 
     def cycleView(self, event):
+        """Cycle through views."""
         self.cycleCount = (self.cycleCount+1) % 3
         # transpose data
         self.orig = np.transpose(self.orig, (2, 0, 1))
@@ -238,10 +240,10 @@ class responsiveObj:
         self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
         # update brain slice
         self.updateSlc()
-        # update masks
         self.updateMsks()
 
     def exportNifti(self, event):
+        """Export labels in the image browser as a nifti file."""
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -257,6 +259,7 @@ class responsiveObj:
         save(new_image, self.basename+'_labels.nii.gz')
 
     def resetGlobal(self, event):
+        """Reset stuff."""
         # reset color bar
         self.sHistC.reset()
         # reset ima browser slider
@@ -283,40 +286,36 @@ class responsiveObj:
             self.volHistMask = np.squeeze(self.ima_ncut_labels[:, :, 0])
             # reset counter field
             self.counterField = np.zeros((self.nrBins, self.nrBins))
-        # update masks
         self.updateMsks()
 
     def updateThetaMin(self, val):
+        """Update volume histogram mask's minimum theta."""
         if self.segmType == 'main':
-            # get current theta value from slider
-            thetaVal = self.sThetaMin.val
-            # update theta min sector mask
+            thetaVal = self.sThetaMin.val  # get theta value from slider
             self.sectorObj.updateThetaMin(thetaVal)
-            # update masks
             self.updateMsks()
         else:
             return
 
     def updateThetaMax(self, val):
+        """Update volume histogram mask's maximum theta."""
         if self.segmType == 'main':
-            # get current theta value from slider
-            thetaVal = self.sThetaMax.val
-            # update theta min sector mask
+            thetaVal = self.sThetaMax.val  # get theta value from slider
             self.sectorObj.updateThetaMax(thetaVal)
-            # update masks
             self.updateMsks()
         else:
             return
 
     def exportNyp(self, event):
+        """Export histogram counts as a numpy array."""
         if self.segmType == 'ncut':
             np.save(self.basename + '_volHistLabels', self.volHistMask)
         elif self.segmType == 'main':
             np.save(self.basename + '_volHist', self.counts)
-            
             return
 
     def updateLabels(self, val):
+        """Update labels in volume histogram."""
         if self.segmType == 'ncut':
             self.labelNr = self.sLabelNr.val
         else:

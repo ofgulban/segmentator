@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Some utility functions."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -19,14 +19,14 @@
 import numpy as np
 
 
-# Pixel to voxel mapping
 def sub2ind(array_shape, rows, cols):
+    """Pixel to voxel mapping. Similar to matlabs function."""
     # return (rows*array_shape + cols)
     return (cols*array_shape + rows)
 
 
-# Kind of inverse histogram
 def Ima2VolHistMapping(xinput, yinput, binsArray):
+    """Image to volume histogram mapping. Kind of inverse histogram."""
     dgtzData = np.digitize(xinput, binsArray)-1
     dgtzGra = np.digitize(yinput, binsArray)-1
     nrBins = len(binsArray)-1  # subtract 1 (more borders than containers)
@@ -35,6 +35,7 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
 
 
 def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
+    """Volume histogram to image mapping."""
     imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:

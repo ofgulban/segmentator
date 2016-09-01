@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Processing input and plotting."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -28,12 +28,12 @@ from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, VolHist2ImaMapping
 import config as cfg
+import segmentator
 
 #
 """Load Data"""
-import segmentator
 nii = load(segmentator.args.filename)
-#nii = load('/media/sf_D_DRIVE/Segmentator/Segmentator_local/nii/sub-11_T1wDivPD_bet_cdfMatch.nii.gz')
+
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
@@ -221,7 +221,10 @@ bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
 
 # define switch for Lasso option
 switchCounter = 1
+
+
 def lassoSwitch(event):
+    """Enable disable lasso tool."""
     global lasso, switchCounter, OnSelectCounter
     lasso = []
     switchCounter += 1
@@ -244,6 +247,7 @@ pix = np.vstack((xv.flatten(), yv.flatten())).T
 
 
 def updateArray(array, indices):
+    """Lasso related."""
     lin = np.arange(array.size)
     newArray = array.flatten()
     newArray[lin[indices]] = 1
@@ -251,7 +255,10 @@ def updateArray(array, indices):
 
 
 OnSelectCounter = 0
+
+
 def onselect(verts):
+    """Lasso related."""
     global pix, OnSelectCounter
     p = path.Path(verts)
     ind = p.contains_points(pix, radius=1.5)
@@ -269,6 +276,5 @@ def onselect(verts):
     fig.canvas.draw_idle()
 
 bLasso.on_clicked(lassoSwitch)
-
 
 plt.show()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Some default parameters used in initialisation."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider

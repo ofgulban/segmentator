@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Sector mask to mask stuff in volume histogram."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+#
 # This code is taken from user 'ali_m' from StackOverflow:
 # <http://stackoverflow.com/questions/18352973/mask-a-circular-sector-in-a-numpy-array>
 
@@ -23,6 +23,8 @@ import numpy as np
 
 
 class sector_mask:
+    """A shape with useful parameters to detect some tissues quickly."""
+
     def __init__(self, shape, centre, radius, angle_range):
         self.radius = radius
         self.shape = shape
@@ -70,6 +72,10 @@ class sector_mask:
         self.set_polCrd()
 
     def updateThetaMin(self, degree):
+        """There is another updateThetaMin in segmentator_functions.py.
+
+        Why?
+        """
         rad = np.deg2rad(degree)
         self.tmin = rad
         # ensure stop angle > start angle
@@ -82,6 +88,10 @@ class sector_mask:
         self.set_polCrd()
 
     def updateThetaMax(self, degree):
+        """There is another updateThetaMax in segmentator_functions.py.
+
+        Why?
+        """
         rad = np.deg2rad(degree)
         self.tmax = rad
         # ensure stop angle > start angle
@@ -94,9 +104,7 @@ class sector_mask:
         self.set_polCrd()
 
     def binaryMask(self):
-        """
-        Define function that returns a boolean mask for a circular sector.
-        """
+        """Return a boolean mask for a circular sector."""
         # circular mask
         self.circmask = self.r2 <= self.radius*self.radius
         # angular mask
@@ -105,28 +113,19 @@ class sector_mask:
         return self.circmask*self.anglemask
 
     def contains(self, event):
-        """
-        Develop logical test to check if a cursor pointer is inside the
-        sector mask
-        """
+        """Check if a cursor pointer is inside the sector mask."""
         xbin = np.floor(event.xdata)
         ybin = np.floor(event.ydata)
         Mask = self.binaryMask()
         # the next line doesn't follow pep 8 (otherwise it fails)
-        if Mask[ybin][xbin] == True:  # switch x and ybin, volHistMask not Cart
+        if Mask[ybin][xbin] is True:  # switch x and ybin, volHistMask not Cart
             return True
         else:
             return False
 
-    def draw(self,
-             ax,
-             cmap='Reds',
-             alpha=0.2,
-             vmin=0.1,
-             interpolation='nearest',
-             origin='lower',
-             extent=[0, 100, 0, 100]
-             ):
+    def draw(self, ax, cmap='Reds', alpha=0.2, vmin=0.1,
+             interpolation='nearest', origin='lower', extent=[0, 100, 0, 100]):
+        """Draw stuff."""
         BinMask = self.binaryMask()
         FigObj = ax.imshow(
             BinMask,
