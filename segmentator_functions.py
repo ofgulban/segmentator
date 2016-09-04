@@ -54,12 +54,12 @@ class responsiveObj:
         self.figure.canvas.draw()
 
     def updateSlc(self):
-        # update brain slices
+        """Update image browser slices."""
         self.slcH.set_data(self.orig[:, :, self.sliceNr])
         self.slcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
 
     def connect(self):
-        """Make the object responsive"""
+        """Make the object responsive."""
         self.cidpress = self.figure.canvas.mpl_connect(
             'button_press_event', self.on_press)
         self.cidrelease = self.figure.canvas.mpl_connect(
@@ -80,6 +80,7 @@ class responsiveObj:
             self.ctrlHeld = False
 
     def findVoxInHist(self, event):
+        """Find voxel's location in histogram."""
         self.press = event.xdata, event.ydata
         xvoxel = int(np.floor(event.xdata))
         yvoxel = int(np.floor(event.ydata))

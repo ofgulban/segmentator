@@ -47,9 +47,6 @@ gamma = 0.0001  # ensures that the max data points fall inside the last bin
 scaleFactor = 500 - gamma
 orig = orig - orig.min()
 orig = scaleFactor/orig.max() * orig
-# define dataMin and dataMax for later use
-dataMin = np.round(orig.min())
-dataMax = np.round(orig.max())
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
@@ -72,6 +69,8 @@ palette.set_bad('m', 1.0)
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
+dataMin = np.round(orig.min())
+dataMax = np.round(orig.max())
 nrBins = int(dataMax - dataMin)
 binEdges = np.arange(dataMin, dataMax+1)
 counts, xedges, yedges, volHistH = plt.hist2d(
@@ -253,7 +252,6 @@ def updateArray(array, indices):
     newArray[lin[indices]] = 1
     return newArray.reshape(array.shape)
 
-
 OnSelectCounter = 0
 
 
@@ -262,13 +260,13 @@ def onselect(verts):
     global pix, OnSelectCounter
     p = path.Path(verts)
     ind = p.contains_points(pix, radius=1.5)
-    # update volHistMask
+    # update volume histogram mask
     if OnSelectCounter == 0:
         flexFig.volHistMask = flexFig.sectorObj.binaryMask()
     OnSelectCounter += 1
     flexFig.volHistMask = updateArray(flexFig.volHistMask, ind)
     flexFig.volHistMaskH.set_data(flexFig.volHistMask)
-    # update imaMask
+    # update image mask
     flexFig.imaMask = VolHist2ImaMapping(
         flexFig.invHistVolume[:, :, flexFig.sliceNr],
         flexFig.volHistMask)
