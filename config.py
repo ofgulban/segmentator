@@ -1,4 +1,4 @@
-"""Some default parameters used in initialisation."""
+"""This script contains variables that are shared by several modules."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -15,9 +15,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-# this script contains variables that are shared by several modules
 
 # define variables used to initialise the sector mask
 init_centre = (0, 0)

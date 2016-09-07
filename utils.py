@@ -20,7 +20,7 @@ import numpy as np
 
 
 def sub2ind(array_shape, rows, cols):
-    """Pixel to voxel mapping. Similar to matlabs function."""
+    """Pixel to voxel mapping. Similar to matlab's function."""
     # return (rows*array_shape + cols)
     return (cols*array_shape + rows)
 
