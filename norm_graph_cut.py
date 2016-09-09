@@ -39,11 +39,11 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
     image = np.round(255 / image.max() * image)
     image = image.astype('uint8')
 
-    # # dilate and erode (closing) to fill in white dots in grays (arbitrary)
-    # image = closing(image, square(closing_size))
-    #
-    # # a bit of blurring to help getting smoother edges (arbitrary)
-    # image = gaussian(image, 2)
+    # dilate and erode (closing) to fill in white dots in grays (arbitrary)
+    image = closing(image, square(closing_size))
+    
+    # a bit of blurring to help getting smoother edges (arbitrary)
+    image = gaussian(image, 2)
 
     # scikit implementation expects rgb format (shape: NxMx3)
     image = np.tile(image, (3, 1, 1))
@@ -57,13 +57,13 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
                                    max_rec=max_rec)
     return labels2
 
-path = '/media/Data_Drive/Segmentator_Data/Sri/t1_mp2rage_gauss_bet_volHist.npy'
+path = '/media/sf_D_DRIVE/MotionQuartet/Analysis/P2/LongTRSegmentation/GM-CSF/SortedMin_restore_masked_volHist.npy'
 basename = path.split(os.extsep, 1)[0]
 
 img = np.load(path)
 img = np.log10(img+1)
 
-max_recursion = 8
+max_recursion = 6
 marian = np.zeros((img.shape[0], img.shape[1], max_recursion + 1))
 for i in range(0, max_recursion + 1):
     msk = norm_grap_cut(img, max_rec=i)
