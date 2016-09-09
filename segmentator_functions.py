@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -72,10 +73,12 @@ class responsiveObj:
             'key_release_event', self.on_key_release)
 
     def on_key_press(self, event):
+        """Determine what happens if key is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
 
     def on_key_release(self, event):
+        """Determine what happens if key is released."""
         if event.key == 'control':
             self.ctrlHeld = False
 
@@ -99,6 +102,7 @@ class responsiveObj:
         self.figure.canvas.draw()
 
     def on_press(self, event):
+        """Determine what happens if mouse button is clicked."""
         if self.segmType == 'main':
             if event.button == 1:  # left button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
@@ -161,9 +165,22 @@ class responsiveObj:
                     oLabels = self.ima_ncut_labels[:, :, counter]
                     nLabels = self.ima_ncut_labels[:, :, counter+1]
                     # replace old values with new values (in clicked subfield)
-                    self.volHistMask[oLabels == val] = nLabels[oLabels == val]
+                    self.volHistMask[oLabels == val] = np.copy(
+                        nLabels[oLabels == val])
                     # update masks
                     self.updateMsks()
+                    # calculate political borders
+                    grad = np.gradient(self.volHistMask)
+                    self.pltMap = np.greater(np.sqrt(
+                        np.power(grad[0], 2) + np.power(grad[1], 2)), 0)*255
+                    self.pltMap = self.pltMap.reshape(
+                        self.volHistMask.shape+(1,)).repeat(4, 2)
+                    self.pltMap[:, :, 3] = self.pltMap[:, :, 3]/255
+                    # plot political borders
+                    self.pltMapH.set_data(self.pltMap)
+                    self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
+                    self.figure.canvas.draw()
+
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
                     self.findVoxInHist(event)
                 else:
@@ -179,6 +196,7 @@ class responsiveObj:
                     self.updateMsks()
 
     def on_motion(self, event):
+        """Determine what happens if mouse button moves."""
         if self.segmType == 'main':
             # ... button is pressed
             if self.press is None:
@@ -204,6 +222,7 @@ class responsiveObj:
             return
 
     def on_release(self, event):
+        """Determine what happens if mouse button is released."""
         self.press = None
         # try to remove the blue circle
         try:
@@ -282,11 +301,15 @@ class responsiveObj:
         elif self.segmType == 'ncut':
             self.sLabelNr.reset()
             # reset ncut labels
-            self.ima_ncut_labels = self.orig_ncut_labels.copy()
+            self.ima_ncut_labels = np.copy(self.orig_ncut_labels)
             # reset values for volHistMask
-            self.volHistMask = np.squeeze(self.ima_ncut_labels[:, :, 0])
+            self.volHistMask = self.ima_ncut_labels[:, :, 0].reshape(
+                (self.nrBins, self.nrBins))
             # reset counter field
             self.counterField = np.zeros((self.nrBins, self.nrBins))
+            # reset political borders
+            self.pltMap = np.zeros((self.nrBins, self.nrBins))
+            self.pltMapH.set_data(self.pltMap)
         self.updateMsks()
 
     def updateThetaMin(self, val):

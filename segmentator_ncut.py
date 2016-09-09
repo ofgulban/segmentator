@@ -128,6 +128,11 @@ ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
 
+# plot map for poltical borders
+pltMap = np.zeros((nrBins, nrBins, 1)).repeat(4, 2)
+pltMapH = ax.imshow(pltMap, alpha=1,
+                    extent=[0, nrBins, nrBins, 0])
+
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=1000))
 plt.colorbar(volHistH)
@@ -174,6 +179,8 @@ flexFig = responsiveObj(figure=ax.figure,
                         imaMaskH=imaMaskH,
                         volHistMask=volHistMask,
                         volHistMaskH=volHistMaskH,
+                        pltMap=pltMap,
+                        pltMapH=pltMapH,
                         counterField=np.zeros((nrBins, nrBins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
