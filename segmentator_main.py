@@ -50,9 +50,15 @@ orig = scaleFactor/orig.max() * orig
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-# calculate gradient magnitude (using L2 norm of the vector)
-gra = np.gradient(ima)
-gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
+if segmentator.args.gramag:
+    nii2 = load(segmentator.args.gramag)
+    gra = np.squeeze(nii2.get_data())
+else:
+    # calculate gradient magnitude (using L2 norm of the vector)
+    gra = np.gradient(ima)
+    gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) +
+                  np.power(gra[2], 2))
+
 # reshape ima (more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)

@@ -20,6 +20,9 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('filename',
                     help="path to nii file with image data",)
+parser.add_argument("--gramag", '-g',
+                    required=False,
+                    help="path to gradient magnitude (useful for deriche)",)
 parser.add_argument("--ncut", '-l',
                     required=False,
                     help="path to nyp file with ncut labels",)
