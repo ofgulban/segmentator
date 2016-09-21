@@ -167,19 +167,9 @@ class responsiveObj:
                     # replace old values with new values (in clicked subfield)
                     self.volHistMask[oLabels == val] = np.copy(
                         nLabels[oLabels == val])
-                    # update masks
+
                     self.updateMsks()
-                    # calculate political borders
-                    grad = np.gradient(self.volHistMask)
-                    self.pltMap = np.greater(np.sqrt(
-                        np.power(grad[0], 2) + np.power(grad[1], 2)), 0)*255
-                    self.pltMap = self.pltMap.reshape(
-                        self.volHistMask.shape+(1,)).repeat(4, 2)
-                    self.pltMap[:, :, 3] = self.pltMap[:, :, 3]/255
-                    # plot political borders
-                    self.pltMapH.set_data(self.pltMap)
-                    self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
-                    self.figure.canvas.draw()
+                    self.labelContours()
 
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
                     self.findVoxInHist(event)
@@ -192,8 +182,10 @@ class responsiveObj:
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
                     self.volHistMask[self.volHistMask == val] = self.labelNr
-                    # update masks
+
+                    self.labelContours()
                     self.updateMsks()
+
 
     def on_motion(self, event):
         """Determine what happens if mouse button moves."""
@@ -344,3 +336,16 @@ class responsiveObj:
             self.labelNr = self.sLabelNr.val
         else:
             return
+
+    def labelContours(self):
+        """Calculate and plot political borders."""
+        grad = np.gradient(self.volHistMask)
+        self.pltMap = np.greater(np.sqrt(
+            np.power(grad[0], 2) + np.power(grad[1], 2)), 0)*255
+        self.pltMap = self.pltMap.reshape(
+            self.volHistMask.shape+(1,)).repeat(4, 2)
+        self.pltMap[:, :, 3] = self.pltMap[:, :, 3]/255
+        # plot political borders
+        self.pltMapH.set_data(self.pltMap)
+        self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
+        self.figure.canvas.draw()
