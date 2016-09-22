@@ -138,11 +138,14 @@ pltMapH = ax.imshow(pltMap, alpha=1,
 volHistH.set_norm(LogNorm(vmax=1000))
 plt.colorbar(volHistH)
 
+# Set up a colormap for ncut labels
+ncut_palette = plt.cm.gist_rainbow
+ncut_palette.set_under('w', 0)
 # plot hist mask (with ncut labels)
 volHistMask = np.squeeze(ncut_labels[:, :, 0])
 volHistMaskH = ax.imshow(volHistMask, interpolation='none',
-                         alpha=0.2, cmap=plt.cm.gist_rainbow,
-                         vmin=np.min(ncut_labels),
+                         alpha=0.2, cmap=ncut_palette,
+                         vmin=np.min(ncut_labels)+1,  # to make 0 transparent
                          vmax=lMax+varNumAddLabel,
                          extent=[0, nrBins, nrBins, 0])
 
