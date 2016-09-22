@@ -27,6 +27,7 @@ from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, VolHist2ImaMapping
+from utils import TruncateRange, ScaleRange
 import config as cfg
 import segmentator
 
@@ -37,33 +38,16 @@ nii = load(segmentator.args.filename)
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
-# truncate too low and too high values
-percDataMin = np.percentile(orig, 0.01)
-orig[orig < percDataMin] = percDataMin
-percDataMax = np.percentile(orig, 99.9)
-orig[orig > percDataMax] = percDataMax
-gamma = 0.0001  # ensures that the max data points fall inside the last bin
-# auto-scaling for faster interface (0-500 or 600 seems fine)
-scaleFactor = 500 - gamma
-orig = orig - orig.min()
-orig = scaleFactor/orig.max() * orig
+orig = TruncateRange(orig, percMin=0.01, percMax=99.9)
+orig = ScaleRange(orig, scaleFactor=500, delta=0.000001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
 if segmentator.args.gramag:
     nii2 = load(segmentator.args.gramag)
     gra = np.squeeze(nii2.get_data())
-
-    # truncate too low and too high values
-    percGraMin = np.percentile(gra, 0.1)
-    gra[gra < percGraMin] = percGraMin
-    percGraMax = np.percentile(gra, 99.0)
-    gra[gra > percGraMax] = percGraMax
-    gamma = 0.0001  # ensures that the max data points fall inside the last bin
-    # auto-scaling for faster interface (0-500 or 600 seems fine)
-    scaleFactor = 500 - gamma
-    gra = gra - gra.min()
-    gra = scaleFactor/gra.max() * gra
+    gra = TruncateRange(gra, percMin=0.01, percMax=99.9)
+    gra = ScaleRange(gra, scaleFactor=500, delta=0.000001)
 
 else:
     # calculate gradient magnitude (using L2 norm of the vector)

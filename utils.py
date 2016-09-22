@@ -46,3 +46,25 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
         imaSlcMask[voxMask] = idx
     imaSlcMask = imaSlcMask.reshape(imaSlc2volHistMap.shape)
     return imaSlcMask
+
+
+def TruncateRange(data, percMin=0.01, percMax=99.9):
+    """Truncate too low and too high values."""
+    # adjust minimum
+    percDataMin = np.percentile(data, percMin)
+    data[data < percDataMin] = percDataMin
+    # adjust maximum
+    percDataMax = np.percentile(data, percMax)
+    data[data > percDataMax] = percDataMax
+    return data
+
+
+def ScaleRange(data, scaleFactor=500, delta=0):
+    """Scale values as a preprocessing step.
+
+    Lower scaleFactors give faster interface (0-500 or 600 seems fast enough).
+    Delta ensures that the max data points fall inside the last bin when this
+    function is used with histograms.
+    """
+    data = data - data.min()
+    return scaleFactor / data.max() * data
