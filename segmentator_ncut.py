@@ -156,7 +156,7 @@ slcH = ax2.imshow(orig[:, :, int(orig.shape[2]/2)], cmap=plt.cm.gray,
                   extent=[0, orig.shape[1], orig.shape[0], 0])
 imaMask = np.zeros(orig.shape[0:2])*total_labels[1]
 imaMaskH = ax2.imshow(imaMask, interpolation='none', alpha=0.5,
-                      cmap=plt.cm.gist_rainbow, vmin=np.min(ncut_labels),
+                      cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
                       vmax=lMax+varNumAddLabel,
                       extent=[0, orig.shape[1], orig.shape[0], 0])
 

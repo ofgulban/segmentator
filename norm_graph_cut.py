@@ -58,7 +58,7 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
                                    max_rec=max_rec)
     return labels2
 
-path = '/home/faruk/Data/T1_volHist.npy'
+path = '/media/sf_D_DRIVE/MotionQuartet/Analysis/P2/LongTRSegmentation/GM-CSF/SortedMin_restore_masked_volHist.npy'
 basename = path.split(os.extsep, 1)[0]
 
 img = np.load(path)
