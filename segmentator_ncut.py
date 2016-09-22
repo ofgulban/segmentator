@@ -64,8 +64,9 @@ ima_ncut_labels = ncut_labels.copy()
 # %%
 """Data Pre-Processing"""
 orig = np.squeeze(nii.get_data())
-orig = TruncateRange(orig, percMin=0.01, percMax=99.9)
-orig = ScaleRange(orig, scaleFactor=500, delta=0.000001)
+percMin, percMax = segmentator.args.percmin, segmentator.args.percmax
+orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
+orig = ScaleRange(orig, scaleFactor=segmentator.args.scale, delta=0.0001)
 # define dataMin and dataMax for later use
 dataMin = np.round(orig.min())
 dataMax = np.round(orig.max())
@@ -75,8 +76,8 @@ ima = orig.copy()
 if segmentator.args.gramag:
     nii2 = load(segmentator.args.gramag)
     gra = np.squeeze(nii2.get_data())
-    gra = TruncateRange(gra, percMin=0.01, percMax=99.9)
-    gra = ScaleRange(gra, scaleFactor=500, delta=0.000001)
+    gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
+    gra = ScaleRange(gra, scaleFactor=segmentator.args.scale, delta=0.0001)
 else:
     # calculate gradient magnitude (using L2 norm of the vector)
     gra = np.gradient(ima)

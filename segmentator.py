@@ -18,17 +18,31 @@
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('filename',
-                    help="path to nii file with image data",)
-parser.add_argument("--gramag", '-g',
+
+parser.add_argument('filename',  metavar='path',
+                    help="Path to nii file with image data")
+
+parser.add_argument("--gramag", metavar='path',
                     required=False,
-                    help="path to gradient magnitude (useful for deriche)",)
-parser.add_argument("--ncut", '-l',
+                    help="Path to gradient magnitude (useful for deriche)")
+
+parser.add_argument("--ncut",  metavar='path',
                     required=False,
-                    help="path to nyp file with ncut labels",)
+                    help="Path to nyp file with ncut labels")
+
+parser.add_argument("--scale", metavar='500',
+                    required=False, default=500, type=float,
+                    help="Data is scaled from 0 to this number.")
+
+parser.add_argument("--percmin", metavar='0.25',
+                    required=False, default=0.25, type=float,
+                    help="Minimum percentile used in truncation.")
+
+parser.add_argument("--percmax",  metavar='99.75',
+                    required=False, default=99.75, type=float,
+                    help="Maximum percentile used in truncation.")
+
 args = parser.parse_args()
-
-
 if args.ncut:
     import segmentator_ncut
 else:
