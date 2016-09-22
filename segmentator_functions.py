@@ -255,9 +255,15 @@ class responsiveObj:
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
-        temp = np.transpose(self.invHistVolume, cycBackPerm)
+        # assing unique integers (for ncut labels)
+        out_volHistMask = np.copy(self.volHistMask)
+        labels = np.unique(self.volHistMask)
+        intLabels = [i for i in range(labels.size)]
+        for label, newLabel in zip(labels, intLabels):
+            out_volHistMask[out_volHistMask == label] = intLabels[newLabel]
         # get 3D brain mask
-        outNii = VolHist2ImaMapping(temp, self.volHistMask)
+        temp = np.transpose(self.invHistVolume, cycBackPerm)
+        outNii = VolHist2ImaMapping(temp, out_volHistMask)
         outNii = outNii.reshape(temp.shape)
         # save mask image as nii
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
