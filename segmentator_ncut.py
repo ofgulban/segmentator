@@ -82,6 +82,17 @@ ima = orig.copy()
 if segmentator.args.gramag:
     nii2 = load(segmentator.args.gramag)
     gra = np.squeeze(nii2.get_data())
+
+    # truncate too low and too high values
+    percGraMin = np.percentile(gra, 0.1)
+    gra[gra < percGraMin] = percGraMin
+    percGraMax = np.percentile(gra, 99.0)
+    gra[gra > percGraMax] = percGraMax
+    gamma = 0.0001  # ensures that the max data points fall inside the last bin
+    # auto-scaling for faster interface (0-500 or 600 seems fine)
+    scaleFactor = 500 - gamma
+    gra = gra - gra.min()
+    gra = scaleFactor/gra.max() * gra
 else:
     # calculate gradient magnitude (using L2 norm of the vector)
     gra = np.gradient(ima)
