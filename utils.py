@@ -66,5 +66,6 @@ def ScaleRange(data, scaleFactor=500, delta=0):
     Delta ensures that the max data points fall inside the last bin when this
     function is used with histograms.
     """
+    scaleFactor = scaleFactor - delta
     data = data - data.min()
     return scaleFactor / data.max() * data
