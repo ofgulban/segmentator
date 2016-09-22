@@ -1,5 +1,6 @@
 """Normalized graph cuts for segmentator (experimental)."""
 
+import ncut_prepare
 import os
 import numpy as np
 from matplotlib import animation
@@ -8,7 +9,6 @@ from skimage.filters import gaussian
 from skimage.future import graph
 from skimage.morphology import square, closing
 from skimage.segmentation import slic
-from nibabel import save, Nifti1Image
 
 
 def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
@@ -19,7 +19,7 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
     -----------
         image: np.ndarray (2D)
             Volume histogram.
-        closing_size: positive integer
+        closing_size: int, positive
             determines dilation size closing operation.
         max_edge: float, optional
             The maximum possible value of an edge in the RAG. This corresponds
@@ -58,17 +58,17 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
                                    max_rec=max_rec)
     return labels2
 
-path = '/media/sf_D_DRIVE/MotionQuartet/Analysis/P2/LongTRSegmentation/GM-CSF/SortedMin_restore_masked_volHist.npy'
+path = ncut_prepare.args.filename
 basename = path.split(os.extsep, 1)[0]
 
 img = np.load(path)
 img = np.log10(img+1)
 
-max_recursion = 7
-marian = np.zeros((img.shape[0], img.shape[1], max_recursion + 1))
+max_recursion = ncut_prepare.args.maxrec
+ncut = np.zeros((img.shape[0], img.shape[1], max_recursion + 1))
 for i in range(0, max_recursion + 1):
     msk = norm_grap_cut(img, max_rec=i)
-    marian[:, :, i] = msk
+    ncut[:, :, i] = msk
 
 
 # plots
@@ -96,15 +96,12 @@ def updatefig(*args):
     """Animate the plot."""
     global unq, msk, idx, tmp
     idx += 1
-    idx = idx % marian.shape[2]
-    tmp = np.copy(marian[:, :, idx])
+    idx = idx % ncut.shape[2]
+    tmp = np.copy(ncut[:, :, idx])
     im.set_array(tmp.T)
     return im,
 
 ani = animation.FuncAnimation(fig, updatefig, interval=750, blit=True)
 plt.show()
 
-# new_image = Nifti1Image(marian[:, :, :], affine=np.eye(4, 4))
-# save(new_image, basename+'_ncut')
-
-np.save(basename+'_ncut', marian)
+np.save(basename+'_ncut', ncut)
