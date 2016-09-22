@@ -325,11 +325,16 @@ class responsiveObj:
             return
 
     def updateLabels(self, val):
-        """Update labels in volume histogram."""
+        """Update labels in volume histogram with slider."""
         if self.segmType == 'ncut':
             self.labelNr = self.sLabelNr.val
         else:
             return
+
+    def updateLabelsRadio(self, val):
+        """Update labels with radio buttons."""
+        labelScale = self.lMax / 6.  # nr of non-zero radio buttons
+        self.labelNr = int(float(val) * labelScale)
 
     def labelContours(self):
         """

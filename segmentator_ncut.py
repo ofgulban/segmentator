@@ -25,7 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from nibabel import load
 from matplotlib.colors import LogNorm
-from matplotlib.widgets import Slider, Button
+from matplotlib.widgets import Slider, Button, RadioButtons
 from utils import Ima2VolHistMapping, TruncateRange, ScaleRange
 from segmentator_functions import responsiveObj
 import segmentator
@@ -188,6 +188,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         counterField=np.zeros((nrBins, nrBins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
+                        lMax=lMax
                         )
 
 # make the figure responsive to clicks
@@ -197,20 +198,25 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 
 # %%
 """Sliders and Buttons"""
-# colorbar slider
 axcolor = 'lightgoldenrodyellow'
-axHistC = plt.axes([0.15, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
+
+# radio buttons (ugly but good enough for now)
+rax = plt.axes([0.91, 0.35, 0.08, 0.5], axisbg=axcolor)  # x, y, xsize, ysize
+flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)])
+
+# colorbar slider
+axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], axisbg=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
+
+# label slider
+axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], axisbg=axcolor)
+flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax+varNumAddLabel,
+                          valinit=lMax, valfmt='%i')
 
 # ima browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
                           valinit=0.5, valfmt='%0.3f')
-
-# label slider
-axLabels = plt.axes([0.15, bottom-0.2, 0.25, 0.025], axisbg=axcolor)
-flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax+varNumAddLabel,
-                          valinit=lMax, valfmt='%i')
 
 # cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
@@ -241,5 +247,6 @@ flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
+flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
 
 plt.show()
