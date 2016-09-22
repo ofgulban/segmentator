@@ -1,13 +1,14 @@
+"""Normalized graph cuts for segmentator (experimental)."""
+
 import os
 import numpy as np
+from matplotlib import animation
 from matplotlib import pyplot as plt
 from skimage.filters import gaussian
 from skimage.future import graph
 from skimage.morphology import square, closing
 from skimage.segmentation import slic
 from nibabel import save, Nifti1Image
-
-from skimage import color
 
 
 def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
@@ -57,7 +58,7 @@ def norm_grap_cut(image, closing_size=10, max_edge=100000000, max_rec=3):
                                    max_rec=max_rec)
     return labels2
 
-path = '/media/Data_Drive/Segmentator_Data/Christophe/cerebellum_msr_cereb_volHist.npy'
+path = '/home/faruk/Data/T1_volHist.npy'
 basename = path.split(os.extsep, 1)[0]
 
 img = np.load(path)
@@ -83,8 +84,6 @@ ax2.set_title('Ncut')
 
 plt.show()
 
-import matplotlib.animation as animation
-
 fig = plt.figure()
 unq = np.unique(msk)
 idx = -1
@@ -94,6 +93,7 @@ im = plt.imshow(msk.T, origin="lower", cmap=plt.cm.flag,
 
 
 def updatefig(*args):
+    """Animate the plot."""
     global unq, msk, idx, tmp
     idx += 1
     idx = idx % marian.shape[2]

@@ -57,7 +57,7 @@ for ind in np.arange(ncut_labels.shape[2]):
     ncut_labels[:, :, ind] = tmp2
 lMax = np.max(ncut_labels)
 
-orig_ncut_labels = ncut_labels
+orig_ncut_labels = ncut_labels.copy()
 ima_ncut_labels = ncut_labels.copy()
 
 
