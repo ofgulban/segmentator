@@ -220,8 +220,6 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
-
-
 # define switch for Lasso option
 switchCounter = 1
 

@@ -1,4 +1,4 @@
-"""Functions mostly written by Marian."""
+"""Functions covering the user interaction with the GUI."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -255,14 +255,12 @@ class responsiveObj:
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
-        self.orig = np.transpose(self.orig, cycBackPerm)
-        self.invHistVolume = np.transpose(self.invHistVolume, cycBackPerm)
-        self.cycleCount = 0
+        temp = np.transpose(self.invHistVolume, cycBackPerm)
         # get 3D brain mask
-        mask3D = VolHist2ImaMapping(self.invHistVolume, self.volHistMask)
-        mask3D = mask3D.reshape(self.invHistVolume.shape)
-        # save image as nii
-        new_image = Nifti1Image(mask3D, header=self.nii.get_header(),
+        outNii = VolHist2ImaMapping(temp, self.volHistMask)
+        outNii = outNii.reshape(temp.shape)
+        # save mask image as nii
+        new_image = Nifti1Image(outNii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         save(new_image, self.basename+'_labels.nii.gz')
 
