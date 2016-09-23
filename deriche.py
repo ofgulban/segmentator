@@ -21,7 +21,7 @@ data = np.ascontiguousarray(data, dtype=np.float32)
 
 # calculate gradients
 print(".")
-alpha = 2
+alpha = deriche_prepare.args.alpha
 gra_x = deriche_3D(data, alpha=alpha)
 
 print(".")
