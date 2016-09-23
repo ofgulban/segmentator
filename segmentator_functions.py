@@ -41,6 +41,8 @@ class responsiveObj:
         """Update volume histogram mask."""
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
+            self.volHistMask = self.lassoArr(self.volHistMask,
+                                             self.idxLasso)
             self.volHistMaskH.set_data(self.volHistMask)
         elif self.segmType == 'ncut':
             self.labelContours()
@@ -281,15 +283,19 @@ class responsiveObj:
         # update brain slice
         self.updateSlc()
         if self.segmType == 'main':
-            # reset theta sliders
-            self.sThetaMin.reset()
-            self.sThetaMax.reset()
-            # reset values for mask
-            self.sectorObj.set_x(cfg.init_centre[0])
-            self.sectorObj.set_y(cfg.init_centre[1])
-            self.sectorObj.set_r(cfg.init_radius)
-            self.sectorObj.tmin, self.sectorObj.tmax = np.deg2rad(
-                cfg.init_theta)
+            if self.lassoSwitchCount == 1:  # reset only lasso drawing
+                self.idxLasso = np.zeros(self.nrBins*self.nrBins, dtype=bool)
+            else:
+                # reset theta sliders
+                self.sThetaMin.reset()
+                self.sThetaMax.reset()
+                # reset values for mask
+                self.sectorObj.set_x(cfg.init_centre[0])
+                self.sectorObj.set_y(cfg.init_centre[1])
+                self.sectorObj.set_r(cfg.init_radius)
+                self.sectorObj.tmin, self.sectorObj.tmax = np.deg2rad(
+                    cfg.init_theta)
+
         elif self.segmType == 'ncut':
             self.sLabelNr.reset()
             # reset ncut labels
@@ -356,3 +362,10 @@ class responsiveObj:
         self.pltMap[:, :, 3] = self.pltMap[:, :, 3]/255
         self.pltMapH.set_data(self.pltMap)
         self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
+
+    def lassoArr(self, array, indices):
+        """Lasso related."""
+        lin = np.arange(array.size)
+        newArray = array.flatten()
+        newArray[lin[indices]] = 1
+        return newArray.reshape(array.shape)

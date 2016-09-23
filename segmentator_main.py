@@ -142,6 +142,8 @@ volHistMaskH, volHistMask = sectorObj.draw(
 
 # initiate a flexible figure object, pass to it usefull properties
 segmType = 'main'
+idxLasso = np.zeros(nrBins*nrBins, dtype=bool)
+lassoSwitchCount = 0
 flexFig = responsiveObj(figure=ax.figure,
                         axes=ax.axes,
                         axes2=ax2.axes,
@@ -157,7 +159,9 @@ flexFig = responsiveObj(figure=ax.figure,
                         volHistMask=volHistMask,
                         volHistMaskH=volHistMaskH,
                         contains=volHistMaskH.contains,
-                        counts=counts)
+                        counts=counts,
+                        idxLasso=idxLasso,
+                        lassoSwitchCount=lassoSwitchCount)
 
 # make the figure responsive to clicks
 flexFig.connect()
@@ -220,26 +224,19 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
-# define switch for Lasso option
-switchCounter = 1
 
 
 def lassoSwitch(event):
     """Enable disable lasso tool."""
-    global lasso, switchCounter, OnSelectCounter
+    global lasso
     lasso = []
-    switchCounter += 1
-    switchStatus = switchCounter % 2
-    if switchStatus == 0:
-        # disable drag function of sector mask
-        flexFig.disconnect()
-        # enable lasso
+    flexFig.lassoSwitchCount = (flexFig.lassoSwitchCount+1) % 2
+    if flexFig.lassoSwitchCount == 1:  # enable lasso
+        flexFig.disconnect()  # disable drag function of sector mask
         lasso = LassoSelector(ax, onselect)
-    elif switchStatus == 1:
-        OnSelectCounter = 0
-        lasso = []
-        # enable drag function of sector mask
-        flexFig.connect()
+    else:  # disable lasso
+        lasso = []  # I am not sure we want to reset lasso with this button
+        flexFig.connect()  # enable drag function of sector mask
 
 # Pixel coordinates
 pix = np.arange(nrBins)
@@ -247,26 +244,14 @@ xv, yv = np.meshgrid(pix, pix)
 pix = np.vstack((xv.flatten(), yv.flatten())).T
 
 
-def updateArray(array, indices):
-    """Lasso related."""
-    lin = np.arange(array.size)
-    newArray = array.flatten()
-    newArray[lin[indices]] = 1
-    return newArray.reshape(array.shape)
-
-OnSelectCounter = 0
-
-
 def onselect(verts):
     """Lasso related."""
-    global pix, OnSelectCounter
+    global pix
     p = path.Path(verts)
-    ind = p.contains_points(pix, radius=1.5)
+    newLasIdx = p.contains_points(pix, radius=1.5)  # new lasso indices
+    flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
     # update volume histogram mask
-    if OnSelectCounter == 0:
-        flexFig.volHistMask = flexFig.sectorObj.binaryMask()
-    OnSelectCounter += 1
-    flexFig.volHistMask = updateArray(flexFig.volHistMask, ind)
+    flexFig.volHistMask = flexFig.lassoArr(flexFig.volHistMask, newLasIdx)
     flexFig.volHistMaskH.set_data(flexFig.volHistMask)
     # update image mask
     flexFig.imaMask = VolHist2ImaMapping(
