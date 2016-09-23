@@ -36,6 +36,7 @@ class responsiveObj:
         self.press = None
         self.ctrlHeld = False
         self.labelNr = 0
+        self.imaMaskSwitchCount = 0
 
     def updateMsks(self):
         """Update volume histogram mask."""
@@ -347,6 +348,14 @@ class responsiveObj:
         """Update labels with radio buttons."""
         labelScale = self.lMax / 6.  # nr of non-zero radio buttons
         self.labelNr = int(float(val) * labelScale)
+
+    def imaMaskTrans(self, event):
+        self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
+        if self.imaMaskSwitchCount == 1:  # set imaMask transp
+            self.imaMaskH.set_alpha(0)
+        else:  # set imaMask opaque
+            self.imaMaskH.set_alpha(0.5)
+        self.updateMsks()
 
     def labelContours(self):
         """

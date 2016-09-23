@@ -238,6 +238,12 @@ flexFig.bExportNyp = Button(exportax, 'Export\nLabels',
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
+# imaMask button
+imaMaskax = plt.axes([0.9125, 0.25, 0.075, 0.075])
+flexFig.bImaMask = Button(imaMaskax, 'Transp\nMask',
+                          color=axcolor, hovercolor='0.975')
+
+
 # %%
 """Updates"""
 flexFig.sHistC.on_changed(flexFig.updateColorBar)
@@ -247,6 +253,7 @@ flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
+flexFig.bImaMask.on_clicked(flexFig.imaMaskTrans)
 flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
 
 plt.show()
