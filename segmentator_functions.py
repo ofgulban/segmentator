@@ -182,7 +182,7 @@ class responsiveObj:
                     ybin = np.floor(event.ydata)
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
-                    self.volHistMask[self.volHistMask == val] = self.labelNr
+                    self.volHistMask[self.volHistMask == val] = np.copy(self.labelNr)
                     self.updateMsks()
 
     def on_motion(self, event):

@@ -1,4 +1,4 @@
-"""Command line agument parsing."""
+"""Command line agument parsing for segmentator."""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
