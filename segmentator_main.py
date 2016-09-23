@@ -251,14 +251,7 @@ def onselect(verts):
     newLasIdx = p.contains_points(pix, radius=1.5)  # new lasso indices
     flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
     # update volume histogram mask
-    flexFig.volHistMask = flexFig.lassoArr(flexFig.volHistMask, newLasIdx)
-    flexFig.volHistMaskH.set_data(flexFig.volHistMask)
-    # update image mask
-    flexFig.imaMask = VolHist2ImaMapping(
-        flexFig.invHistVolume[:, :, flexFig.sliceNr],
-        flexFig.volHistMask)
-    flexFig.imaMaskH.set_data(flexFig.imaMask)
-    fig.canvas.draw_idle()
+    flexFig.updateMsks()
 
 bLasso.on_clicked(lassoSwitch)
 
