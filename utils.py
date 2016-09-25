@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 
 
@@ -78,3 +79,11 @@ def ScaleRange(data, scaleFactor=500, delta=0):
     scaleFactor = scaleFactor - delta
     data = data - data.min()
     return scaleFactor / data.max() * data
+
+
+def calcEntrop(x):
+    """Calculate entropy of a segment"""
+    counts = np.bincount(x)
+    probs = counts[np.nonzero(counts)] / len(x)
+    entrop = - np.sum(probs * np.log2(probs))
+    return entrop
