@@ -88,6 +88,7 @@ def calcEntrop(x):
     entrop = - np.sum(probs * np.log2(probs))
     return entrop
 
+
 def calcInfoGain(x, y):
     """Calculate information gain (red entropy) from splitting data"""
     # get parent segment
@@ -100,9 +101,3 @@ def calcInfoGain(x, y):
     # calculate
     infoGain = (zEntrop-np.sum((xEntrop, yEntrop))) / zEntrop
     return infoGain
-
-    
-    
-    
-
-    
