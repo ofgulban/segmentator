@@ -83,6 +83,9 @@ def getVoxInd(pix2VoxMap, pixInd):
 
 def calcEntrop(x):
     """Calculate entropy of a segment"""
+    if x.size == 0:
+        print "array empty. no entropy calculated"
+    x = x.astype(int)
     counts = np.bincount(x)
     probs = counts[np.nonzero(counts)] / len(x)
     entrop = - np.sum(probs * np.log2(probs))
