@@ -28,6 +28,7 @@ from matplotlib.colors import LogNorm, ListedColormap, BoundaryNorm
 from matplotlib.widgets import Slider, Button, RadioButtons
 from utils import Ima2VolHistMapping, TruncateRange, ScaleRange
 from segmentator_functions import responsiveObj
+from VolHist2ImaMapping4Vols import VolHist2ImaOffline
 import segmentator
 
 # %%
@@ -179,6 +180,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         segmType=segmType,
                         orig=orig,
                         nii=nii,
+                        ima=ima,
                         nrBins=nrBins,
                         sliceNr=int(0.5*orig.shape[2]),
                         slcH=slcH,
@@ -196,8 +198,13 @@ flexFig = responsiveObj(figure=ax.figure,
 
 # make the figure responsive to clicks
 flexFig.connect()
+# get mapping from image slice to volume histogram
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
+# get mapping from volume histogram to all volxes in data (slow!!!)
+print "start VolHist to Ima calculation"
+flexFig.volHist2ImaMap = VolHist2ImaOffline(ima2volHistMap, nrBins)
+print "calculation done"
 
 # %%
 """Sliders and Buttons"""

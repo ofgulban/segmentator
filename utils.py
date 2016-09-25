@@ -49,15 +49,6 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
     return imaSlcMask
 
 
-def getVoxInd(pix2VoxMap, pixInd):
-    """Get voxel indices from pixel indices"""
-    # Use pixels as indices to get voxels (i.e. create voxMask)
-    voxInd = pix2VoxMap[pixInd]
-    # Use list comprehension (faster than itertools, hstack, ...)
-    voxInd = [item for sublist in voxInd for item in sublist]
-    return voxInd
-
-
 def TruncateRange(data, percMin=0.01, percMax=99.9):
     """Truncate too low and too high values."""
     # adjust minimum
@@ -79,6 +70,15 @@ def ScaleRange(data, scaleFactor=500, delta=0):
     scaleFactor = scaleFactor - delta
     data = data - data.min()
     return scaleFactor / data.max() * data
+
+
+def getVoxInd(pix2VoxMap, pixInd):
+    """Get voxel indices from pixel indices"""
+    # Use vol hist pixels as indices to get data voxels (i.e. create voxMask)
+    voxInd = pix2VoxMap[pixInd]
+    # Use list comprehension (faster than itertools, hstack, ...)
+    voxInd = [item for sublist in voxInd for item in sublist]
+    return voxInd
 
 
 def calcEntrop(x):

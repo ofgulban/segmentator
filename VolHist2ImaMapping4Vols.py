@@ -1,4 +1,8 @@
-"""Some utility functions."""
+"""This function serves to make a mapping from the volume histogram to every
+voxel in the data, not just the currently displayed slice.
+
+This function is slow and might benefit from cython.
+"""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
@@ -19,7 +23,7 @@
 import numpy as np
 
 
-def VolHist2ImaMapping4Vols(vox2pixMap, nrBins):
+def VolHist2ImaOffline(vox2pixMap, nrBins):
     """Volume histogram to image mapping for volumes. Uses logical indexing"""
     # get bincount (to know how many voxels are in pixel 0,1,etc.. of volHist)
     counts = np.bincount(vox2pixMap, minlength=nrBins**2)
