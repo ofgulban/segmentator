@@ -35,7 +35,7 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
 
 
 def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
-    """Volume histogram to image mapping."""
+    """Volume histogram to image mapping for slices. Uses np.ind1"""
     imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:
@@ -46,6 +46,15 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
         imaSlcMask[voxMask] = idx
     imaSlcMask = imaSlcMask.reshape(imaSlc2volHistMap.shape)
     return imaSlcMask
+
+
+def getVoxInd(pix2VoxMap, pixInd):
+    """Get voxel indices from pixel indices"""
+    # Use pixels as indices to get voxels (i.e. create voxMask)
+    voxInd = pix2VoxMap[pixInd]
+    # Use list comprehension (faster than itertools, hstack, ...)
+    voxInd = [item for sublist in voxInd for item in sublist]
+    return voxInd
 
 
 def TruncateRange(data, percMin=0.01, percMax=99.9):
