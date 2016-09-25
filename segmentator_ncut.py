@@ -24,7 +24,7 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from nibabel import load
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm, ListedColormap, BoundaryNorm
 from matplotlib.widgets import Slider, Button, RadioButtons
 from utils import Ima2VolHistMapping, TruncateRange, ScaleRange
 from segmentator_functions import responsiveObj
@@ -131,7 +131,10 @@ ax.set_title("2D Histogram")
 
 # plot map for poltical borders
 pltMap = np.zeros((nrBins, nrBins, 1)).repeat(4, 2)
-pltMapH = ax.imshow(pltMap, alpha=1,
+cmapPltMap = ListedColormap(['w', 'black', 'red', 'blue'])
+boundsPltMap = [0, 1, 2, 3, 4]
+normPltMap = BoundaryNorm(boundsPltMap, cmapPltMap.N)
+pltMapH = ax.imshow(pltMap, alpha=1, cmap=cmapPltMap, norm=normPltMap,
                     extent=[0, nrBins, nrBins, 0])
 
 # plot colorbar for 2d hist
