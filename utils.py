@@ -87,3 +87,22 @@ def calcEntrop(x):
     probs = counts[np.nonzero(counts)] / len(x)
     entrop = - np.sum(probs * np.log2(probs))
     return entrop
+
+def calcInfoGain(x, y):
+    """Calculate information gain (red entropy) from splitting data"""
+    # get parent segment
+    z = np.hstack((x, y))
+    # get entropy for the subdivisions (children) segments
+    xEntrop = (len(x)/len(z)) * calcEntrop(x)
+    yEntrop = (len(y)/len(z)) * calcEntrop(y)
+    # get entropy for the undivided (parent) segment
+    zEntrop = calcEntrop(z)
+    # calculate
+    infoGain = (zEntrop-np.sum((xEntrop, yEntrop))) / zEntrop
+    return infoGain
+
+    
+    
+    
+
+    
