@@ -95,8 +95,8 @@ class responsiveObj:
             elif event.key == 'left':
                 self.sectorObj.rotate(10.0)
                 self.updateMsks()
-        else:
-            return
+            else:
+                return
 
     def on_key_release(self, event):
         """Determine what happens if key is released."""
@@ -313,6 +313,8 @@ class responsiveObj:
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
+        print "successfully exported labels as: \n" + \
+            self.basename + self.flexfilename
 
     def resetGlobal(self, event):
         """Reset stuff."""
@@ -377,7 +379,10 @@ class responsiveObj:
         if self.segmType == 'ncut':
             np.save(self.basename + '_volHistLabels', self.volHistMask)
         elif self.segmType == 'main':
-            np.save(self.basename + '_volHist', self.counts)
+            filename = '_volHist' + '_pcMax' + str(int(self.initTpl[0])) + \
+                '_pcMin' + str(int(self.initTpl[1])) + '_sc' + \
+                str(int(self.initTpl[2]))
+            np.save(self.basename + filename, self.counts)
             return
 
     def updateLabels(self, val):

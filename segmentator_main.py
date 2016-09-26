@@ -41,7 +41,8 @@ orig = np.squeeze(nii.get_data())
 
 percMin, percMax = segmentator.args.percmin, segmentator.args.percmax
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-orig = ScaleRange(orig, scaleFactor=segmentator.args.scale, delta=0.0001)
+scaleFactor = segmentator.args.scale
+orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
@@ -153,6 +154,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         contains=volHistMaskH.contains,
                         counts=counts,
                         idxLasso=idxLasso,
+                        initTpl=(percMin, percMax, scaleFactor),
                         lassoSwitchCount=lassoSwitchCount)
 
 # make the figure responsive to clicks
