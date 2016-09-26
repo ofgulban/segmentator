@@ -18,6 +18,7 @@
 
 from __future__ import division
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def sub2ind(array_shape, rows, cols):
@@ -70,6 +71,19 @@ def ScaleRange(data, scaleFactor=500, delta=0):
     scaleFactor = scaleFactor - delta
     data = data - data.min()
     return scaleFactor / data.max() * data
+
+
+def Hist2D(ima, gra):
+    """Prepare 2D histogram related variables.
+
+    This function is modularized to be caleld from the terminal.
+    """
+    dataMin = np.round(ima.min())
+    dataMax = np.round(ima.max())
+    nrBins = int(dataMax - dataMin)
+    binEdges = np.arange(dataMin, dataMax+1)
+    counts, _, _, volHistH = plt.hist2d(ima, gra, bins=binEdges, cmap='Greys')
+    return counts, volHistH, dataMin, dataMax, nrBins, binEdges
 
 
 def getVoxInd(pix2VoxMap, pixInd):

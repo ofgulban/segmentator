@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 from nibabel import load
 from matplotlib.colors import LogNorm, ListedColormap, BoundaryNorm
 from matplotlib.widgets import Slider, Button, RadioButtons
-from utils import Ima2VolHistMapping, TruncateRange, ScaleRange
+from utils import Ima2VolHistMapping, TruncateRange, ScaleRange, Hist2D
 from segmentator_functions import responsiveObj
 from VolHist2ImaMapping4Vols import VolHist2ImaOffline
 import segmentator
@@ -89,43 +89,16 @@ else:
 ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
 
-
-# fill ncut_labels up with zeros if needed
-binEdges = np.arange(dataMin, dataMax+1)
-nrBins = len(binEdges)-1
-
-if ncut_labels.shape[0] < nrBins:
-    dif1 = nrBins - ncut_labels.shape[0]
-    ncut_labels = np.append(ncut_labels,
-                            np.zeros((dif1,
-                                      ncut_labels.shape[1],
-                                      ncut_labels.shape[2])),
-                            axis=0)
-
-if ncut_labels.shape[1] < nrBins:
-    dif2 = nrBins - ncut_labels.shape[1]
-    ncut_labels = np.append(ncut_labels,
-                            np.zeros((ncut_labels.shape[0],
-                                      dif2,
-                                      ncut_labels.shape[2])),
-                            axis=1)
-# set number of free labels that the user can set
-varNumAddLabel = 5
-
 # %%
 """Plots"""
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-binEdges = np.arange(dataMin, dataMax+1)
-nrBins = len(binEdges)-1
-counts, xedges, yedges, volHistH = plt.hist2d(ima, gra,
-                                              bins=binEdges,
-                                              cmap='Greys'
-                                              )
+
+counts, volHistH, dataMin, dataMax, nrBins, binEdges = Hist2D(ima, gra)
 
 ax.set_xlim(dataMin, dataMax)
-ax.set_ylim(0, dataMax)
+ax.set_ylim(dataMin, dataMax)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
@@ -145,12 +118,28 @@ plt.colorbar(volHistH)
 # Set up a colormap for ncut labels
 ncut_palette = plt.cm.gist_rainbow
 ncut_palette.set_under('w', 0)
+
+# fill ncut_labels up with zeros if needed
+if ncut_labels.shape[0] < nrBins:
+    dif1 = nrBins - ncut_labels.shape[0]
+    ncut_labels = np.append(ncut_labels,
+                            np.zeros((dif1,
+                                      ncut_labels.shape[1],
+                                      ncut_labels.shape[2])), axis=0)
+
+if ncut_labels.shape[1] < nrBins:
+    dif2 = nrBins - ncut_labels.shape[1]
+    ncut_labels = np.append(ncut_labels,
+                            np.zeros((ncut_labels.shape[0],
+                                      dif2,
+                                      ncut_labels.shape[2])), axis=1)
+
 # plot hist mask (with ncut labels)
 volHistMask = np.squeeze(ncut_labels[:, :, 0])
 volHistMaskH = ax.imshow(volHistMask, interpolation='none',
                          alpha=0.2, cmap=ncut_palette,
                          vmin=np.min(ncut_labels)+1,  # to make 0 transparent
-                         vmax=lMax+varNumAddLabel,
+                         vmax=lMax,
                          extent=[0, nrBins, nrBins, 0])
 
 # plot 3D ima by default
@@ -161,7 +150,7 @@ slcH = ax2.imshow(orig[:, :, int(orig.shape[2]/2)], cmap=plt.cm.gray,
 imaMask = np.zeros(orig.shape[0:2])*total_labels[1]
 imaMaskH = ax2.imshow(imaMask, interpolation='none', alpha=0.5,
                       cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
-                      vmax=lMax+varNumAddLabel,
+                      vmax=lMax,
                       extent=[0, orig.shape[1], orig.shape[0], 0])
 
 # adjust subplots on figure
@@ -220,7 +209,7 @@ flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
 
 # label slider
 axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], axisbg=axcolor)
-flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax+varNumAddLabel,
+flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax,
                           valinit=lMax, valfmt='%i')
 
 # ima browser slider

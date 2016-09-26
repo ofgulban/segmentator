@@ -26,7 +26,7 @@ from matplotlib import path
 from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
-from utils import Ima2VolHistMapping, VolHist2ImaMapping
+from utils import Ima2VolHistMapping, VolHist2ImaMapping, Hist2D
 from utils import TruncateRange, ScaleRange
 import config as cfg
 import segmentator
@@ -73,16 +73,8 @@ palette.set_bad('m', 1.0)
 # Plot 2D histogram
 fig = plt.figure()
 ax = fig.add_subplot(121)
-dataMin = np.round(orig.min())
-dataMax = np.round(orig.max())
-nrBins = int(dataMax - dataMin)
-binEdges = np.arange(dataMin, dataMax+1)
-counts, xedges, yedges, volHistH = plt.hist2d(
-    ima,
-    gra,
-    bins=binEdges,
-    cmap='Greys'
-    )
+
+counts, volHistH, dataMin, dataMax, nrBins, binEdges = Hist2D(ima, gra)
 
 ax.set_xlim(dataMin, dataMax)
 ax.set_ylim(dataMin, dataMax)
