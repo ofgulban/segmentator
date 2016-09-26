@@ -217,6 +217,11 @@ axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
                           valinit=0.5, valfmt='%0.3f')
 
+# ima mask transparency slider
+axTransp = plt.axes([0.6, bottom-0.11, 0.25, 0.025], axisbg=axcolor)
+flexFig.sImaMaskTrans = Slider(axTransp, 'Transparency', 0, 0.999,
+                               valinit=0.5, valfmt='%0.3f')
+
 # cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
 flexFig.bCycle = Button(cycleax, 'Cycle\nView',
@@ -237,8 +242,8 @@ flexFig.bExportNyp = Button(exportax, 'Export\nLabels',
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
-# imaMask button
-imaMaskax = plt.axes([0.9125, 0.25, 0.075, 0.075])
+# imaMask transparency button
+imaMaskax = plt.axes([0.915, bottom-0.155, 0.075, 0.075])
 flexFig.bImaMask = Button(imaMaskax, 'Transp\nMask',
                           color=axcolor, hovercolor='0.975')
 
@@ -248,11 +253,12 @@ flexFig.bImaMask = Button(imaMaskax, 'Transp\nMask',
 flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
 flexFig.sLabelNr.on_changed(flexFig.updateLabels)
+flexFig.sImaMaskTrans.on_changed(flexFig.imaMaskTransS)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
-flexFig.bImaMask.on_clicked(flexFig.imaMaskTrans)
+flexFig.bImaMask.on_clicked(flexFig.imaMaskTransB)
 flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
 
 plt.show()
