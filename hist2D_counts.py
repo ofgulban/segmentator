@@ -77,6 +77,6 @@ ima = np.ndarray.flatten(ima)
 gra = np.ndarray.flatten(gra)
 
 counts, _, _, _, _, _ = Hist2D(ima, gra)
-outName = basename + '_volHist_TEST'
+outName = basename + '_volHist'
 np.save(outName, counts)
 print 'Counts saved as: ' + outName

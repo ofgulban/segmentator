@@ -370,6 +370,7 @@ class responsiveObj:
         self.labelNr = int(float(val) * labelScale)
 
     def imaMaskTrans(self, event):
+        """Update alpha of the image mask to toggle transparency of it."""
         self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
         if self.imaMaskSwitchCount == 1:  # set imaMask transp
             self.imaMaskH.set_alpha(0)

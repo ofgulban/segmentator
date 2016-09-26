@@ -87,7 +87,7 @@ def Hist2D(ima, gra):
 
 
 def getVoxInd(pix2VoxMap, pixInd):
-    """Get voxel indices from pixel indices"""
+    """Get voxel indices from pixel indices."""
     # Use vol hist pixels as indices to get data voxels (i.e. create voxMask)
     voxInd = pix2VoxMap[pixInd]
     # Use list comprehension (faster than itertools, hstack, ...)
@@ -96,7 +96,7 @@ def getVoxInd(pix2VoxMap, pixInd):
 
 
 def calcEntrop(x):
-    """Calculate entropy of a segment"""
+    """Calculate entropy of a segment."""
     if x.size == 0:
         print "array empty. no entropy calculated"
     x = x.astype(int)
@@ -107,7 +107,7 @@ def calcEntrop(x):
 
 
 def calcInfoGain(x, y):
-    """Calculate information gain (red entropy) from splitting data"""
+    """Calculate information gain (red entropy) from splitting data."""
     # get parent segment
     z = np.hstack((x, y))
     # get entropy for the subdivisions (children) segments
