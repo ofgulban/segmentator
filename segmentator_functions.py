@@ -37,6 +37,7 @@ class responsiveObj:
         self.ctrlHeld = False
         self.labelNr = 0
         self.imaMaskSwitchCount = 0
+        self.nrExports = 0
         self.entropWin = 0
 
     def updateMsks(self):
@@ -291,7 +292,11 @@ class responsiveObj:
         # save mask image as nii
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
-        save(new_image, self.basename+'_labels.nii.gz')
+        self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
+        if os.path.isfile(self.basename + self.flexfilename):
+            self.nrExports += 1
+            self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
+        save(new_image, self.basename + self.flexfilename)
 
     def resetGlobal(self, event):
         """Reset stuff."""
