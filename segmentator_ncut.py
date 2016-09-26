@@ -67,7 +67,8 @@ ima_ncut_labels = ncut_labels.copy()
 orig = np.squeeze(nii.get_data())
 percMin, percMax = segmentator.args.percmin, segmentator.args.percmax
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-orig = ScaleRange(orig, scaleFactor=segmentator.args.scale, delta=0.0001)
+scaleFactor = segmentator.args.scale
+orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 # define dataMin and dataMax for later use
 dataMin = np.round(orig.min())
 dataMax = np.round(orig.max())
@@ -156,6 +157,7 @@ imaMaskH = ax2.imshow(imaMask, interpolation='none', alpha=0.5,
 # adjust subplots on figure
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
+fig.canvas.set_window_title(nii.get_filename())
 plt.axis('off')
 
 
@@ -182,6 +184,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         counterField=np.zeros((nrBins, nrBins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
+                        initTpl=(percMin, percMax, scaleFactor),
                         lMax=lMax
                         )
 

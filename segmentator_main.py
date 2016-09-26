@@ -110,6 +110,7 @@ imaMaskH = ax2.imshow(
 # adjust subplots on figure
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
+fig.canvas.set_window_title(nii.get_filename())
 plt.axis('off')
 
 #
