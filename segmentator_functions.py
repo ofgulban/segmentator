@@ -82,6 +82,21 @@ class responsiveObj:
         """Determine what happens if key is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
+        if self.segmType == 'main':
+            if event.key == 'up':
+                self.sectorObj.scale_r(1.05)
+                self.updateMsks()
+            elif event.key == 'down':
+                self.sectorObj.scale_r(0.95)
+                self.updateMsks()
+            elif event.key == 'right':
+                self.sectorObj.rotate(-10.0)
+                self.updateMsks()
+            elif event.key == 'left':
+                self.sectorObj.rotate(10.0)
+                self.updateMsks()
+        else:
+            return
 
     def on_key_release(self, event):
         """Determine what happens if key is released."""
