@@ -292,6 +292,7 @@ class responsiveObj:
         # save mask image as nii
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
+        # get new flex file name and check for overwriting
         self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         if os.path.isfile(self.basename + self.flexfilename):
             self.nrExports += 1
