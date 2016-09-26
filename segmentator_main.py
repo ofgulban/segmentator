@@ -172,6 +172,11 @@ axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
                           valfmt='%0.3f')
 
+# ima mask transparency slider
+axTransp = plt.axes([0.6, bottom-0.11, 0.25, 0.025], axisbg=axcolor)
+flexFig.sImaMaskTrans = Slider(axTransp, 'Transparency', 0, 0.999,
+                               valinit=0.5, valfmt='%0.3f')
+
 # theta sliders
 aThetaMin = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
 flexFig.sThetaMin = Slider(aThetaMin, 'ThetaMin', 0, 359.9,
@@ -200,16 +205,24 @@ flexFig.bExportNyp = Button(exportax, 'Export\nCounts',
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
+# imaMask transparency button
+imaMaskax = plt.axes([0.915, bottom-0.155, 0.075, 0.075])
+flexFig.bImaMask = Button(imaMaskax, 'Transp\nMask',
+                          color=axcolor, hovercolor='0.975')
+
 #
 """Updates"""
 flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
+flexFig.sImaMaskTrans.on_changed(flexFig.imaMaskTransS)
 flexFig.sThetaMin.on_changed(flexFig.updateThetaMin)
 flexFig.sThetaMax.on_changed(flexFig.updateThetaMax)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
+flexFig.bImaMask.on_clicked(flexFig.imaMaskTransB)
+
 
 #
 """New stuff: Lasso (Experimental)"""

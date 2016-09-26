@@ -299,6 +299,8 @@ class responsiveObj:
         self.sHistC.reset()
         # reset ima browser slider
         self.sSliceNr.reset()
+        # reset transparency ima mask slider
+        self.sImaMaskTrans.reset()
         # reset slice number
         self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
         # update brain slice
@@ -364,19 +366,25 @@ class responsiveObj:
         else:
             return
 
+    def imaMaskTransS(self, val):
+        """Update transparency of image mask with slider."""
+        self.imaMaskH.set_alpha(self.sImaMaskTrans.val)
+
+    def imaMaskTransB(self, event):
+        """Update transparency of image mask to toggle transparency of it."""
+        self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
+        if self.imaMaskSwitchCount == 1:  # set imaMask transp
+            self.imaMaskH.set_alpha(0)
+            self.sImaMaskTrans.set_val(0)
+        else:  # set imaMask opaque
+            self.imaMaskH.set_alpha(0.8)
+            self.sImaMaskTrans.set_val(0.8)
+        self.updateMsks()
+
     def updateLabelsRadio(self, val):
         """Update labels with radio buttons."""
         labelScale = self.lMax / 6.  # nr of non-zero radio buttons
         self.labelNr = int(float(val) * labelScale)
-
-    def imaMaskTrans(self, event):
-        """Update alpha of the image mask to toggle transparency of it."""
-        self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
-        if self.imaMaskSwitchCount == 1:  # set imaMask transp
-            self.imaMaskH.set_alpha(0)
-        else:  # set imaMask opaque
-            self.imaMaskH.set_alpha(0.5)
-        self.updateMsks()
 
     def labelContours(self):
         """
