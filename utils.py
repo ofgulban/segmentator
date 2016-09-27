@@ -84,37 +84,3 @@ def Hist2D(ima, gra):
     binEdges = np.arange(dataMin, dataMax+1)
     counts, _, _, volHistH = plt.hist2d(ima, gra, bins=binEdges, cmap='Greys')
     return counts, volHistH, dataMin, dataMax, nrBins, binEdges
-
-
-def getVoxInd(pix2VoxMap, pixInd):
-    """Get voxel indices from pixel indices."""
-    # Use vol hist pixels as indices to get data voxels (i.e. create voxMask)
-    voxInd = pix2VoxMap[pixInd]
-    # Use list comprehension (faster than itertools, hstack, ...)
-    voxInd = [item for sublist in voxInd for item in sublist]
-    return voxInd
-
-
-def calcEntrop(x):
-    """Calculate entropy of a segment."""
-    if x.size == 0:
-        print "array empty. no entropy calculated"
-    x = x.astype(int)
-    counts = np.bincount(x)
-    probs = counts[np.nonzero(counts)] / len(x)
-    entrop = - np.sum(probs * np.log2(probs))
-    return entrop
-
-
-def calcInfoGain(x, y):
-    """Calculate information gain (red entropy) from splitting data."""
-    # get parent segment
-    z = np.hstack((x, y))
-    # get entropy for the subdivisions (children) segments
-    xEntrop = (len(x)/len(z)) * calcEntrop(x)
-    yEntrop = (len(y)/len(z)) * calcEntrop(y)
-    # get entropy for the undivided (parent) segment
-    zEntrop = calcEntrop(z)
-    # calculate
-    infoGain = (zEntrop-np.sum((xEntrop, yEntrop))) / zEntrop
-    return infoGain
