@@ -26,7 +26,7 @@ from matplotlib import path
 from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
-from utils import Ima2VolHistMapping, VolHist2ImaMapping, Hist2D
+from utils import Ima2VolHistMapping, Hist2D
 from utils import TruncateRange, ScaleRange
 import config as cfg
 import segmentator
