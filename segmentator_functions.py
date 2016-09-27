@@ -377,7 +377,11 @@ class responsiveObj:
     def exportNyp(self, event):
         """Export histogram counts as a numpy array."""
         if self.segmType == 'ncut':
-            np.save(self.basename + '_volHistLabels', self.volHistMask)
+            filename = '_volHistLabels' + '_pcMax' + \
+                str(int(self.initTpl[0])) + '_pcMin' + \
+                str(int(self.initTpl[1])) + '_sc' + \
+                str(int(self.initTpl[2]))
+            np.save(self.basename + filename, self.volHistMask)
         elif self.segmType == 'main':
             filename = '_volHist' + '_pcMax' + str(int(self.initTpl[0])) + \
                 '_pcMin' + str(int(self.initTpl[1])) + '_sc' + \
