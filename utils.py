@@ -50,7 +50,7 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
     return imaSlcMask
 
 
-def TruncateRange(data, percMin=0.01, percMax=99.9):
+def TruncateRange(data, percMin=0.25, percMax=99.75):
     """Truncate too low and too high values."""
     # adjust minimum
     percDataMin = np.percentile(data, percMin)
