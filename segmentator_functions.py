@@ -382,11 +382,16 @@ class responsiveObj:
                 str(int(self.initTpl[1])) + '_sc' + \
                 str(int(self.initTpl[2]))
             np.save(self.basename + filename, self.volHistMask)
+            print "successfully exported histogram colors as: \n" + \
+                self.basename + filename
         elif self.segmType == 'main':
             filename = '_volHist' + '_pcMax' + str(int(self.initTpl[0])) + \
                 '_pcMin' + str(int(self.initTpl[1])) + '_sc' + \
                 str(int(self.initTpl[2]))
             np.save(self.basename + filename, self.counts)
+            print "successfully exported histogram counts as: \n" + \
+                self.basename + filename
+        else:
             return
 
     def updateLabels(self, val):
