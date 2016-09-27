@@ -291,6 +291,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
+        print "start exporting labels..."
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -308,12 +309,13 @@ class responsiveObj:
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
+        self.nrExports = 0
         self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        if os.path.isfile(self.basename + self.flexfilename):
+        while os.path.isfile(self.basename + self.flexfilename):
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
-        print "successfully exported labels as: \n" + \
+        print "successfully exported image labels as: \n" + \
             self.basename + self.flexfilename
 
     def resetGlobal(self, event):
@@ -382,11 +384,16 @@ class responsiveObj:
                 str(int(self.initTpl[1])) + '_sc' + \
                 str(int(self.initTpl[2]))
             np.save(self.basename + filename, self.volHistMask)
+            print "successfully exported histogram colors as: \n" + \
+                self.basename + filename
         elif self.segmType == 'main':
             filename = '_volHist' + '_pcMax' + str(int(self.initTpl[0])) + \
                 '_pcMin' + str(int(self.initTpl[1])) + '_sc' + \
                 str(int(self.initTpl[2]))
             np.save(self.basename + filename, self.counts)
+            print "successfully exported histogram counts as: \n" + \
+                self.basename + filename
+        else:
             return
 
     def updateLabels(self, val):
