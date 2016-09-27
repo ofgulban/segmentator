@@ -238,7 +238,7 @@ flexFig.bExport = Button(exportax, 'Export\nNifti',
 
 # export nyp button
 exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
-flexFig.bExportNyp = Button(exportax, 'Export\nLabels',
+flexFig.bExportNyp = Button(exportax, 'Export\nHist',
                             color=axcolor, hovercolor='0.975')
 
 # reset button
