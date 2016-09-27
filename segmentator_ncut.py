@@ -179,9 +179,9 @@ flexFig.connect()
 ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 # get mapping from volume histogram to all volxes in data (slow!!!)
-#print "start VolHist to Ima calculation"
-#flexFig.volHist2ImaMap = VolHist2ImaOffline(ima2volHistMap, nrBins)
-#print "calculation done"
+print "start VolHist to Ima calculation"
+flexFig.volHist2ImaMap = VolHist2ImaOffline(ima2volHistMap, nrBins)
+print "calculation done"
 
 # %%
 """Sliders and Buttons"""

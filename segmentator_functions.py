@@ -190,24 +190,24 @@ class responsiveObj:
                         nLabels[oLabels == val])
                     self.updateMsks()
 
-#                    print "find field with highest entropy"
-#                    self.entropVal = 0
-#                    self.entropWin = 0
-#                    print str(np.unique(self.volHistMask))
-#                    for tempVal in np.unique(self.volHistMask):
-#                        print 'tempVal:' + str(tempVal)
-#                        lgcInd = np.where(self.volHistMask == tempVal)[0]
-#                        print "lgcInd:" + str(lgcInd)
-#                        if np.greater(lgcInd.size, 0):
-#                            tempEntrop = calcEntrop(self.ima[getVoxInd(
-#                                self.volHist2ImaMap, lgcInd)])
-#                        if np.greater(tempEntrop, self.entropVal):
-#                            print "new winner"
-#                            print str(tempEntrop)
-#                            self.entropVal = tempEntrop
-#                            self.entropWin = tempVal
-#                    print "new entropy field established"
-#                    self.updateMsks()
+                    print "find field with highest entropy"
+                    self.entropVal = 0
+                    self.entropWin = 0
+                    print str(np.unique(self.volHistMask))
+                    for tempVal in np.unique(self.volHistMask):
+                        print 'tempVal:' + str(tempVal)
+                        lgcInd = np.where(self.volHistMask == tempVal)[0]
+                        print "lgcInd:" + str(lgcInd)
+                        if np.greater(lgcInd.size, 0):
+                            tempEntrop = calcEntrop(self.ima[getVoxInd(
+                                self.volHist2ImaMap, lgcInd)])
+                        if np.greater(tempEntrop, self.entropVal):
+                            print "new winner"
+                            print str(tempEntrop)
+                            self.entropVal = tempEntrop
+                            self.entropWin = tempVal
+                    print "new entropy field established"
+                    self.updateMsks()
 
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
                     self.findVoxInHist(event)
@@ -433,8 +433,8 @@ class responsiveObj:
         self.pltMap = np.greater(np.sqrt(np.power(grad[0], 2) +
                                          np.power(grad[1], 2)), 0)
         # give division with highest entropy red label
-#        self.pltMap[np.logical_and([self.volHistMask == self.entropWin][0],
-#                                   self.pltMap)] = 2
+        self.pltMap[np.logical_and([self.volHistMask == self.entropWin][0],
+                                   self.pltMap)] = 2
         self.pltMapH.set_data(self.pltMap)
         self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
 
