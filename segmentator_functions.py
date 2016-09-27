@@ -431,10 +431,7 @@ class responsiveObj:
         """
         grad = np.gradient(self.volHistMask)
         self.pltMap = np.greater(np.sqrt(np.power(grad[0], 2) +
-                                         np.power(grad[1], 2)), 0)*255
-        self.pltMap = self.pltMap.reshape(
-            self.volHistMask.shape+(1,)).repeat(4, 2)
-        self.pltMap[:, :, 3] = self.pltMap[:, :, 3]/255
+                                         np.power(grad[1], 2)), 0)
         # give division with highest entropy red label
 #        self.pltMap[np.logical_and([self.volHistMask == self.entropWin][0],
 #                                   self.pltMap)] = 2
