@@ -26,9 +26,18 @@ parser.add_argument("--maxRec", metavar='6',
                     required=False, default=6, type=int,
                     help="Maximum number of recursions.")
 
-parser.add_argument("--nrReg", metavar='2500',
+parser.add_argument("--nrSupPix", "-sp", metavar='2500',
                     required=False, default=2500, type=int,
                     help="Number of regions/superpixels.")
+
+parser.add_argument("--compactness", "-c", metavar='5',
+                    required=False, default=5, type=float,
+                    help="Compactness balances intensity proximity and space \
+                    proximity of the superpixels. \
+                    Higher values give more weight to space proximity, making \
+                    superpixel shapes more square/cubic. This parameter \
+                    depends strongly on image contrast and on the shapes of \
+                    objects in the image.")
 
 args = parser.parse_args()
 import norm_graph_cut
