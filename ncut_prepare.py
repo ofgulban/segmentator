@@ -22,9 +22,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('filename',  metavar='path',
                     help="Path to npy file with volume histogram counts data")
 
-parser.add_argument("--maxrec", metavar='6',
+parser.add_argument("--maxRec", metavar='6',
                     required=False, default=6, type=int,
                     help="Maximum number of recursions.")
+
+parser.add_argument("--nrReg", metavar='2500',
+                    required=False, default=2500, type=int,
+                    help="Number of regions/superpixels.")
 
 args = parser.parse_args()
 import norm_graph_cut
