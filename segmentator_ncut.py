@@ -120,21 +120,6 @@ plt.colorbar(volHistH)
 ncut_palette = plt.cm.gist_rainbow
 ncut_palette.set_under('w', 0)
 
-# fill ncut_labels up with zeros if needed
-if ncut_labels.shape[0] < nrBins:
-    dif1 = nrBins - ncut_labels.shape[0]
-    ncut_labels = np.append(ncut_labels,
-                            np.zeros((dif1,
-                                      ncut_labels.shape[1],
-                                      ncut_labels.shape[2])), axis=0)
-
-if ncut_labels.shape[1] < nrBins:
-    dif2 = nrBins - ncut_labels.shape[1]
-    ncut_labels = np.append(ncut_labels,
-                            np.zeros((ncut_labels.shape[0],
-                                      dif2,
-                                      ncut_labels.shape[2])), axis=1)
-
 # plot hist mask (with ncut labels)
 volHistMask = np.squeeze(ncut_labels[:, :, 0])
 volHistMaskH = ax.imshow(volHistMask, interpolation='none',
