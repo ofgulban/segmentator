@@ -291,6 +291,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
+        print "start exporting labels..."
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -314,7 +315,7 @@ class responsiveObj:
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
-        print "successfully exported labels as: \n" + \
+        print "successfully exported image labels as: \n" + \
             self.basename + self.flexfilename
 
     def resetGlobal(self, event):
