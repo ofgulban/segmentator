@@ -308,8 +308,9 @@ class responsiveObj:
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
+        self.nrExports = 0
         self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        if os.path.isfile(self.basename + self.flexfilename):
+        while os.path.isfile(self.basename + self.flexfilename):
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
