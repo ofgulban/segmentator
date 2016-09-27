@@ -203,8 +203,9 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
 axcolor = 'lightgoldenrodyellow'
 
 # radio buttons (ugly but good enough for now)
-rax = plt.axes([0.91, 0.35, 0.08, 0.5], axisbg=axcolor)  # x, y, xsize, ysize
-flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)])
+rax = plt.axes([0.91, 0.35, 0.08, 0.5], axisbg=(0.75, 0.75, 0.75))
+flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)],
+                             activecolor=(0.25, 0.25, 0.25))
 
 # colorbar slider
 axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], axisbg=axcolor)
@@ -223,7 +224,7 @@ flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
 # ima mask transparency slider
 axTransp = plt.axes([0.6, bottom-0.11, 0.25, 0.025], axisbg=axcolor)
 flexFig.sImaMaskTrans = Slider(axTransp, 'Transparency', 0, 0.999,
-                               valinit=0.5, valfmt='%0.3f')
+                               valinit=0.5, valfmt='%0.1f')
 
 # cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
@@ -246,9 +247,9 @@ resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
 # imaMask transparency button
-imaMaskax = plt.axes([0.915, bottom-0.155, 0.075, 0.075])
-flexFig.bImaMask = Button(imaMaskax, 'Transp\nMask',
-                          color=axcolor, hovercolor='0.975')
+imaMaskax = plt.axes([0.915, bottom-0.11, 0.025, 0.025])
+flexFig.bImaMask = Button(imaMaskax, ' ',
+                          color=(1, 0.5, 0.5), hovercolor=(1, 0.7, 0.7))
 
 
 # %%
