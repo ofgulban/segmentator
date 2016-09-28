@@ -37,8 +37,10 @@ class responsiveObj:
         self.ctrlHeld = False
         self.labelNr = 0
         self.imaMaskSwitchCount = 0
+        self.TranspVal = 0.5
         self.nrExports = 0
         self.entropWin = 0
+        self.borderSwitch = 0
 
     def updateMsks(self):
         """Update volume histogram mask."""
@@ -54,6 +56,8 @@ class responsiveObj:
         # update imaMask
         self.imaMask = VolHist2ImaMapping(
             self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
+        if self.borderSwitch == 1:
+            self.imaMask = self.calcImaMaskBrd()
         self.imaMaskH.set_data(self.imaMask)
         self.imaMaskH.set_extent((0, self.imaMask.shape[1],
                                   self.imaMask.shape[0], 0))
@@ -88,6 +92,9 @@ class responsiveObj:
             self.imaMaskTransSwitch()
         elif event.key == 'e':
             self.imaMaskIncr(0.1)
+        elif event.key == '1':
+            self.borderSwitch = (self.borderSwitch + 1) % 2
+            self.updateMsks()
         if self.segmType == 'main':
             if event.key == 'up':
                 self.sectorObj.scale_r(1.05)
@@ -312,8 +319,8 @@ class responsiveObj:
         self.sHistC.reset()
         # reset ima browser slider
         self.sSliceNr.reset()
-        # reset transparency ima mask slider
-        self.sImaMaskTrans.reset()
+        # reset transparency
+        self.TranspVal = 0.5
         # reset slice number
         self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
         # update brain slice
@@ -393,29 +400,18 @@ class responsiveObj:
 
     def imaMaskIncr(self, incr):
         """Update transparency of image mask by increment."""
-        self.TranspVal = self.sImaMaskTrans.val
         if (self.TranspVal + incr >= 0) & (self.TranspVal + incr <= 1):
             self.TranspVal += incr
         self.imaMaskH.set_alpha(self.TranspVal)
-        self.sImaMaskTrans.set_val(self.TranspVal)
-        self.updateMsks()
-
-    def imaMaskTransS(self, val):
-        """Update transparency of image mask with slider."""
-        self.TranspVal = self.sImaMaskTrans.val
-        self.imaMaskH.set_alpha(self.TranspVal)
-        # set imaMaskSwitchCount to 0 for smooth integration of slider + button
-        self.imaMaskSwitchCount = 0
         self.updateMsks()
 
     def imaMaskTransSwitch(self):
         """Update transparency of image mask to toggle transparency of it."""
         self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
         if self.imaMaskSwitchCount == 1:  # set imaMask transp
-            self.TranspVal = 0
+            self.imaMaskH.set_alpha(0)
         else:  # set imaMask opaque
-            self.TranspVal = self.sImaMaskTrans.val
-        self.imaMaskH.set_alpha(self.TranspVal)
+            self.imaMaskH.set_alpha(self.TranspVal)
         self.updateMsks()
 
     def updateLabelsRadio(self, val):
@@ -441,3 +437,9 @@ class responsiveObj:
         newArray = array.flatten()
         newArray[lin[indices]] = 1
         return newArray.reshape(array.shape)
+
+    def calcImaMaskBrd(self):
+        """Calculate borders of image mask slice."""
+        grad = np.gradient(self.imaMask)
+        return np.greater(np.sqrt(np.power(grad[0], 2) +
+                          np.power(grad[1], 2)), 0)
