@@ -82,6 +82,12 @@ class responsiveObj:
         """Determine what happens if key is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
+        elif event.key == 'q':
+            self.imaMaskIncr(-0.1)
+        elif event.key == 'w':
+            self.imaMaskTransSwitch()
+        elif event.key == 'e':
+            self.imaMaskIncr(0.1)
         if self.segmType == 'main':
             if event.key == 'up':
                 self.sectorObj.scale_r(1.05)
@@ -200,7 +206,8 @@ class responsiveObj:
                     ybin = np.floor(event.ydata)
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
-                    self.volHistMask[self.volHistMask == val] = np.copy(self.labelNr)
+                    self.volHistMask[self.volHistMask == val] = \
+                        np.copy(self.labelNr)
                     self.updateMsks()
 
     def on_motion(self, event):
@@ -384,19 +391,31 @@ class responsiveObj:
         else:
             return
 
+    def imaMaskIncr(self, incr):
+        """Update transparency of image mask by increment."""
+        self.TranspVal = self.sImaMaskTrans.val
+        if (self.TranspVal + incr >= 0) & (self.TranspVal + incr <= 1):
+            self.TranspVal += incr
+        self.imaMaskH.set_alpha(self.TranspVal)
+        self.sImaMaskTrans.set_val(self.TranspVal)
+        self.updateMsks()
+
     def imaMaskTransS(self, val):
         """Update transparency of image mask with slider."""
-        self.imaMaskH.set_alpha(self.sImaMaskTrans.val)
+        self.TranspVal = self.sImaMaskTrans.val
+        self.imaMaskH.set_alpha(self.TranspVal)
+        # set imaMaskSwitchCount to 0 for smooth integration of slider + button
+        self.imaMaskSwitchCount = 0
+        self.updateMsks()
 
-    def imaMaskTransB(self, event):
+    def imaMaskTransSwitch(self):
         """Update transparency of image mask to toggle transparency of it."""
         self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
         if self.imaMaskSwitchCount == 1:  # set imaMask transp
-            self.imaMaskH.set_alpha(0)
-            self.sImaMaskTrans.set_val(0)
+            self.TranspVal = 0
         else:  # set imaMask opaque
-            self.imaMaskH.set_alpha(0.8)
-            self.sImaMaskTrans.set_val(0.8)
+            self.TranspVal = self.sImaMaskTrans.val
+        self.imaMaskH.set_alpha(self.TranspVal)
         self.updateMsks()
 
     def updateLabelsRadio(self, val):

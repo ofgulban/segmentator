@@ -208,10 +208,6 @@ flexFig.bExportNyp = Button(exportax, 'Export\nHist',
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
-# imaMask transparency button
-imaMaskax = plt.axes([0.915, bottom-0.11, 0.025, 0.025])
-flexFig.bImaMask = Button(imaMaskax, ' ',
-                          color=(1, 0.5, 0.5), hovercolor=(1, 0.7, 0.7))
 
 #
 """Updates"""
@@ -224,7 +220,6 @@ flexFig.bCycle.on_clicked(flexFig.cycleView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
-flexFig.bImaMask.on_clicked(flexFig.imaMaskTransB)
 
 
 #
