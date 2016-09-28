@@ -107,9 +107,11 @@ ax.set_title("2D Histogram")
 pltMap = np.zeros((nrBins, nrBins, 1)).repeat(4, 2)
 cmapPltMap = ListedColormap(['w', 'black', 'red', 'blue'])
 boundsPltMap = [0, 1, 2, 3, 4]
+cmapPltMap.set_under('w', 0)
 normPltMap = BoundaryNorm(boundsPltMap, cmapPltMap.N)
 pltMapH = ax.imshow(pltMap, alpha=1, cmap=cmapPltMap, norm=normPltMap,
-                    extent=[0, nrBins, nrBins, 0])
+                    vmin=boundsPltMap[1], vmax=boundsPltMap[-1],
+                    extent=[0, nrBins, nrBins, 0], interpolation='none')
 
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=1000))
