@@ -1,11 +1,8 @@
 """Cython setup.
 
-Only use this if you want Deriche filter gradient magnitude.
-
 Make sure that you have cython. In the terminal, cd to this file's folder then
 run:
-
-    python setup.py build_ext --inplace
+python setup.py build_ext --inplace
 """
 
 from distutils.core import setup
