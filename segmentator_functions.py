@@ -373,21 +373,22 @@ class responsiveObj:
 
     def exportNyp(self, event):
         """Export histogram counts as a numpy array."""
+        outFileName = self.basename + '_identifier' \
+            + '_pcMax' + str(self.initTpl[0]) \
+            + '_pcMin' + str(self.initTpl[1]) \
+            + '_sc' + str(int(self.initTpl[2]))
         if self.segmType == 'ncut':
-            filename = '_volHistLabels' + '_pcMax' + \
-                str(int(self.initTpl[0])) + '_pcMin' + \
-                str(int(self.initTpl[1])) + '_sc' + \
-                str(int(self.initTpl[2]))
-            np.save(self.basename + filename, self.volHistMask)
+            outFileName = outFileName.replace('identifier', 'volHistLabels')
+            outFileName = outFileName.replace('.', 'pt')
+            np.save(outFileName, self.volHistMask)
             print "successfully exported histogram colors as: \n" + \
-                self.basename + filename
+                outFileName
         elif self.segmType == 'main':
-            filename = '_volHist' + '_pcMax' + str(int(self.initTpl[0])) + \
-                '_pcMin' + str(int(self.initTpl[1])) + '_sc' + \
-                str(int(self.initTpl[2]))
-            np.save(self.basename + filename, self.counts)
+            outFileName = outFileName.replace('identifier', 'volHist')
+            outFileName = outFileName.replace('.', 'pt')
+            np.save(outFileName, self.counts)
             print "successfully exported histogram counts as: \n" + \
-                self.basename + filename
+                outFileName
         else:
             return
 
