@@ -67,6 +67,7 @@ graMag = np.sqrt(np.power(temp[:, :, :, 0], 2) +
                  np.power(temp[:, :, :, 1], 2) +
                  np.power(temp[:, :, :, 2], 2))
 out = Nifti1Image(graMag, affine=nii.get_affine())
-outName = basename+'_deriche_a' + str(alpha) + '_graMag.nii.gz'
-save(out, outName)
+outName = basename+'_deriche_a' + str(alpha) + '_graMag'
+outName = outName.replace('.', 'pt')
+save(out, outName + '.nii.gz')
 print 'Saved as:', outName
