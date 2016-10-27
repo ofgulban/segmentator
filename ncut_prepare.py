@@ -40,6 +40,5 @@ parser.add_argument("--compactness", "-c", metavar='2',
                     objects in the image.")
 
 args = parser.parse_args()
-import norm_graph_cut
 
 print('initializing...')

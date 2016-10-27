@@ -27,4 +27,3 @@ parser.add_argument("--alpha", "-a", metavar='2',
                     help="Alpha controls smoothing, lower -> smoother")
 
 args = parser.parse_args()
-import deriche
