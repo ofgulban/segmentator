@@ -41,4 +41,4 @@ parser.add_argument("--compactness", "-c", metavar='2',
 
 args = parser.parse_args()
 
-print('initializing...')
+import norm_graph_cut
