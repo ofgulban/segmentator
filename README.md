@@ -16,7 +16,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 ##### Optional
 - [scikit-image](http://scikit-image.org/), for normalized graph cuts. However you should install it from [this fork](https://github.com/ofgulban/scikit-image) for the required functionality. If you are scared of messing up your current python modules consider using [miniconda](http://conda.pydata.org/miniconda.html) with [virtual python environments](http://conda.pydata.org/docs/using/envs.html).
 
-- [cython](http://cython.org/), for Deriche filter gradient magnitude calculation.
+- [cython](http://cython.org/) (tested on 0.24.1), for Deriche filter gradient magnitude calculation.
 
 ## How to start
 
