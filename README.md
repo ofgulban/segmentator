@@ -7,11 +7,13 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 ## Dependencies
 
-| [Python 2.7](https://www.python.org/download/releases/2.7/)| |
-|---|--- |
-| [NumPy](http://www.numpy.org/) | tested on  *1.11.1* |
-| [matplotlib](http://matplotlib.org/) | tested on *1.5.3* |
-| [NiBabel](http://nipy.org/nibabel/) | tested on *2.1.0* |
+[Python 2.7](https://www.python.org/download/releases/2.7/) and the following packages:
+
+| Package                              | Tested version |
+|--------------------------------------|----------------|
+| [NumPy](http://www.numpy.org/)       | 1.11.1         |
+| [matplotlib](http://matplotlib.org/) | 1.5.3          |
+| [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
 
 ##### Optional
 - [scikit-image](http://scikit-image.org/), for normalized graph cuts. However you should install it from [this fork](https://github.com/ofgulban/scikit-image) for the required functionality. If you are scared of messing up your current python modules consider using [miniconda](http://conda.pydata.org/miniconda.html) with [virtual python environments](http://conda.pydata.org/docs/using/envs.html).
