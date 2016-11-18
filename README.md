@@ -7,8 +7,8 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 ## Dependencies
 
-| [Python 2.7](https://www.python.org/download/releases/2.7/)|
-|-|-|
+| [Python 2.7](https://www.python.org/download/releases/2.7/)| |
+|---|--- |
 | [NumPy](http://www.numpy.org/) | tested on  *1.11.1* |
 | [matplotlib](http://matplotlib.org/) | tested on *1.5.3* |
 | [NiBabel](http://nipy.org/nibabel/) | tested on *2.1.0* |
