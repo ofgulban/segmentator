@@ -5,21 +5,6 @@ Segmentator is a free and open-source package for multi-dimensional data explora
 
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
 
-## Dependencies
-
-[Python 2.7](https://www.python.org/download/releases/2.7/) and the following packages:
-
-| Package                              | Tested version |
-|--------------------------------------|----------------|
-| [NumPy](http://www.numpy.org/)       | 1.11.1         |
-| [matplotlib](http://matplotlib.org/) | 1.5.3          |
-| [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
-
-##### Optional
-- [scikit-image](http://scikit-image.org/), for normalized graph cuts. However you should install it from [this fork](https://github.com/ofgulban/scikit-image) for the required functionality. If you are scared of messing up your current python modules consider using [miniconda](http://conda.pydata.org/miniconda.html) with [virtual python environments](http://conda.pydata.org/docs/using/envs.html).
-
-- [cython](http://cython.org/) (tested on 0.24.1), for Deriche filter gradient magnitude calculation.
-
 ## Installation & Quick Start
 
 Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
