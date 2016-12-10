@@ -1,4 +1,4 @@
-# Segmentator (work in progress)
+# Segmentator
 [![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
 
 Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation. This application is mainly developed for ultra-high field magnetic resonance imaging (MRI) brain data.
