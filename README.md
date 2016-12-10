@@ -20,20 +20,9 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 - [cython](http://cython.org/) (tested on 0.24.1), for Deriche filter gradient magnitude calculation.
 
-## How to start
+## Installation & Quick Start
 
-Open a terminal, navigate to Segmentator's folder (for instance: `cd /home/john/segmentator/` ) and type ```python segmentator.py --help``` to see the usage and all the available options.
-
-To load data simply run:
-```bash
-python segmentator.py /path/to/your/file.nii.gz
-```
-
-You should see a window appearing soon after. Try dragging the red circle around. You can even draw directly on the histogram after turning the lasso tool on:
-
-![demo](images/animated.gif)
-
-To use advanced features (normalized graph cuts, deriche filter) please visit our [github wiki](https://github.com/ofgulban/segmentator/wiki).
+Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
 
 ## Support
 
