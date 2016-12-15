@@ -5,6 +5,14 @@ Segmentator is a free and open-source package for multi-dimensional data explora
 
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
 
+## Core dependencies
+
+| Package                              | Tested version |
+|--------------------------------------|----------------|
+| [NumPy](http://www.numpy.org/)       | 1.11.1         |
+| [matplotlib](http://matplotlib.org/) | 1.5.3          |
+| [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
+
 ## Installation & Quick Start
 
 Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
