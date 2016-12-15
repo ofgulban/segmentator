@@ -7,6 +7,8 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 ## Core dependencies
 
+[Python 2.7](https://www.python.org/download/releases/2.7/)
+
 | Package                              | Tested version |
 |--------------------------------------|----------------|
 | [NumPy](http://www.numpy.org/)       | 1.11.1         |
