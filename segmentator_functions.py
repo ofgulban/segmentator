@@ -354,19 +354,19 @@ class responsiveObj:
         self.updateMsks()
 
     def updateThetaMin(self, val):
-        """Update volume histogram mask's minimum theta."""
+        """Update theta (min) in volume histogram mask."""
         if self.segmType == 'main':
-            thetaVal = self.sThetaMin.val  # get theta value from slider
-            self.sectorObj.updateThetaMin(thetaVal)
+            theta_val = self.sThetaMin.val  # get theta value from slider
+            self.sectorObj.theta_min(theta_val)
             self.updateMsks()
         else:
             return
 
     def updateThetaMax(self, val):
-        """Update volume histogram mask's maximum theta."""
+        """Update theta(max) in volume histogram mask."""
         if self.segmType == 'main':
-            thetaVal = self.sThetaMax.val  # get theta value from slider
-            self.sectorObj.updateThetaMax(thetaVal)
+            theta_val = self.sThetaMax.val  # get theta value from slider
+            self.sectorObj.theta_max(theta_val)
             self.updateMsks()
         else:
             return

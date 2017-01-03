@@ -74,11 +74,8 @@ class sector_mask:
         self.tmax += rad
         self.set_polCrd()  # update polar coordinates
 
-    def updateThetaMin(self, degree):
-        """There is another updateThetaMin in segmentator_functions.py.
-
-        Why?
-        """
+    def theta_min(self, degree):
+        """Angle to determine one the cut out piece in circular mask."""
         rad = np.deg2rad(degree)
         self.tmin = rad
         # ensure stop angle > start angle
@@ -90,11 +87,8 @@ class sector_mask:
         # update polar coordinates
         self.set_polCrd()
 
-    def updateThetaMax(self, degree):
-        """There is another updateThetaMax in segmentator_functions.py.
-
-        Why?
-        """
+    def theta_max(self, degree):
+        """Angle to determine one the cut out piece in circular mask."""
         rad = np.deg2rad(degree)
         self.tmax = rad
         # ensure stop angle > start angle
