@@ -235,6 +235,7 @@ def lassoSwitch(event):
         lasso = []  # I am not sure we want to reset lasso with this button
         flexFig.connect()  # enable drag function of sector mask
 
+
 # Pixel coordinates
 pix = np.arange(nrBins)
 xv, yv = np.meshgrid(pix, pix)
@@ -249,6 +250,7 @@ def onselect(verts):
     flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
     # update volume histogram mask
     flexFig.updateMsks()
+
 
 bLasso.on_clicked(lassoSwitch)
 

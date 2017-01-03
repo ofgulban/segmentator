@@ -22,13 +22,13 @@ import matplotlib.pyplot as plt
 
 
 def sub2ind(array_shape, rows, cols):
-    """Pixel to voxel mapping. Similar to matlab's function."""
+    """Pixel to voxel mapping (similar to matlab's function)."""
     # return (rows*array_shape + cols)
     return (cols*array_shape + rows)
 
 
 def Ima2VolHistMapping(xinput, yinput, binsArray):
-    """Image to volume histogram mapping. Kind of inverse histogram."""
+    """Image to volume histogram mapping (kind of inverse histogram)."""
     dgtzData = np.digitize(xinput, binsArray)-1
     dgtzGra = np.digitize(yinput, binsArray)-1
     nrBins = len(binsArray)-1  # subtract 1 (more borders than containers)
@@ -37,7 +37,7 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
 
 
 def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
-    """Volume histogram to image mapping for slices. Uses np.ind1"""
+    """Volume histogram to image mapping for slices (uses np.ind1)."""
     imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:

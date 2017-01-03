@@ -65,6 +65,7 @@ def norm_grap_cut(image, closing_size=5, max_edge=10000000, max_rec=3,
                                    num_cuts=1000, max_rec=max_rec)
     return labels2, labels1
 
+
 path = ncut_prepare.args.filename
 basename = path.split(os.extsep, 1)[0]
 
@@ -109,6 +110,7 @@ def updatefig(*args):
     tmp = np.copy(ncut[:, :, idx])
     im.set_array(tmp.T)
     return im,
+
 
 ani = animation.FuncAnimation(fig, updatefig, interval=750, blit=True)
 plt.show()

@@ -24,7 +24,7 @@ import numpy as np
 
 
 def VolHist2ImaOffline(vox2pixMap, nrBins):
-    """Volume histogram to image mapping for volumes. Uses logical indexing"""
+    """Map from volume histogram to 3D image (uses logical indexing)."""
     # get bincount (to know how many voxels are in pixel 0,1,etc.. of volHist)
     counts = np.bincount(vox2pixMap, minlength=nrBins**2)
     # get sorting indices (used to sort list acc. to pixels for vox2pixMap)

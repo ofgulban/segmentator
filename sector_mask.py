@@ -42,7 +42,7 @@ class sector_mask:
         self.theta %= (2*np.pi)
 
     def set_polCrd(self):
-        # convert cartesian --> polar coordinates
+        """Convert cartesian to polar coordinates."""
         self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
             self.y-self.cy)*(self.y-self.cy)
         self.theta = np.arctan2(self.x-self.cx, self.y-self.cy) - self.tmin
@@ -50,26 +50,29 @@ class sector_mask:
         self.theta %= (2*np.pi)
 
     def set_x(self, x):
+        """Set x axis value."""
         self.cx = x
-        # update polar coordinates
-        self.set_polCrd()
+        self.set_polCrd()  # update polar coordinates
 
     def set_y(self, y):
+        """Set y axis value."""
         self.cy = y
-        # update polar coordinates
-        self.set_polCrd()
+        self.set_polCrd()  # update polar coordinates
 
     def set_r(self, radius):
+        """Set radius of the circle."""
         self.radius = radius
 
     def scale_r(self, scale):
+        """Scale (multiply) the radius."""
         self.radius = self.radius * scale
 
     def rotate(self, degree):
+        """Rotate shape."""
         rad = np.deg2rad(degree)
         self.tmin += rad
         self.tmax += rad
-        self.set_polCrd()
+        self.set_polCrd()  # update polar coordinates
 
     def updateThetaMin(self, degree):
         """There is another updateThetaMin in segmentator_functions.py.
