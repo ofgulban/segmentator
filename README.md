@@ -1,37 +1,23 @@
-# Segmentator (work in progress)
+# Segmentator
 [![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
 
-Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation. This application is mainly developed for ultra-high field magnetic resonance imaging (MRI) brain data.
+Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation for 3D images. This application is mainly developed and tested using ultra-high field magnetic resonance imaging (MRI) brain data.
 
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
 
-## Dependencies
+## Core dependencies
 
-| [Python 2.7](https://www.python.org/download/releases/2.7/)|
-|-|-|
-| [NumPy](http://www.numpy.org/) | tested on  *1.11.1* |
-| [matplotlib](http://matplotlib.org/) | tested on *1.5.3* |
-| [NiBabel](http://nipy.org/nibabel/) | tested on *2.1.0* |
+[**Python 2.7**](https://www.python.org/download/releases/2.7/)
 
-##### Optional
-- [scikit-image](http://scikit-image.org/), for normalized graph cuts. However you should install it from [this fork](https://github.com/ofgulban/scikit-image) for the required functionality. If you are scared of messing up your current python modules consider using [miniconda](http://conda.pydata.org/miniconda.html) with [virtual python environments](http://conda.pydata.org/docs/using/envs.html).
+| Package                              | Tested version |
+|--------------------------------------|----------------|
+| [NumPy](http://www.numpy.org/)       | 1.11.1         |
+| [matplotlib](http://matplotlib.org/) | 1.5.3          |
+| [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
 
-- [cython](http://cython.org/), for Deriche filter gradient magnitude calculation.
+## Installation & Quick Start
 
-## How to start
-
-Open a terminal, navigate to Segmentator's folder (for instance: `cd /home/john/segmentator/` ) and type ```python segmentator.py --help``` to see the usage and all the available options.
-
-To load data simply run:
-```bash
-python segmentator.py /path/to/your/file.nii.gz
-```
-
-You should see a window appearing soon after. Try dragging the red circle around. You can even draw directly on the histogram after turning the lasso tool on:
-
-![demo](images/animated.gif)
-
-To use advanced features (normalized graph cuts, deriche filter) please visit our [github wiki](https://github.com/ofgulban/segmentator/wiki).
+Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
 
 ## Support
 
