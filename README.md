@@ -1,10 +1,34 @@
-[![DOI](https://zenodo.org/badge/24138/ofgulban/segmentator.svg)](https://zenodo.org/badge/latestdoi/24138/ofgulban/segmentator)
+# Segmentator
+[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
 
-# Segmentator (work in progress)
+Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation for 3D images. This application is mainly developed and tested using ultra-high field magnetic resonance imaging (MRI) brain data.
 
-Segmentator is an open-source package for multi-dimensional data exploration and segmentation purposes. This application is mainly developed for magnetic resonance imaging (MRI) brain data.
+The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
 
-The goal is to provide a complementary tool to the already available tissue segmentation methods (to the best of our knowledge) in other softwares (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap).
+## Core dependencies
+
+[**Python 2.7**](https://www.python.org/download/releases/2.7/)
+
+| Package                              | Tested version |
+|--------------------------------------|----------------|
+| [NumPy](http://www.numpy.org/)       | 1.11.1         |
+| [matplotlib](http://matplotlib.org/) | 1.5.3          |
+| [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
+
+## Installation & Quick Start
+
+Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
+
+## Support
+
+Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
+
+
+## License
+
+The project is licensed under [GNU Geneal Public License Version 3](http://www.gnu.org/licenses/gpl.html).
+
+## References
 
 This application is based on the following work:
 
@@ -16,40 +40,8 @@ This application is based on the following work:
 
 * Kniss, J., Kindlmann, G., & Hansen, C. D. (2005). Multidimensional transfer functions for volume rendering. Visualization Handbook, 189–209. http://doi.org/10.1016/B978-012387582-2/50011-3
 
+* Jianbo Shi, & Malik, J. (2000). Normalized cuts and image segmentation. IEEE Transactions on Pattern Analysis and Machine Intelligence, 22(8), 888–905. http://doi.org/10.1109/34.868688
 
-## Dependencies
+* Ip, C. Y., Varshney, A., & Jaja, J. (2012). Hierarchical exploration of volumes using multilevel segmentation of the intensity-gradient histograms. IEEE Transactions on Visualization and Computer Graphics, 18(12), 2355–2363. http://doi.org/10.1109/TVCG.2012.231
 
-- [Python 2.7](https://www.python.org/download/releases/2.7/)
-- [NumPy](http://www.numpy.org/)
-- [matplotlib](http://matplotlib.org/)
-- [NiBabel](http://nipy.org/nibabel/)
-
-
-## How to use
-
-Edit *"Load Data"* section in *segmentator_main.py* by giving the absolute path to your nifti data (Beware: int8 data types are not recommended):
-
-```
-"""Load Data"""
-nii = load('/run/media/ofgulban/Data/Segmentator_Datasets/Test_Data.nii')
-```
-
-then open a terminal, navigate to Segmentator's folder (for instance: `cd /home/john/segmentator/` ) and type:
-
-```
-python segmentator_main.py
-```
-
-You should see a window appearing soon after. Try manipulating the sliders and even directly drawing on the 2D Histogram:
-
-![demo](images/animated.gif)
-
-
-## Support
-
-Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for bug reports and feature requests.
-
-
-## License
-
-The project is licensed under [GNU Geneal Public License Version 3](http://www.gnu.org/licenses/gpl.html).
+* Monga, O., Deriche, R., & Rocchisani, J.-M. (1991). 3D edge detection using recursive filtering: Application to scanner images. CVGIP: Image Understanding, 53(1), 76–87. http://doi.org/10.1016/1049-9660(91)90006-B
