@@ -1,6 +1,8 @@
-"""Processing input and plotting."""
+"""
+Processing input and plotting.
 
-"""Segmentator main."""
+Segmentator main.
+"""
 
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
