@@ -17,7 +17,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 ## Installation & Quick Start
 
-Please visit our [wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
+Please visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
 
 ## Support
 
