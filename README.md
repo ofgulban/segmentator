@@ -6,8 +6,8 @@ Segmentator is a free and open-source package for multi-dimensional data explora
 
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, ITK-Snap, MIPAV).
 
-### Citation
-* Omer Faruk Gulban, & Marian Schneider. (2016). Segmentator: v1.1.0. Zenodo. http://doi.org/10.5281/zenodo.157996
+### Cite as
+* Omer Faruk Gulban, Marian Schneider, 2016. Segmentator: v1.1.0. doi:10.5281/zenodo.157996
 
 ## Core dependencies
 
