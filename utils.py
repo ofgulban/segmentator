@@ -22,13 +22,41 @@ import matplotlib.pyplot as plt
 
 
 def sub2ind(array_shape, rows, cols):
-    """Pixel to voxel mapping (similar to matlab's function)."""
+    """Pixel to voxel mapping (similar to matlab's function).
+
+    Parameters
+    ----------
+    array_shape : TODO
+    rows : TODO
+    cols : TODO
+
+    Returns
+    -------
+    TODO
+
+    """
     # return (rows*array_shape + cols)
     return (cols*array_shape + rows)
 
 
 def Ima2VolHistMapping(xinput, yinput, binsArray):
-    """Image to volume histogram mapping (kind of inverse histogram)."""
+    """Image to volume histogram mapping (kind of inverse histogram).
+
+    Parameters
+    ----------
+    xinput : TODO
+        First image, which is often the intensity image (eg. T1w).
+    yinput : TODO
+        Second image, which is often the gradient magnitude image
+        derived from the first image.
+    binsArray : TODO
+
+    Returns
+    -------
+    vox2pixMap : TODO
+        Voxel to pixel mapping.
+
+    """
     dgtzData = np.digitize(xinput, binsArray)-1
     dgtzGra = np.digitize(yinput, binsArray)-1
     nrBins = len(binsArray)-1  # subtract 1 (more borders than containers)
@@ -37,7 +65,18 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
 
 
 def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
-    """Volume histogram to image mapping for slices (uses np.ind1)."""
+    """Volume histogram to image mapping for slices (uses np.ind1).
+
+    Parameters
+    ----------
+    imaSlc2volHistMap : TODO
+    volHistMask : TODO
+
+    Returns
+    -------
+    imaSlcMask :  TODO
+
+    """
     imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:
@@ -51,7 +90,22 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
 
 
 def TruncateRange(data, percMin=0.25, percMax=99.75):
-    """Truncate too low and too high values."""
+    """Truncate too low and too high values.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Image to be truncated.
+    percMin : float
+        Percentile minimum.
+    percMax : float
+        Percentile maximum.
+
+    Returns
+    -------
+    data : np.ndarray
+
+    """
     percDataMin, percDataMax = np.percentile(data, [percMin, percMax])
     data[data < percDataMin] = percDataMin  # adjust minimum
     data[data > percDataMax] = percDataMax  # adjust maximum
@@ -61,9 +115,22 @@ def TruncateRange(data, percMin=0.25, percMax=99.75):
 def ScaleRange(data, scaleFactor=500, delta=0):
     """Scale values as a preprocessing step.
 
-    Lower scaleFactors give faster interface (0-500 or 600 seems fast enough).
-    Delta ensures that the max data points fall inside the last bin when this
-    function is used with histograms.
+    Parameters
+    ----------
+    data : np.ndarray
+        Image to be scaled.
+    scaleFactor : float
+        Lower scaleFactors provides faster interface due to loweing the
+        resolution of 2D histogram ( 500 seems fast enough).
+    delta : float
+        Delta ensures that the max data points fall inside the last bin
+        when this function is used with histograms.
+
+    Returns
+    -------
+    data: np.ndarray
+        Scaled image.
+
     """
     scaleFactor = scaleFactor - delta
     data = data - data.min()
@@ -73,7 +140,30 @@ def ScaleRange(data, scaleFactor=500, delta=0):
 def Hist2D(ima, gra):
     """Prepare 2D histogram related variables.
 
-    This function is modularized to be caleld from the terminal.
+    Parameters
+    ----------
+    ima : np.ndarray
+        First image, which is often the intensity image (eg. T1w).
+    gra : np.ndarray
+        Second image, which is often the gradient magnitude image
+        derived from the first image.
+
+    Returns
+    -------
+    counts : integer
+    volHistH : TODO
+    dataMin : float
+        Minimum of the first image.
+    dataMax : float
+        Maximum of the first image.
+    nrBins : integer
+        Number of one dimensional bins (not the pixels).
+    binEdges : TODO
+
+    Notes
+    -----
+    This function is modularized to be called from the terminal.
+
     """
     dataMin = np.round(ima.min())
     dataMax = np.round(ima.max())
