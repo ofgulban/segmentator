@@ -17,54 +17,55 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import argparse
 import numpy as np
 from utils import TruncateRange, ScaleRange, Hist2D
 from nibabel import load
+from segmentator.args import filename, gramag, scale, percmin, percmax
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument('filename',  metavar='path',
-                    help="Path to nii file with image data")
-
-parser.add_argument("--gramag", metavar='path',
-                    required=False,
-                    help="Path to gradient magnitude (useful for deriche)")
-
-parser.add_argument("--scale", metavar='500',
-                    required=False, default=500, type=float,
-                    help="Data is scaled from 0 to this number.")
-
-parser.add_argument("--percmin", metavar='0.25',
-                    required=False, default=0.25, type=float,
-                    help="Minimum percentile used in truncation.")
-
-parser.add_argument("--percmax",  metavar='99.75',
-                    required=False, default=99.75, type=float,
-                    help="Maximum percentile used in truncation.")
-
-args = parser.parse_args()
+# TODO: Broken for now
+# parser = argparse.ArgumentParser()
+#
+# parser.add_argument('filename',  metavar='path',
+#                     help="Path to nii file with image data")
+#
+# parser.add_argument("--gramag", metavar='path',
+#                     required=False,
+#                     help="Path to gradient magnitude (useful for deriche)")
+#
+# parser.add_argument("--scale", metavar='500',
+#                     required=False, default=500, type=float,
+#                     help="Data is scaled from 0 to this number.")
+#
+# parser.add_argument("--percmin", metavar='0.25',
+#                     required=False, default=0.25, type=float,
+#                     help="Minimum percentile used in truncation.")
+#
+# parser.add_argument("--percmax",  metavar='99.75',
+#                     required=False, default=99.75, type=float,
+#                     help="Maximum percentile used in truncation.")
+#
+# segmentator.args = parser.parse_args()
 
 #
 """Load Data"""
-nii = load(args.filename)
+nii = load(filename)
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
 
-percMin, percMax = args.percmin, args.percmax
+percMin, percMax = percmin, percmax
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-orig = ScaleRange(orig, scaleFactor=args.scale, delta=0.0001)
+orig = ScaleRange(orig, scaleFactor=scale, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if args.gramag:
-    nii2 = load(args.gramag)
+if gramag:
+    nii2 = load(gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
-    gra = ScaleRange(gra, scaleFactor=args.scale, delta=0.0001)
+    gra = ScaleRange(gra, scaleFactor=scale, delta=0.0001)
 
 else:
     # calculate gradient magnitude (using L2 norm of the vector)
@@ -78,7 +79,7 @@ gra = np.ndarray.flatten(gra)
 
 counts, _, _, _, _, _ = Hist2D(ima, gra)
 outName = basename + '_volHist' + '_pcMax' + str(percMax) \
-          + '_pcMin' + str(percMin) + '_sc' + str(int(args.scale))
+          + '_pcMin' + str(percMin) + '_sc' + str(int(scale))
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
 print 'Counts saved as: ' + outName

@@ -1,13 +1,25 @@
-"""Cython setup.
+"""Segmentator setup."""
 
-Make sure that you have cython. In the terminal, cd to this file's folder then
-run:
-python setup.py build_ext --inplace
-"""
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
-from distutils.core import setup
-from Cython.Build import cythonize
-
-setup(
-    ext_modules=cythonize("deriche_3D.pyx")
-)
+setup(name='segmentator',
+      version='1.2.0',
+      description=('Multi-dimensional data exploration and segmentation for 3D \
+                   images.'),
+      url='https://github.com/ofgulban/segmentator',
+      download_url='',
+      author='Omer Faruk Gulban',
+      author_email='faruk.gulban@maastrichtuniversity.nl',
+      license='GNU General Public License Version 3',
+      packages=['segmentator'],
+      install_requires=['numpy', 'matplotlib'],
+      keywords=['mri', 'segmentation'],
+      zip_safe=True,
+      entry_points={
+          'console_scripts': [
+              'segmentator = segmentator.__main__:main',
+              ]},
+      )
