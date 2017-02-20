@@ -1,7 +1,7 @@
 """3D Deriche filter implementation.
 
 Before using this run:
-python setup.py build_ext --inplace
+python deriche_setup.py build_ext --inplace
 
 It is my first time using cython, so probably this is not very optimal for now.
 Probably there are some redundant stuff, will be cleaned up in time.

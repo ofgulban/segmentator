@@ -33,27 +33,26 @@ from sector_mask import sector_mask
 from utils import Ima2VolHistMapping, Hist2D
 from utils import TruncateRange, ScaleRange
 import config as cfg
-import segmentator
 
 """Load Data"""
-nii = load(segmentator.args.filename)
+nii = load(cfg.filename)
 
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
 
-percMin, percMax = segmentator.args.percmin, segmentator.args.percmax
+percMin, percMax = cfg.perc_min, cfg.perc_max
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-scaleFactor = segmentator.args.scale
+scaleFactor = cfg.scale
 orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if segmentator.args.gramag:
-    nii2 = load(segmentator.args.gramag)
+if cfg.gramag:
+    nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
-    gra = ScaleRange(gra, scaleFactor=segmentator.args.scale, delta=0.0001)
+    gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
 
 else:
     # calculate gradient magnitude (using L2 norm of the vector)

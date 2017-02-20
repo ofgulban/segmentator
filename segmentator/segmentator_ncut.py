@@ -23,18 +23,18 @@ Lots of code repetition, will be integrated better in the future.
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
+import config as cfg
 from nibabel import load
 from matplotlib.colors import LogNorm, ListedColormap, BoundaryNorm
 from matplotlib.widgets import Slider, Button, RadioButtons
 from utils import Ima2VolHistMapping, TruncateRange, ScaleRange, Hist2D
 from segmentator_functions import responsiveObj
-import segmentator
 
 # %%
 """Load Data"""
 #
-nii = load(segmentator.args.filename)
-ncut_labels = np.load(segmentator.args.ncut)
+nii = load(cfg.filename)
+ncut_labels = np.load(cfg.ncut)
 
 # transpose the labels
 ncut_labels = np.transpose(ncut_labels, (1, 0, 2))
@@ -64,9 +64,9 @@ ima_ncut_labels = ncut_labels.copy()
 # %%
 """Data Pre-Processing"""
 orig = np.squeeze(nii.get_data())
-percMin, percMax = segmentator.args.percmin, segmentator.args.percmax
+percMin, percMax = cfg.percmin, cfg.percmax
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-scaleFactor = segmentator.args.scale
+scaleFactor = cfg.scale
 orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 # define dataMin and dataMax for later use
 dataMin = np.round(orig.min())
@@ -74,11 +74,11 @@ dataMax = np.round(orig.max())
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if segmentator.args.gramag:
-    nii2 = load(segmentator.args.gramag)
+if cfg.gramag:
+    nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
-    gra = ScaleRange(gra, scaleFactor=segmentator.args.scale, delta=0.0001)
+    gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
 else:
     # calculate gradient magnitude (using L2 norm of the vector)
     gra = np.gradient(ima)

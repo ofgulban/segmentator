@@ -20,24 +20,25 @@ flag with segmentator.py to load the output of this script (suffix: '_graMag').
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import deriche_prepare
+import config as cfg
 from deriche_3D import deriche_3D
 import os
 import numpy as np
 from nibabel import load, save, Nifti1Image
 import time
 
+
 start = time.time()
 print('computing gradients...')
 
-nii = load(deriche_prepare.args.filename)
+nii = load(cfg.filename)
 basename = nii.get_filename().split(os.extsep, 1)[0]
 data = nii.get_data()
 data = np.ascontiguousarray(data, dtype=np.float32)
 
 # calculate gradients
 print(".")
-alpha = deriche_prepare.args.alpha
+alpha = cfg.deriche_alpha
 gra_x = deriche_3D(data, alpha=alpha)
 
 print(".")
