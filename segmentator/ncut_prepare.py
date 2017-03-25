@@ -76,11 +76,11 @@ basename = path.split(os.extsep, 1)[0]
 img = np.load(path)
 img = np.log10(img+1)
 
-max_recursion = cfg.maxRec
+max_recursion = cfg.max_rec
 ncut = np.zeros((img.shape[0], img.shape[1], max_recursion + 1))
 for i in range(0, max_recursion + 1):
     msk, regions = norm_grap_cut(img, max_rec=i,
-                                 nrSupPix=cfg.nrSupPix,
+                                 nrSupPix=cfg.nr_sup_pix,
                                  compactness=cfg.compactness)
     ncut[:, :, i] = msk
 

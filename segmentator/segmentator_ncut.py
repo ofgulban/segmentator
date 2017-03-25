@@ -64,7 +64,7 @@ ima_ncut_labels = ncut_labels.copy()
 # %%
 """Data Pre-Processing"""
 orig = np.squeeze(nii.get_data())
-percMin, percMax = cfg.percmin, cfg.percmax
+percMin, percMax = cfg.perc_min, cfg.perc_max
 orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
 scaleFactor = cfg.scale
 orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
