@@ -119,7 +119,7 @@ def updatefig(*args):
 ani = animation.FuncAnimation(fig, updatefig, interval=750, blit=True)
 plt.show()
 
-outName = basename + '_ncut' + '_sp' + str(cfg.nrSupPix) \
+outName = basename + '_ncut' + '_sp' + str(cfg.nr_sup_pix) \
           + '_c' + str(cfg.compactness)
 outName = outName.replace('.', 'pt')
 np.save(outName, ncut)
