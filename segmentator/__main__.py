@@ -107,6 +107,8 @@ def main(args=None):
     config.max_rec = args.ncut_maxRec
     config.nr_sup_pix = args.ncut_nrSupPix
     config.compactness = args.ncut_compactness
+    # used in ncut
+    config.ncut = args.ncut
 
     print("===========\nSegmentator\n===========")
 
