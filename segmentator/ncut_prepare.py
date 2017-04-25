@@ -1,6 +1,6 @@
 """Normalized graph cuts for segmentator (experimental).
 
-TODO: Probably broken after restructuring.
+TODO: Replacing the functionality using scikit-learn?
 
 """
 
@@ -8,24 +8,20 @@ import os
 import numpy as np
 from matplotlib import animation
 from matplotlib import pyplot as plt
-from skimage.filters import gaussian
 from skimage.future import graph
-from skimage.morphology import square, closing
 from skimage.segmentation import slic
 import config as cfg
 
 
-def norm_grap_cut(image, closing_size=5, max_edge=10000000, max_rec=3,
-                  compactness=5, nrSupPix=2000, ):
+def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,
+                  nrSupPix=2000):
     """Normalized graph cut wrapper for 2D numpy arrays.
 
     Parameters
     ----------
         image: np.ndarray (2D)
             Volume histogram.
-        closing_size: int, positive
-            determines dilation size closing operation.
-        max_edge: float, optional
+        max_edge: float
             The maximum possible value of an edge in the RAG. This corresponds
             to an edge between identical regions. This is used to put self
             edges in the RAG.
@@ -46,16 +42,13 @@ def norm_grap_cut(image, closing_size=5, max_edge=10000000, max_rec=3,
             identifier.
 
     """
-    # truncate very high values to gain precision later in uint8 conversion
-    perc = np.percentile(image, 99.75)
+    # truncate very high values
+    perc = np.percentile(image, 99.99)
     image[image > perc] = perc
 
     # scale for uint8 conversion
     image = np.round(255 / image.max() * image)
     image = image.astype('uint8')
-
-    # # dilate and erode (closing) to fill in white dots in grays (arbitrary)
-    # image = closing(image, square(closing_size))
 
     # scikit implementation expects rgb format (shape: NxMx3)
     image = np.tile(image, (3, 1, 1))

@@ -21,6 +21,6 @@ deriche_alpha = 2
 
 # used in segmentator ncut
 ncut = False
-max_rec = 6
+max_rec = 8
 nr_sup_pix = 2500
 compactness = 2
