@@ -72,6 +72,10 @@ def main(args=None):
               Use this flag with the following arguments:")
         )
     parser.add_argument(
+        "--ncut_figs", action='store_true',
+        help="Figures are presented (useful for debugging)."
+        )
+    parser.add_argument(
         "--ncut_maxRec", required=False, type=int,
         default=config.max_rec, metavar=config.max_rec,
         help="Maximum number of recursions."
@@ -104,6 +108,7 @@ def main(args=None):
     # used in deriche filter
     config.deriche_alpha = args.der_alpha
     # used in ncut preparation
+    config.ncut_figs = args.ncut_figs
     config.max_rec = args.ncut_maxRec
     config.nr_sup_pix = args.ncut_nrSupPix
     config.compactness = args.ncut_compactness

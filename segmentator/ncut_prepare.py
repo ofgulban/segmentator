@@ -78,40 +78,40 @@ for i in range(0, max_recursion + 1):
     ncut[:, :, i] = msk
 
 # plots
-fig = plt.figure()
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
+if cfg.ncut_figs:
+    fig = plt.figure()
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
 
-# ax1.imshow(img.T, origin="lower", cmap=plt.cm.inferno)
-ax1.imshow(regions.T, origin="lower", cmap=plt.cm.inferno)
-ax2.imshow(msk.T, origin="lower", cmap=plt.cm.nipy_spectral)
+    # ax1.imshow(img.T, origin="lower", cmap=plt.cm.inferno)
+    ax1.imshow(regions.T, origin="lower", cmap=plt.cm.inferno)
+    ax2.imshow(msk.T, origin="lower", cmap=plt.cm.nipy_spectral)
 
-ax1.set_title('Source')
-ax2.set_title('Ncut')
+    ax1.set_title('Source')
+    ax2.set_title('Ncut')
 
-plt.show()
+    plt.show()
 
-fig = plt.figure()
-unq = np.unique(msk)
-idx = -1
+    fig = plt.figure()
+    unq = np.unique(msk)
+    idx = -1
 
-im = plt.imshow(msk.T, origin="lower", cmap=plt.cm.flag,
-                animated=True)
+    im = plt.imshow(msk.T, origin="lower", cmap=plt.cm.flag,
+                    animated=True)
 
+    def updatefig(*args):
+        """Animate the plot."""
+        global unq, msk, idx, tmp
+        idx += 1
+        idx = idx % ncut.shape[2]
+        tmp = np.copy(ncut[:, :, idx])
+        im.set_array(tmp.T)
+        return im,
 
-def updatefig(*args):
-    """Animate the plot."""
-    global unq, msk, idx, tmp
-    idx += 1
-    idx = idx % ncut.shape[2]
-    tmp = np.copy(ncut[:, :, idx])
-    im.set_array(tmp.T)
-    return im,
+    ani = animation.FuncAnimation(fig, updatefig, interval=750, blit=True)
+    plt.show()
 
-
-ani = animation.FuncAnimation(fig, updatefig, interval=750, blit=True)
-plt.show()
-
+# save output
 outName = basename + '_ncut' + '_sp' + str(cfg.nr_sup_pix) \
           + '_c' + str(cfg.compactness)
 outName = outName.replace('.', 'pt')
