@@ -36,7 +36,7 @@ ima = orig.copy()
 if cfg.gramag:
     nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
-    gra = TruncateRange(gra, percMin=cfg.perc_min, percMax=cfg.percMax)
+    gra = TruncateRange(gra, percMin=cfg.perc_min, percMax=cfg.perc_max)
     gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
 else:
     # calculate gradient magnitude (using L2 norm of the vector)
