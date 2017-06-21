@@ -19,7 +19,8 @@
    style="enable-background:new"
    inkscape:export-filename="/home/faruk/Git/segmentator/logo/logo.png"
    inkscape:export-xdpi="300"
-   inkscape:export-ydpi="300">
+   inkscape:export-ydpi="300"
+   enable-background="new">
   <defs
      id="defs4">
     <linearGradient
@@ -233,6 +234,15 @@
        y1="116.13522"
        x2="159.16176"
        y2="154.45013" />
+    <filter
+       inkscape:collect="always"
+       id="filter3900">
+      <feBlend
+         inkscape:collect="always"
+         mode="darken"
+         in2="BackgroundImage"
+         id="feBlend3902" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -242,10 +252,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.0000001"
-     inkscape:cx="182.10671"
-     inkscape:cy="12.971643"
+     inkscape:cx="182.60671"
+     inkscape:cy="85.881049"
      inkscape:document-units="px"
-     inkscape:current-layer="layer7"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1134"
@@ -265,7 +275,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -274,8 +284,7 @@
      id="layer3"
      inkscape:label="Background"
      style="display:inline"
-     transform="translate(0,-50)"
-     sodipodi:insensitive="true">
+     transform="translate(0,-50)">
     <path
        inkscape:connector-curvature="0"
        style="color:#000000;fill:#d5e5ff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
@@ -307,6 +316,11 @@
        sodipodi:end="5.9341195"
        inkscape:transform-center-y="-12.08551"
        inkscape:transform-center-x="-0.0027101473" />
+    <path
+       id="path4447"
+       d="m 268.47958,193.76081 -10.85333,-6.25383 -55.3684,-31.9797 0.012,63.9403 -0.0103,12.52617 66.2214,-38.23294 z"
+       style="color:#000000;fill:#d5e5ff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:connector-curvature="0" />
     <rect
        style="color:#000000;fill:url(#linearGradient4545);fill-opacity:1;stroke:none;stroke-width:0.70999998;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect4128"
@@ -314,11 +328,6 @@
        height="250"
        x="0"
        y="50" />
-    <path
-       id="path4447"
-       d="m 268.47958,193.76081 -10.85333,-6.25383 -55.3684,-31.9797 0.012,63.9403 -0.0103,12.52617 66.2214,-38.23294 z"
-       style="color:#000000;fill:#d5e5ff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
-       inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
        style="color:#000000;fill:#d5e5ff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40000001;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
@@ -807,7 +816,7 @@
      inkscape:groupmode="layer"
      id="layer7"
      inkscape:label="Top Frame"
-     style="display:inline"
+     style="display:inline;filter:url(#filter3900)"
      transform="translate(0,-10)">
     <rect
        y="0.75421798"
