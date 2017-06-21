@@ -39,4 +39,4 @@ This application is based on the following work:
 * Kniss, J., Kindlmann, G., & Hansen, C. D. (2005). Multidimensional transfer functions for volume rendering. Visualization Handbook, 189–209. http://doi.org/10.1016/B978-012387582-2/50011-3  
 * Jianbo Shi, & Malik, J. (2000). Normalized cuts and image segmentation. IEEE Transactions on Pattern Analysis and Machine Intelligence, 22(8), 888–905. http://doi.org/10.1109/34.868688  
 * Ip, C. Y., Varshney, A., & Jaja, J. (2012). Hierarchical exploration of volumes using multilevel segmentation of the intensity-gradient histograms. IEEE Transactions on Visualization and Computer Graphics, 18(12), 2355–2363. http://doi.org/10.1109/TVCG.2012.231  
-* Monga, O., Deriche, R., & Rocchisani, J.-M. (1991). 3D edge detection using recursive filtering: Application to scanner images. CVGIP: Image Understanding, 53(1), 76–87. http://doi.org/10.1016/1049-9660(91)90006-B  
+
