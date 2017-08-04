@@ -16,15 +16,17 @@ from scipy.ndimage.filters import gaussian_filter1d
 from retinex_for_mri.filters import anisodiff3
 
 # load
-nii = load('/home/faruk/gdrive/temp_segmentator_paper_data/MPRAGE/S02/derived/01_division/spm_arcweld/mS02_T1wDivPD_nosub.nii.gz')
+nii = load('/home/faruk/gdrive/temp_segmentator_paper_data/MP2RAGE/S013/derived/01_uni/fast_restored_arcweld/S013_uni_bet_nosub_restore.nii.gz')
 ima = nii.get_data()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # non-zero mask
-msk = ima > 0  # TODO: Parametrize
+msk = (ima != 0)  # TODO: Parametrize
+#
+ima[msk] = ima[msk] + np.min(ima)
 
 # aniso. diff. filter
-ima = anisodiff3(ima, niter=2, kappa=50, gamma=0.1, option=1)
+ima = anisodiff3(ima, niter=2, kappa=500, gamma=0.1, option=1)
 
 # calculate gradient magnitude
 gra = np.gradient(ima)
@@ -34,7 +36,7 @@ gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
 # out = Nifti1Image(gra.reshape(nii.shape), affine=nii.affine)
 # save(out, basename + '_gra' + '.nii.gz')
 
-ima_max = np.percentile(ima, 99)
+ima_max = np.percentile(ima, 100)
 
 # reshape for histograms
 ima, gra, msk = ima.flatten(), gra.flatten(), msk.flatten()
@@ -58,7 +60,7 @@ print peaks
 print tissues
 
 # insert zero-max arc
-zmax_max = tissues[-1] + tissues[-1] - tissues[1]  # first gm and wm
+zmax_max = ima_max
 zmax_center = (0 + zmax_max) / 2.
 zmax_radius = zmax_max - zmax_center
 tissues = np.append(tissues, zmax_center)
@@ -90,10 +92,9 @@ soft[-1, :] = zmax_weight*np.abs(soft[-1, :])
 # save(out, basename + '_zmaxarc' + '.nii.gz')
 
 # arbitrary weighting (TODO: Can be turned into config file of some sort)
-# save these values for MPRAGE T1w/PDw
-soft[0, :] = soft[0, :] * 0.66  # csf
-# soft[2, :] = soft[2, :] * 1.25  # wm
-soft[3, :] = soft[3, :] * 0.5  # zero-max arc
+# save these values for MP2RAGE UNI
+soft[0, :] = soft[0, :] * 1  # csf
+soft[-1, :] = soft[-1, :] * 0.5  # zero-max arc
 
 # hard tissue membership maps
 hard = np.argmin(soft, axis=0)
@@ -102,7 +103,7 @@ hard = np.argmin(soft, axis=0)
 hard = hard + 1
 hard[~msk] = 0
 
-# save intermediate maps
+# save hard classification
 out = Nifti1Image(hard.reshape(nii.shape), affine=nii.affine)
 save(out, basename + '_arcweld' + '.nii.gz')
 
