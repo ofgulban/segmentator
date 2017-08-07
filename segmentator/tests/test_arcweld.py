@@ -8,13 +8,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # create toy data
-res = 100  # resolution
+res = 500  # resolution
 data = np.mgrid[0:res, 0:res].astype('float')
 ima, gra = data[0, :, :].flatten(), data[1, :, :].flatten()
 dims = data.shape
 
 # have 3 arbitrary classes (standing for classes csf, gm, wm)
-classes = np.array([res/5, res/5*3, res/5*4])
+classes = np.array([res/7, res/7*4, res/7*6])
 
 # find arc anchor
 arc_center = (data.max() + data.min()) / 2.
@@ -26,9 +26,9 @@ classes = np.hstack([classes, arc_center])
 soft = []
 data = data.reshape(dims[0], dims[1]*dims[2])
 for i, a in enumerate(classes):
-    tissue = np.array([a, 0])
+    c = np.array([a, 0])
     # euclidean distance
-    edist = np.sqrt(np.sum((data - tissue[:, None])**2., axis=0))
+    edist = np.sqrt(np.sum((data - c[:, None])**2., axis=0))
     soft.append(edist)
 soft = np.asarray(soft)
 
@@ -36,7 +36,11 @@ soft = np.asarray(soft)
 soft[-1, :] = soft[-1, :] - arc_radius
 soft[-1, :] = arc_weight * np.abs(soft[-1, :])
 
-# hard tissue membership maps
+# arbitrary weights
+soft[0, :] = soft[0, :] * 0.66  # csf
+soft[-1, :] = soft[-1, :] * 0.5  # arc
+
+# hard class membership maps
 hard = np.argmin(soft, axis=0)
 hard = hard.reshape(dims[1], dims[2])
 
