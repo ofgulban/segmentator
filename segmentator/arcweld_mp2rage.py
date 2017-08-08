@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage.filters import gaussian_filter1d
 from retinex_for_mri.filters import anisodiff3
+from utils import compute_gradient_magnitude
 
 # load
 nii = load('/home/faruk/gdrive/temp_segmentator_paper_data/MP2RAGE/S013/derived/01_uni/fast_restored_arcweld/S013_uni_bet_nosub_restore.nii.gz')
@@ -29,8 +30,7 @@ ima[msk] = ima[msk] + np.min(ima)
 ima = anisodiff3(ima, niter=2, kappa=500, gamma=0.1, option=1)
 
 # calculate gradient magnitude
-gra = np.gradient(ima)
-gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
+gra = compute_gradient_magnitude(ima, method='sobel')
 
 # save for debugging
 # out = Nifti1Image(gra.reshape(nii.shape), affine=nii.affine)

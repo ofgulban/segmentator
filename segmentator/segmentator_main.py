@@ -30,7 +30,7 @@ from matplotlib import path
 from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
-from utils import Ima2VolHistMapping, Hist2D
+from utils import Ima2VolHistMapping, Hist2D, compute_gradient_magnitude
 from utils import TruncateRange, ScaleRange
 import config as cfg
 
@@ -48,17 +48,14 @@ orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if cfg.gramag:
+if cfg.gramag not in ['sobel', 'prewitt', 'numpy']:
     nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
     gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
 
 else:
-    # calculate gradient magnitude (using L2 norm of the vector)
-    gra = np.gradient(ima)
-    gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) +
-                  np.power(gra[2], 2))
+    gra = compute_gradient_magnitude(ima, method=cfg.gramag)
 
 # reshape ima (more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(ima)

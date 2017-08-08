@@ -11,7 +11,7 @@ init_theta = (0, 360)
 
 # segmentator main command line variables
 filename = 'sample_filename_here'
-gramag = 'gradient_magnitude_sample_here'
+gramag = 'sobel'
 perc_min = 0.25
 perc_max = 99.75
 scale = 400

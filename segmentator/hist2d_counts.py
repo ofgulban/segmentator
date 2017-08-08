@@ -19,7 +19,7 @@
 import os
 import numpy as np
 import config as cfg
-from utils import TruncateRange, ScaleRange, Hist2D
+from utils import TruncateRange, ScaleRange, Hist2D, compute_gradient_magnitude
 from nibabel import load
 
 # load data
@@ -33,16 +33,14 @@ orig = ScaleRange(orig, scaleFactor=cfg.scale, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if cfg.gramag:
+if cfg.gramag not in ['sobel', 'prewitt', 'numpy']:
     nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=cfg.perc_min, percMax=cfg.perc_max)
     gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
+
 else:
-    # calculate gradient magnitude (using L2 norm of the vector)
-    gra = np.gradient(ima)
-    gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) +
-                  np.power(gra[2], 2))
+    gra = compute_gradient_magnitude(ima, method=cfg.gramag)
 
 # reshape ima (a bit more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(ima)

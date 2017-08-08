@@ -19,7 +19,7 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-
+from scipy.ndimage import sobel, prewitt, laplace, generic_gradient_magnitude
 
 def sub2ind(array_shape, rows, cols):
     """Pixel to voxel mapping (similar to matlab's function).
@@ -171,3 +171,33 @@ def Hist2D(ima, gra):
     binEdges = np.arange(dataMin, dataMax+1)
     counts, _, _, volHistH = plt.hist2d(ima, gra, bins=binEdges, cmap='Greys')
     return counts, volHistH, dataMin, dataMax, nrBins, binEdges
+
+
+def compute_gradient_magnitude(ima, method='sobel'):
+    """Compute gradient magnitude of images.
+
+    Parameters
+    ----------
+    ima : np.ndarray
+        First image, which is often the intensity image (eg. T1w).
+    method : string
+        Gradient computation method. Available options are 'sobel', 'prewitt',
+        'numpy'.
+    Returns
+    -------
+    gra_mag : np.ndarray
+        Second image, which is often the gradient magnitude image
+        derived from the first image
+    """
+    if method == 'sobel':
+        return generic_gradient_magnitude(ima, sobel)/32.
+    elif method == 'prewitt':
+        return generic_gradient_magnitude(ima, prewitt)/18.
+    elif method == 'numpy':
+        gra = np.gradient(ima)
+        gra_mag = np.zeros(ima.shape)
+        for d in range(len(gra)):
+            gra_mag = np.sum(gra_mag, np.power(gra[d], 2.))
+        return np.sqrt(gra_mag)
+    else:
+        print 'Gradient magnitude method is invalid!'
