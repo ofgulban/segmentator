@@ -19,7 +19,8 @@
 import os
 import numpy as np
 import config as cfg
-from utils import TruncateRange, ScaleRange, Hist2D, set_gradient_magnitude
+from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import set_gradient_magnitude, prep_2D_hist
 from nibabel import load
 
 # load data
@@ -28,15 +29,15 @@ basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # data processing
 orig = np.squeeze(nii.get_data())
-orig = TruncateRange(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
-orig = ScaleRange(orig, scaleFactor=cfg.scale, delta=0.0001)
+orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
+orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 
 # reshape ima (a bit more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(orig)
 gra = np.ndarray.flatten(gra)
 
-counts, _, _, _, _, _ = Hist2D(ima, gra)
+counts, _, _, _, _, _ = prep_2D_hist(ima, gra)
 outName = (basename + '_volHist'
            + '_pMax' + str(cfg.perc_max) + '_pMin' + str(cfg.perc_min)
            + '_sc' + str(int(cfg.scale))

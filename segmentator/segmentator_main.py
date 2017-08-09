@@ -30,8 +30,9 @@ from matplotlib import path
 from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
-from utils import Ima2VolHistMapping, Hist2D
-from utils import TruncateRange, ScaleRange, set_gradient_magnitude
+from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
+from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import set_gradient_magnitude
 import config as cfg
 
 """Load Data"""
@@ -41,13 +42,13 @@ nii = load(cfg.filename)
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
 dims = orig.shape
-orig = TruncateRange(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
-orig = ScaleRange(orig, scaleFactor=cfg.scale, delta=0.0001)
+orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
+orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 
 # reshape ima (more intuitive for voxel-wise operations)
-ima = np.ndarray.flatten(orig)
-gra = np.ndarray.flatten(gra)
+ima = np.copy(orig.flatten())
+gra = gra.flatten()
 
 #
 """Plots"""
@@ -61,7 +62,7 @@ palette.set_bad('m', 1.0)
 fig = plt.figure()
 ax = fig.add_subplot(121)
 
-counts, volHistH, dataMin, dataMax, nrBins, binEdges = Hist2D(ima, gra)
+counts, volHistH, dataMin, dataMax, nrBins, binEdges = prep_2D_hist(ima, gra)
 
 ax.set_xlim(dataMin, dataMax)
 ax.set_ylim(dataMin, dataMax)
@@ -146,7 +147,7 @@ flexFig = responsiveObj(figure=ax.figure,
 
 # make the figure responsive to clicks
 flexFig.connect()
-ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
+ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=binEdges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
 #

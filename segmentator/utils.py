@@ -42,7 +42,7 @@ def sub2ind(array_shape, rows, cols):
     return (cols*array_shape + rows)
 
 
-def Ima2VolHistMapping(xinput, yinput, binsArray):
+def map_ima_to_2D_hist(xinput, yinput, bins_arr):
     """Image to volume histogram mapping (kind of inverse histogram).
 
     Parameters
@@ -52,7 +52,8 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
     yinput : TODO
         Second image, which is often the gradient magnitude image
         derived from the first image.
-    binsArray : TODO
+    bins_arr : TODO
+        Array of bins.
 
     Returns
     -------
@@ -60,14 +61,14 @@ def Ima2VolHistMapping(xinput, yinput, binsArray):
         Voxel to pixel mapping.
 
     """
-    dgtzData = np.digitize(xinput, binsArray)-1
-    dgtzGra = np.digitize(yinput, binsArray)-1
-    nrBins = len(binsArray)-1  # subtract 1 (more borders than containers)
+    dgtzData = np.digitize(xinput, bins_arr)-1
+    dgtzGra = np.digitize(yinput, bins_arr)-1
+    nrBins = len(bins_arr)-1  # subtract 1 (more borders than containers)
     vox2pixMap = sub2ind(nrBins, dgtzData, dgtzGra)  # 1D
     return vox2pixMap
 
 
-def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
+def map_2D_hist_to_ima(imaSlc2volHistMap, volHistMask):
     """Volume histogram to image mapping for slices (uses np.ind1).
 
     Parameters
@@ -92,7 +93,7 @@ def VolHist2ImaMapping(imaSlc2volHistMap, volHistMask):
     return imaSlcMask
 
 
-def TruncateRange(data, percMin=0.25, percMax=99.75):
+def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     """Truncate too low and too high values.
 
     Parameters
@@ -103,31 +104,40 @@ def TruncateRange(data, percMin=0.25, percMax=99.75):
         Percentile minimum.
     percMax : float
         Percentile maximum.
+    discard_zeros : bool
+        Discard voxels with value 0 from truncation.
 
     Returns
     -------
     data : np.ndarray
 
     """
-    percDataMin, percDataMax = np.percentile(data, [percMin, percMax])
+    if discard_zeros:
+        msk = data != 0
+    else:
+        msk = np.ones(data.shape)
+    percDataMin, percDataMax = np.percentile(data[msk], [percMin, percMax])
     data[data < percDataMin] = percDataMin  # adjust minimum
     data[data > percDataMax] = percDataMax  # adjust maximum
+    data[~msk] = 0  # put back masked out voxels
     return data
 
 
-def ScaleRange(data, scaleFactor=500, delta=0):
+def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
     """Scale values as a preprocessing step.
 
     Parameters
     ----------
     data : np.ndarray
         Image to be scaled.
-    scaleFactor : float
+    scale_factor : float
         Lower scaleFactors provides faster interface due to loweing the
         resolution of 2D histogram ( 500 seems fast enough).
     delta : float
         Delta ensures that the max data points fall inside the last bin
         when this function is used with histograms.
+    discard_zeros : bool
+        Discard voxels with value 0 from truncation.
 
     Returns
     -------
@@ -135,12 +145,17 @@ def ScaleRange(data, scaleFactor=500, delta=0):
         Scaled image.
 
     """
-    scaleFactor = scaleFactor - delta
-    data = data - data.min()
-    return scaleFactor / data.max() * data
+    if discard_zeros:
+        msk = data != 0
+    else:
+        msk = np.ones(data.shape)
+    scale_factor = scale_factor - delta
+    data[msk] = data[msk] - data[msk].min()
+    data[msk] = scale_factor / data[msk].max() * data[msk]
+    return data
 
 
-def Hist2D(ima, gra):
+def prep_2D_hist(ima, gra):
     """Prepare 2D histogram related variables.
 
     Parameters
@@ -273,9 +288,9 @@ def set_gradient_magnitude(image, gramag_option):
     if gramag_option not in cfg.gramag_options:
         gra_mag_nii = load(gramag_option)
         gra_mag = np.squeeze(gra_mag_nii.get_data())
-        gra_mag = TruncateRange(gra_mag, percMin=cfg.perc_min,
-                                percMax=cfg.perc_max)
-        gra_mag = ScaleRange(gra_mag, scaleFactor=cfg.scale, delta=0.0001)
+        gra_mag = truncate_range(gra_mag, percMin=cfg.perc_min,
+                                 percMax=cfg.perc_max)
+        gra_mag = scale_range(gra_mag, scale_factor=cfg.scale, delta=0.0001)
 
     else:
         gra_mag = compute_gradient_magnitude(image, method=gramag_option)
