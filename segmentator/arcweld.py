@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage.filters import gaussian_filter1d
 from retinex_for_mri.filters import anisodiff3
-from utils import compute_gradient_magnitude
+from segmentator.utils import compute_gradient_magnitude
 
 # load
-nii = load('/home/faruk/gdrive/temp_segmentator_paper_data/MPRAGE/S02/derived/01_division/spm_arcweld/mS02_T1wDivPD_nosub.nii.gz')
+nii = load('/home/faruk/gdrive/Segmentator/data/faruk/arcweld/mprage_S02_restore.nii.gz')
 ima = nii.get_data()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
@@ -28,7 +28,7 @@ msk = ima > 0  # TODO: Parametrize
 ima = anisodiff3(ima, niter=2, kappa=50, gamma=0.1, option=1)
 
 # calculate gradient magnitude
-gra = compute_gradient_magnitude(ima, method='sobel')
+gra = compute_gradient_magnitude(ima, method='3D_sobel')
 
 # save for debugging
 # out = Nifti1Image(gra.reshape(nii.shape), affine=nii.affine)
@@ -91,9 +91,9 @@ soft[-1, :] = zmax_weight*np.abs(soft[-1, :])
 
 # arbitrary weighting (TODO: Can be turned into config file of some sort)
 # save these values for MPRAGE T1w/PDw
-soft[0, :] = soft[0, :] * 0.66  # csf
-# soft[2, :] = soft[2, :] * 1.25  # wm
-soft[3, :] = soft[3, :] * 0.5  # zero-max arc
+# soft[0, :] = soft[0, :] * 0.66  # csf
+# # soft[2, :] = soft[2, :] * 1.25  # wm
+# soft[3, :] = soft[3, :] * 0.5  # zero-max arcs
 
 # hard tissue membership maps
 hard = np.argmin(soft, axis=0)
