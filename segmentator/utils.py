@@ -190,11 +190,13 @@ def create_3D_kernel(operator='sobel'):
     if operator == 'sobel':
         operator = np.array([[[1, 2, 1], [2, 4, 2], [1, 2, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-                             [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]])
+                             [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]],
+                            dtype='float')
     elif operator == 'prewitt':
         operator = np.array([[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
-                             [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]])
+                             [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]],
+                            dtype='float')
     # create permutations operator that will be used in gradient computation
     kernel = np.zeros([6, 3, 3, 3])
     kernel[0, ...] = operator
@@ -228,7 +230,7 @@ def compute_gradient_magnitude(ima, method='sobel'):
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=-1))/32.
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/32.
         return gra_mag
     elif method == '3D_prewitt':
         kernel = create_3D_kernel(operator='prewitt')
@@ -236,7 +238,7 @@ def compute_gradient_magnitude(ima, method='sobel'):
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=-1))/18.
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/18.
         return gra_mag
     elif method == 'scipy_sobel':
         return generic_gradient_magnitude(ima, sobel)/32.
@@ -244,7 +246,7 @@ def compute_gradient_magnitude(ima, method='sobel'):
         return generic_gradient_magnitude(ima, prewitt)/18.
     elif method == 'numpy':
         gra = np.asarray(np.gradient(ima))
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=0))
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
         return gra_mag
     else:
         print 'Gradient magnitude method is invalid!'
