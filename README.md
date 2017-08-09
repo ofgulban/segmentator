@@ -27,7 +27,8 @@ Please visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installatio
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
 
 ## License
-The project is licensed under [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
+Copyright © 2016, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
+Released under [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
 
 ## References
 This application is based on the following work:
