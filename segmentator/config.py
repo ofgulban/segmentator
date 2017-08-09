@@ -11,10 +11,14 @@ init_theta = (0, 360)
 
 # segmentator main command line variables
 filename = 'sample_filename_here'
-gramag = 'sobel'
+gramag = '3D_sobel'
 perc_min = 0.25
 perc_max = 99.75
 scale = 400
+
+# possible gradient magnitude computation options
+gramag_options = ['3D_sobel', '3D_prewitt', 'scipy_sobel', 'scipy_prewitt',
+                  'numpy']
 
 # used in Deriche filter
 deriche_alpha = 2

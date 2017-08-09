@@ -48,7 +48,7 @@ orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
 
 # copy intensity data so we can flatten the copy and leave original intact
 ima = orig.copy()
-if cfg.gramag not in ['sobel', 'prewitt', 'numpy']:
+if cfg.gramag not in cfg.gramag_options:
     nii2 = load(cfg.gramag)
     gra = np.squeeze(nii2.get_data())
     gra = TruncateRange(gra, percMin=percMin, percMax=percMax)

@@ -1,27 +1,39 @@
-"""Experiment with difference grdient magnitude calculations."""
+"""Experiment with different gradient magnitude calculations.
+
+TODO: turn this into unit tests.
+
+"""
 
 import os
-import numpy as np
 from nibabel import load, Nifti1Image, save
-from scipy.ndimage import generic_gradient_magnitude, sobel, prewitt, laplace
+from segmentator.utils import compute_gradient_magnitude
 
 # load
 nii = load('/home/faruk/gdrive/Segmentator/data/faruk/arcweld/mprage_t1w_restore.nii.gz')
 ima = nii.get_data()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
+# calculate 3D Sobel
+gra_mag = compute_gradient_magnitude(ima, method='3D_sobel')
+out = Nifti1Image(gra_mag, affine=nii.affine)
+save(out, basename + '_3D_sobel.nii.gz')
+
+# calculate 3D Prewitt
+gra_mag = compute_gradient_magnitude(ima, method='3D_prewitt')
+out = Nifti1Image(gra_mag, affine=nii.affine)
+save(out, basename + '_3D_prewitt.nii.gz')
+
 # calculate numpy gradient magnitude
-gra = np.gradient(ima)
-gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) + np.power(gra[2], 2))
-out = Nifti1Image(gra, affine=nii.affine)
+gra_mag = compute_gradient_magnitude(ima, method='numpy')
+out = Nifti1Image(gra_mag, affine=nii.affine)
 save(out, basename + '_numpy_gradient.nii.gz')
 
-# calculate sobel
-gra = generic_gradient_magnitude(ima, sobel)/32.
-out = Nifti1Image(gra, affine=nii.affine)
+# calculate scipy sobel
+gra_mag = compute_gradient_magnitude(ima, method='scipy_sobel')
+out = Nifti1Image(gra_mag, affine=nii.affine)
 save(out, basename + '_scipy_sobel.nii.gz')
 
-# calculate prewitt
-gra = generic_gradient_magnitude(ima, prewitt)/32.
-out = Nifti1Image(gra, affine=nii.affine)
+# calculate scipy prewitt
+gra_mag = compute_gradient_magnitude(ima, method='scipy_prewitt')
+out = Nifti1Image(gra_mag, affine=nii.affine)
 save(out, basename + '_scipy_prewitt.nii.gz')

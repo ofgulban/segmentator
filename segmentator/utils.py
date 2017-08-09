@@ -19,7 +19,8 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.ndimage import sobel, prewitt, laplace, generic_gradient_magnitude
+from scipy.ndimage import sobel, prewitt, convolve, generic_gradient_magnitude
+
 
 def sub2ind(array_shape, rows, cols):
     """Pixel to voxel mapping (similar to matlab's function).
@@ -173,6 +174,38 @@ def Hist2D(ima, gra):
     return counts, volHistH, dataMin, dataMax, nrBins, binEdges
 
 
+def create_3D_kernel(operator='sobel'):
+    """Create various 3D kernels.
+
+    Parameters
+    ----------
+    operator : np.ndarray, shape=(n, n, 3)
+        Input can be 'sobel', 'prewitt' or any 3D numpy array.
+
+    Returns
+    -------
+    kernel : np.ndarray, shape(6, n, n, 3)
+
+    """
+    if operator == 'sobel':
+        operator = np.array([[[1, 2, 1], [2, 4, 2], [1, 2, 1]],
+                             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                             [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]])
+    elif operator == 'prewitt':
+        operator = np.array([[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+                             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                             [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]])
+    # create permutations operator that will be used in gradient computation
+    kernel = np.zeros([6, 3, 3, 3])
+    kernel[0, ...] = operator
+    kernel[1, ...] = kernel[0, ::-1, ::-1, ::-1]
+    kernel[2, ...] = np.transpose(kernel[0, ...], [1, 2, 0])
+    kernel[3, ...] = kernel[2, ::-1, ::-1, ::-1]
+    kernel[4, ...] = np.transpose(kernel[0, ...], [2, 0, 1])
+    kernel[5, ...] = kernel[4, ::-1, ::-1, ::-1]
+    return kernel
+
+
 def compute_gradient_magnitude(ima, method='sobel'):
     """Compute gradient magnitude of images.
 
@@ -181,23 +214,37 @@ def compute_gradient_magnitude(ima, method='sobel'):
     ima : np.ndarray
         First image, which is often the intensity image (eg. T1w).
     method : string
-        Gradient computation method. Available options are 'sobel', 'prewitt',
-        'numpy'.
+        Gradient computation method. Available options are '3D_sobel',
+        'scipy_sobel', 'scipy_prewitt', 'numpy'.
     Returns
     -------
     gra_mag : np.ndarray
         Second image, which is often the gradient magnitude image
         derived from the first image
     """
-    if method == 'sobel':
+    if method == '3D_sobel':  # magnitude scale is similar to numpy method
+        kernel = create_3D_kernel(operator='sobel')
+        gra = np.zeros(ima.shape + (kernel.shape[0],))
+        for d in range(kernel.shape[0]):
+            gra[..., d] = convolve(ima, kernel[d, ...])
+        # compute generic gradient magnitude with normalization
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=-1))/32.
+        return gra_mag
+    elif method == '3D_prewitt':
+        kernel = create_3D_kernel(operator='prewitt')
+        gra = np.zeros(ima.shape + (kernel.shape[0],))
+        for d in range(kernel.shape[0]):
+            gra[..., d] = convolve(ima, kernel[d, ...])
+        # compute generic gradient magnitude with normalization
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=-1))/18.
+        return gra_mag
+    elif method == 'scipy_sobel':
         return generic_gradient_magnitude(ima, sobel)/32.
-    elif method == 'prewitt':
+    elif method == 'scipy_prewitt':
         return generic_gradient_magnitude(ima, prewitt)/18.
     elif method == 'numpy':
-        gra = np.gradient(ima)
-        gra_mag = np.zeros(ima.shape)
-        for d in range(len(gra)):
-            gra_mag = np.sum(gra_mag, np.power(gra[d], 2.))
-        return np.sqrt(gra_mag)
+        gra = np.asarray(np.gradient(ima))
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2), axis=0))
+        return gra_mag
     else:
         print 'Gradient magnitude method is invalid!'
