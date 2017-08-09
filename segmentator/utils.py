@@ -19,6 +19,8 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
+import config as cfg
+from nibabel import load
 from scipy.ndimage import sobel, prewitt, convolve, generic_gradient_magnitude
 
 
@@ -250,3 +252,31 @@ def compute_gradient_magnitude(ima, method='sobel'):
         return gra_mag
     else:
         print 'Gradient magnitude method is invalid!'
+
+
+def set_gradient_magnitude(image, gramag_option):
+    """Set gradient magnitude based on the command line flag.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        First image, which is often the intensity image (eg. T1w).
+    gramag_option : string
+        A keyword string or a path to a nigti file.
+
+    Returns
+    -------
+    gra_mag : np.ndarray
+        Gradient magnitude image, which has the same shape as image.
+
+    """
+    if gramag_option not in cfg.gramag_options:
+        gra_mag_nii = load(gramag_option)
+        gra_mag = np.squeeze(gra_mag_nii.get_data())
+        gra_mag = TruncateRange(gra_mag, percMin=cfg.perc_min,
+                                percMax=cfg.perc_max)
+        gra_mag = ScaleRange(gra_mag, scaleFactor=cfg.scale, delta=0.0001)
+
+    else:
+        gra_mag = compute_gradient_magnitude(image, method=gramag_option)
+    return gra_mag

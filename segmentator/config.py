@@ -16,9 +16,10 @@ perc_min = 0.25
 perc_max = 99.75
 scale = 400
 
-# possible gradient magnitude computation options
+# possible gradient magnitude computation keyword options
 gramag_options = ['3D_sobel', '3D_prewitt', 'scipy_sobel', 'scipy_prewitt',
                   'numpy']
+
 
 # used in Deriche filter
 deriche_alpha = 2
