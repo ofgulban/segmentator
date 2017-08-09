@@ -13,8 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage.filters import gaussian_filter1d
-from retinex_for_mri.filters import anisodiff3
-from segmentator.utils import compute_gradient_magnitude
+from segmentator.utils import compute_gradient_magnitude, aniso_diff_3D
 
 # load
 nii = load('/home/faruk/gdrive/Segmentator/data/faruk/arcweld/mprage_S02_restore.nii.gz')
@@ -25,7 +24,7 @@ basename = nii.get_filename().split(os.extsep, 1)[0]
 msk = ima > 0  # TODO: Parametrize
 
 # aniso. diff. filter
-ima = anisodiff3(ima, niter=2, kappa=50, gamma=0.1, option=1)
+ima = aniso_diff_3D(ima, niter=2, kappa=50, gamma=0.1, option=1)
 
 # calculate gradient magnitude
 gra = compute_gradient_magnitude(ima, method='3D_sobel')
