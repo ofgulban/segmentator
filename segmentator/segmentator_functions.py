@@ -20,7 +20,7 @@ from __future__ import division
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import VolHist2ImaMapping
+from utils import map_2D_hist_to_ima
 from nibabel import save, Nifti1Image
 import config as cfg
 
@@ -54,7 +54,7 @@ class responsiveObj:
             self.volHistMaskH.set_data(self.volHistMask)
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
         # update imaMask
-        self.imaMask = VolHist2ImaMapping(
+        self.imaMask = map_2D_hist_to_ima(
             self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
         if self.borderSwitch == 1:
             self.imaMask = self.calcImaMaskBrd()
@@ -298,7 +298,7 @@ class responsiveObj:
             out_volHistMask[out_volHistMask == label] = intLabels[newLabel]
         # get 3D brain mask
         temp = np.transpose(self.invHistVolume, cycBackPerm)
-        outNii = VolHist2ImaMapping(temp, out_volHistMask)
+        outNii = map_2D_hist_to_ima(temp, out_volHistMask)
         outNii = outNii.reshape(temp.shape)
         # save mask image as nii
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),

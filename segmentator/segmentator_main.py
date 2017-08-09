@@ -30,8 +30,9 @@ from matplotlib import path
 from nibabel import load
 from segmentator_functions import responsiveObj
 from sector_mask import sector_mask
-from utils import Ima2VolHistMapping, Hist2D
-from utils import TruncateRange, ScaleRange
+from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
+from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import set_gradient_magnitude
 import config as cfg
 
 """Load Data"""
@@ -40,30 +41,14 @@ nii = load(cfg.filename)
 #
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
-
-percMin, percMax = cfg.perc_min, cfg.perc_max
-orig = TruncateRange(orig, percMin=percMin, percMax=percMax)
-scaleFactor = cfg.scale
-orig = ScaleRange(orig, scaleFactor=scaleFactor, delta=0.0001)
-
-# copy intensity data so we can flatten the copy and leave original intact
-ima = orig.copy()
-if cfg.gramag:
-    nii2 = load(cfg.gramag)
-    gra = np.squeeze(nii2.get_data())
-    gra = TruncateRange(gra, percMin=percMin, percMax=percMax)
-    gra = ScaleRange(gra, scaleFactor=cfg.scale, delta=0.0001)
-
-else:
-    # calculate gradient magnitude (using L2 norm of the vector)
-    gra = np.gradient(ima)
-    gra = np.sqrt(np.power(gra[0], 2) + np.power(gra[1], 2) +
-                  np.power(gra[2], 2))
+dims = orig.shape
+orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
+orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
+gra = set_gradient_magnitude(orig, cfg.gramag)
 
 # reshape ima (more intuitive for voxel-wise operations)
-ima = np.ndarray.flatten(ima)
-gra = np.ndarray.flatten(gra)
-
+ima = np.copy(orig.flatten())
+gra = gra.flatten()
 
 #
 """Plots"""
@@ -77,7 +62,7 @@ palette.set_bad('m', 1.0)
 fig = plt.figure()
 ax = fig.add_subplot(121)
 
-counts, volHistH, dataMin, dataMax, nrBins, binEdges = Hist2D(ima, gra)
+counts, volHistH, dataMin, dataMax, nrBins, binEdges = prep_2D_hist(ima, gra)
 
 ax.set_xlim(dataMin, dataMax)
 ax.set_ylim(dataMin, dataMax)
@@ -92,22 +77,22 @@ plt.colorbar(volHistH)
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
 slcH = ax2.imshow(
-    orig[:, :, int(orig.shape[2]/2)],
+    orig[:, :, int(dims[2]/2)],
     cmap=plt.cm.gray,
     vmin=ima.min(),
     vmax=ima.max(),
     interpolation='none',
-    extent=[0, orig.shape[1], orig.shape[0], 0]
+    extent=[0, dims[1], dims[0], 0]
     )
 
-imaMask = np.ones(orig.shape[0:2])
+imaMask = np.ones(dims[0:2])
 imaMaskH = ax2.imshow(
     imaMask,
     cmap=palette,
     vmin=0.1,
     interpolation='none',
     alpha=0.5,
-    extent=[0, orig.shape[1], orig.shape[0], 0]
+    extent=[0, dims[1], dims[0], 0]
     )
 # adjust subplots on figure
 bottom = 0.30
@@ -148,7 +133,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         nii=nii,
                         sectorObj=sectorObj,
                         nrBins=nrBins,
-                        sliceNr=int(0.5*orig.shape[2]),
+                        sliceNr=int(0.5*dims[2]),
                         slcH=slcH,
                         imaMask=imaMask,
                         imaMaskH=imaMaskH,
@@ -157,13 +142,13 @@ flexFig = responsiveObj(figure=ax.figure,
                         contains=volHistMaskH.contains,
                         counts=counts,
                         idxLasso=idxLasso,
-                        initTpl=(percMin, percMax, scaleFactor),
+                        initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
                         lassoSwitchCount=lassoSwitchCount)
 
 # make the figure responsive to clicks
 flexFig.connect()
-ima2volHistMap = Ima2VolHistMapping(xinput=ima, yinput=gra, binsArray=binEdges)
-flexFig.invHistVolume = np.reshape(ima2volHistMap, orig.shape)
+ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=binEdges)
+flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
 #
 """Sliders and Buttons"""

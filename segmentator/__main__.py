@@ -26,8 +26,10 @@ def main(args=None):
         help="Path to input. Mostly a nifti file with image data."
         )
     parser.add_argument(
-        "--gramag", metavar='path', required=False,
-        help="Path to gradient magnitude (useful for deriche)"
+        "--gramag", metavar='3D_sobel', required=False,
+        default=config.gramag,
+        help="3D_sobel, '3D_prewitt', 'scipy_sobel', 'scipy_prewitt', 'numpy' \
+        or path to a gradient magnitude nifti."
         )
     parser.add_argument(
         "--ncut",  metavar='path', required=False,
