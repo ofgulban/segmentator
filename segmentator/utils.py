@@ -215,6 +215,11 @@ def create_3D_kernel(operator='sobel'):
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]],
                             dtype='float')
+    elif operator == 'scharr':
+        operator = np.array([[[9, 30, 9], [30, 100, 30], [9, 30, 9]],
+                             [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                             [[-9, -30, -9], [-30, -100, -30], [-9, -30, -9]]],
+                            dtype='float')
     # create permutations operator that will be used in gradient computation
     kernel = np.zeros([6, 3, 3, 3])
     kernel[0, ...] = operator
@@ -257,6 +262,14 @@ def compute_gradient_magnitude(ima, method='sobel'):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/18.
+        return gra_mag
+    elif method == '3D_scharr':
+        kernel = create_3D_kernel(operator='prewitt')
+        gra = np.zeros(ima.shape + (kernel.shape[0],))
+        for d in range(kernel.shape[0]):
+            gra[..., d] = convolve(ima, kernel[d, ...])
+        # compute generic gradient magnitude with normalization
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/256.
         return gra_mag
     elif method == 'scipy_sobel':
         return generic_gradient_magnitude(ima, sobel)/32.

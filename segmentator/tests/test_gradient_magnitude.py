@@ -9,7 +9,7 @@ from nibabel import load, Nifti1Image, save
 from segmentator.utils import compute_gradient_magnitude
 
 # load
-nii = load('/home/faruk/gdrive/Segmentator/data/faruk/arcweld/mprage_t1w_restore.nii.gz')
+nii = load('/home/faruk/gdrive/Segmentator/data/faruk/gramag_test/mprage_S02_restore.nii.gz')
 ima = nii.get_data()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
@@ -37,3 +37,8 @@ save(out, basename + '_scipy_sobel.nii.gz')
 gra_mag = compute_gradient_magnitude(ima, method='scipy_prewitt')
 out = Nifti1Image(gra_mag, affine=nii.affine)
 save(out, basename + '_scipy_prewitt.nii.gz')
+
+# calculate 3D Prewitt
+gra_mag = compute_gradient_magnitude(ima, method='3D_scharr')
+out = Nifti1Image(gra_mag, affine=nii.affine)
+save(out, basename + '_3D_scharr.nii.gz')
