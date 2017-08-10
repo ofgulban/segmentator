@@ -192,7 +192,7 @@ def prep_2D_hist(ima, gra):
     return counts, volHistH, dataMin, dataMax, nrBins, binEdges
 
 
-def create_3D_kernel(operator='sobel'):
+def create_3D_kernel(operator='3D_sobel'):
     """Create various 3D kernels.
 
     Parameters
@@ -205,21 +205,24 @@ def create_3D_kernel(operator='sobel'):
     kernel : np.ndarray, shape(6, n, n, 3)
 
     """
-    if operator == 'sobel':
+    if operator == '3D_sobel':
         operator = np.array([[[1, 2, 1], [2, 4, 2], [1, 2, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]],
                             dtype='float')
-    elif operator == 'prewitt':
+    elif operator == '3D_prewitt':
         operator = np.array([[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]],
                             dtype='float')
-    elif operator == 'scharr':
+    elif operator == '3D_scharr':
         operator = np.array([[[9, 30, 9], [30, 100, 30], [9, 30, 9]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-9, -30, -9], [-30, -100, -30], [-9, -30, -9]]],
                             dtype='float')
+    scale_normalization_factor = np.sum(np.abs(operator))
+    operator = np.divide(operator, scale_normalization_factor)
+
     # create permutations operator that will be used in gradient computation
     kernel = np.zeros([6, 3, 3, 3])
     kernel[0, ...] = operator
@@ -231,7 +234,7 @@ def create_3D_kernel(operator='sobel'):
     return kernel
 
 
-def compute_gradient_magnitude(ima, method='sobel'):
+def compute_gradient_magnitude(ima, method='3D_scharr'):
     """Compute gradient magnitude of images.
 
     Parameters
@@ -248,33 +251,29 @@ def compute_gradient_magnitude(ima, method='sobel'):
         derived from the first image
     """
     if method == '3D_sobel':  # magnitude scale is similar to numpy method
-        kernel = create_3D_kernel(operator='sobel')
+        kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/32.
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
     elif method == '3D_prewitt':
-        kernel = create_3D_kernel(operator='prewitt')
+        kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/18.
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
     elif method == '3D_scharr':
-        kernel = create_3D_kernel(operator='prewitt')
+        kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))/256.
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == 'scipy_sobel':
-        return generic_gradient_magnitude(ima, sobel)/32.
-    elif method == 'scipy_prewitt':
-        return generic_gradient_magnitude(ima, prewitt)/18.
     elif method == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
