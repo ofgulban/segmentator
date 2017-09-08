@@ -24,5 +24,5 @@ setup(name='segmentator',
           'console_scripts': [
               'segmentator = segmentator.__main__:main',
               ]},
-      ext_modules=cythonize("segmentator/deriche_3D.pyx")
+      #ext_modules=cythonize("segmentator/future/deriche_3D.pyx") # not used for now
       )
