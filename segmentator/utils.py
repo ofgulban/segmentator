@@ -22,7 +22,7 @@ import warnings
 import matplotlib.pyplot as plt
 import config as cfg
 from nibabel import load
-from scipy.ndimage import sobel, prewitt, convolve, generic_gradient_magnitude
+from scipy.ndimage import convolve
 
 
 def sub2ind(array_shape, rows, cols):
@@ -115,12 +115,14 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     """
     if discard_zeros:
         msk = data != 0
+        pMin, pMax = np.nanpercentile(data[msk], [percMin, percMax])
     else:
-        msk = np.ones(data.shape)
-    percDataMin, percDataMax = np.percentile(data[msk], [percMin, percMax])
-    data[data < percDataMin] = percDataMin  # adjust minimum
-    data[data > percDataMax] = percDataMax  # adjust maximum
-    data[~msk] = 0  # put back masked out voxels
+        pMin, pMax = np.nanpercentile(data, [percMin, percMax])
+    temp = data[~np.isnan(data)]
+    temp[temp < pMin], temp[temp > pMax] = pMin, pMax  # truncate min and max
+    data[~np.isnan(data)] = temp
+    if discard_zeros:
+        data[~msk] = 0  # put back masked out voxels
     return data
 
 
