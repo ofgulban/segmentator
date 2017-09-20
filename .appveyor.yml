@@ -18,4 +18,4 @@ install:
   - activate test-environment
 
 test_script:
-  - py.test --cov=./segmentator
+  - "py.test --cov=C:\\projects\\segmentator"
