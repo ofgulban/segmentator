@@ -8,27 +8,18 @@ platform:
 
 environment:
   matrix:
-    - PYTHON_VERSION: 2.7
-      MINICONDA_DIRNAME: C:\\Miniconda-x64
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: 2.7
+      PYTHON_ARCH: 64
 
 init:
-  - ECHO %PYTHON_VERSION% %MINICONDA_DIRNAME%
+  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
 
 install:
-  # Prepend chosen Python to the PATH of this build
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-  # Check that we have the expected version and architecture for Python
-  - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
-  # Install the conda supplied packages
-  - "conda update -y conda"
-  - "conda install -y pip"
-  # install ase into the current python
-  - "echo %cd%"
-  - "where pip"
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - "python -m pip install -U pip"
   - "pip install -r requirements.txt"
   - "python setup.py develop"
 
 test_script:
-  - ps: |
-      py.test --cov=./segmentator
+  - py.test --cov=./segmentator
