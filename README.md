@@ -1,8 +1,6 @@
+[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623) [![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator) [![codecov](https://codecov.io/gh/ofgulban/segmentator/branch/master/graph/badge.svg)](https://codecov.io/gh/ofgulban/segmentator) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
+
 # Segmentator
-
-[![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator) [![codecov](https://codecov.io/gh/ofgulban/segmentator/branch/master/graph/badge.svg)](https://codecov.io/gh/ofgulban/segmentator) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
-
-[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
 
 <img src="logo/logo.png" width=420 align="right" />
 
@@ -16,10 +14,10 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 | Package                              | Tested version |
 |--------------------------------------|----------------|
-| [NumPy](http://www.numpy.org/)       | 1.11.1         |
+| [NumPy](http://www.numpy.org/)       | 1.13.1         |
 | [matplotlib](http://matplotlib.org/) | 1.5.3          |
 | [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
-| [SciPy](http://scipy.org/)           | 0.19.0         |
+| [SciPy](http://scipy.org/)           | 0.19.1         |
 
 ## Installation & Quick Start
 Please visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
