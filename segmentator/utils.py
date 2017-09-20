@@ -151,10 +151,12 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
     if discard_zeros:
         msk = data != 0
     else:
-        msk = np.ones(data.shape)
+        msk = np.ones(data.shape, dtype=bool)
     scale_factor = scale_factor - delta
-    data[msk] = data[msk] - data[msk].min()
-    data[msk] = scale_factor / data[msk].max() * data[msk]
+    data[msk] = data[msk] - np.nanmin(data[msk])
+    data[msk] = scale_factor / np.nanmax(data[msk]) * data[msk]
+    if discard_zeros:
+        data[~msk] = 0  # put back masked out voxels
     return data
 
 
