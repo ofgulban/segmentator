@@ -1,0 +1,7 @@
+[run]
+source = segmentator
+
+omit =
+    *__init__*
+    *tests/*
+    segmentator/future/*
