@@ -2,6 +2,9 @@ sudo: false
 os:
   - linux
   - osx
+matrix:
+  allow_failures:
+    - os: osx
 language: python
 python:
   - 2.7
