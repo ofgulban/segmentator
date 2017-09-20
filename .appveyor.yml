@@ -9,20 +9,25 @@ platform:
 environment:
   matrix:
     - PYTHON_VERSION: 2.7
-      MINICONDA_DIRNAME: C:\Miniconda27-x64
+      MINICONDA_DIRNAME: C:\\Miniconda-x64
 
 init:
   - ECHO %PYTHON_VERSION% %MINICONDA_DIRNAME%
 
 install:
-  - cmd: set "PATH=%MINICONDA_DIRNAME%;%MINICONDA_DIRNAME%\\Scripts;%PATH%"
-
-  - cmd: conda config --set always_yes true
-  - cmd: conda update --quiet conda
-  - cmd: conda info --all
-  - cmd: conda create --quiet --name conda-env-%PYTHON_VERSION% python=%PYTHON_VERSION% --file requirements-conda.txt
-  - cmd: activate conda-env-%PYTHON_VERSION%
-  - cmd: python setup.py develop
+  # Prepend chosen Python to the PATH of this build
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  # Install the conda supplied packages
+  - "conda update -y conda"
+  - "conda install -y pip"
+  # install ase into the current python
+  - "echo %cd%"
+  - "where pip"
+  - "pip install -r requirements.txt"
+  - "python setup.py develop"
 
 test_script:
   - ps: |
