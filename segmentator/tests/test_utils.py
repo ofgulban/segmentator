@@ -1,7 +1,7 @@
 """Test utility functions."""
 
 import numpy as np
-from tetrahydra.utils import truncate_range, scale_range
+from segmentator.utils import truncate_range, scale_range
 
 
 def test_truncate_range():
