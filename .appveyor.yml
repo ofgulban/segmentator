@@ -9,7 +9,7 @@ platform:
 environment:
   matrix:
     - PYTHON_VERSION: 2.7
-      MINICONDA_DIRNAME: C:\Miniconda2-x64
+      MINICONDA_DIRNAME: C:\Miniconda27-x64
 
 init:
   - ECHO %PYTHON_VERSION% %MINICONDA_DIRNAME%
