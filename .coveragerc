@@ -3,5 +3,7 @@ source = segmentator
 
 omit =
     *__init__*
+    *__main__*
+    *config*
     *tests/*
     segmentator/future/*
