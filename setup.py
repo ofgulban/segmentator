@@ -5,8 +5,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from Cython.Build import cythonize  # required for deriche filter
-
 setup(name='segmentator',
       version='1.2.0',
       description=('Multi-dimensional data exploration and segmentation for 3D \
@@ -24,5 +22,4 @@ setup(name='segmentator',
           'console_scripts': [
               'segmentator = segmentator.__main__:main',
               ]},
-      #ext_modules=cythonize("segmentator/future/deriche_3D.pyx") # not used for now
       )
