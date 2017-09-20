@@ -1,7 +1,8 @@
 # Segmentator
 
+[![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator) [![codecov](https://codecov.io/gh/ofgulban/segmentator/branch/master/graph/badge.svg)](https://codecov.io/gh/ofgulban/segmentator) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
+
 [![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
 
 <img src="logo/logo.png" width=420 align="right" />
 
