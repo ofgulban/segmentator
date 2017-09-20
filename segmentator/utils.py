@@ -115,12 +115,14 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     """
     if discard_zeros:
         msk = data != 0
+        pMin, pMax = np.nanpercentile(data[msk], [percMin, percMax])
     else:
-        msk = np.ones(data.shape)
-    percDataMin, percDataMax = np.percentile(data[msk], [percMin, percMax])
-    data[data < percDataMin] = percDataMin  # adjust minimum
-    data[data > percDataMax] = percDataMax  # adjust maximum
-    data[~msk] = 0  # put back masked out voxels
+        pMin, pMax = np.nanpercentile(data, [percMin, percMax])
+    temp = data[~np.isnan(data)]
+    temp[temp < pMin], temp[temp > pMax] = pMin, pMax  # truncate min and max
+    data[~np.isnan(data)] = temp
+    if discard_zeros:
+        data[~msk] = 0  # put back masked out voxels
     return data
 
 
@@ -149,10 +151,12 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
     if discard_zeros:
         msk = data != 0
     else:
-        msk = np.ones(data.shape)
+        msk = np.ones(data.shape, dtype=bool)
     scale_factor = scale_factor - delta
-    data[msk] = data[msk] - data[msk].min()
-    data[msk] = scale_factor / data[msk].max() * data[msk]
+    data[msk] = data[msk] - np.nanmin(data[msk])
+    data[msk] = scale_factor / np.nanmax(data[msk]) * data[msk]
+    if discard_zeros:
+        data[~msk] = 0  # put back masked out voxels
     return data
 
 
