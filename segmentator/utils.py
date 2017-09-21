@@ -189,8 +189,8 @@ def prep_2D_hist(ima, gra, discard_zeros=True):
 
     """
     if discard_zeros:
-        gra = gra[~np.isclose(ima, 0]
-        ima = ima[~np.isclose(ima, 0]
+        gra = gra[~np.isclose(ima, 0)]
+        ima = ima[~np.isclose(ima, 0)]
     d_min, d_max = np.round(np.nanpercentile(ima, [0, 100]))
     nr_bins = int(d_max - d_min)
     bin_edges = np.arange(d_min, d_max+1)
