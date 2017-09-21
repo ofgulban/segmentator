@@ -64,8 +64,8 @@ def map_ima_to_2D_hist(xinput, yinput, bins_arr):
     """
     dgtzData = np.digitize(xinput, bins_arr)-1
     dgtzGra = np.digitize(yinput, bins_arr)-1
-    nrBins = len(bins_arr)-1  # subtract 1 (more borders than containers)
-    vox2pixMap = sub2ind(nrBins, dgtzData, dgtzGra)  # 1D
+    nr_bins = len(bins_arr)-1  # subtract 1 (more borders than containers)
+    vox2pixMap = sub2ind(nr_bins, dgtzData, dgtzGra)  # 1D
     return vox2pixMap
 
 
@@ -160,7 +160,7 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
     return data
 
 
-def prep_2D_hist(ima, gra):
+def prep_2D_hist(ima, gra, discard_zeros=True):
     """Prepare 2D histogram related variables.
 
     Parameters
@@ -175,25 +175,26 @@ def prep_2D_hist(ima, gra):
     -------
     counts : integer
     volHistH : TODO
-    dataMin : float
+    d_min : float
         Minimum of the first image.
-    dataMax : float
+    d_max : float
         Maximum of the first image.
-    nrBins : integer
+    nr_bins : integer
         Number of one dimensional bins (not the pixels).
-    binEdges : TODO
+    bin_edges : TODO
 
     Notes
     -----
     This function is modularized to be called from the terminal.
 
     """
-    dataMin = np.round(ima.min())
-    dataMax = np.round(ima.max())
-    nrBins = int(dataMax - dataMin)
-    binEdges = np.arange(dataMin, dataMax+1)
-    counts, _, _, volHistH = plt.hist2d(ima, gra, bins=binEdges, cmap='Greys')
-    return counts, volHistH, dataMin, dataMax, nrBins, binEdges
+    if discard_zeros:
+        ima, gra = ima[ima != 0], gra[ima != 0]
+    d_min, d_max = np.round(np.nanpercentile(ima, [0, 100]))
+    nr_bins = int(d_max - d_min)
+    bin_edges = np.arange(d_min, d_max+1)
+    counts, _, _, volHistH = plt.hist2d(ima, gra, bins=bin_edges, cmap='Greys')
+    return counts, volHistH, d_min, d_max, nr_bins, bin_edges
 
 
 def create_3D_kernel(operator='3D_sobel'):
