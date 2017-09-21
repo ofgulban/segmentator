@@ -19,9 +19,6 @@ scale = 400
 # possible gradient magnitude computation keyword options
 gramag_options = ['3D_scharr', '3D_sobel', '3D_prewitt', 'numpy']
 
-# used in Deriche filter
-deriche_alpha = 2
-
 # used in segmentator ncut
 ncut = False
 max_rec = 8

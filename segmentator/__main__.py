@@ -55,18 +55,6 @@ def main(args=None):
         help="Only save 2D histogram image without showing GUI."
         )
 
-    # used in Deriche filter gradient magnitude computation
-    parser.add_argument(
-        "--deriche_prepare", action='store_true',
-        help=("------------------(utility feature)------------------ \
-              Use this flag with the following arguments:")
-        )
-    parser.add_argument(
-        "--der_alpha", required=False, type=float,
-        default=2, metavar='2',
-        help="Alpha controls smoothing, lower -> smoother"
-        )
-
     # used in ncut preparation  (TODO: not yet tested after restructuring.)
     parser.add_argument(
         "--ncut_prepare", action='store_true',
@@ -107,8 +95,6 @@ def main(args=None):
     config.scale = args.scale
     config.perc_min = args.percmin
     config.perc_max = args.percmax
-    # used in deriche filter
-    config.deriche_alpha = args.der_alpha
     # used in ncut preparation
     config.ncut_figs = args.ncut_figs
     config.max_rec = args.ncut_maxRec
@@ -123,8 +109,6 @@ def main(args=None):
     if args.nogui:
         print '--No GUI option is selected. Saving 2D histogram image...'
         import hist2d_counts
-    elif args.deriche_prepare:
-        import deriche
     elif args.ncut_prepare:
         print '--Preparing n-cut related files...'
         import ncut_prepare
