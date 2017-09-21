@@ -37,7 +37,7 @@ gra = set_gradient_magnitude(orig, cfg.gramag)
 ima = np.ndarray.flatten(orig)
 gra = np.ndarray.flatten(gra)
 
-counts, _, _, _, _, _ = prep_2D_hist(ima, gra)
+counts, _, _, _, _, _ = prep_2D_hist(ima, gra, discard_zeros=cfg.discard_zeros)
 outName = (basename + '_volHist'
            + '_pMax' + str(cfg.perc_max) + '_pMin' + str(cfg.perc_min)
            + '_sc' + str(int(cfg.scale))
