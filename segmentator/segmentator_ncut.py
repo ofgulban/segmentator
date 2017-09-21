@@ -101,7 +101,7 @@ pltMapH = ax.imshow(pltMap, alpha=1, cmap=cmapPltMap, norm=normPltMap,
                     extent=[0, nr_bins, nr_bins, 0], interpolation='none')
 
 # plot colorbar for 2d hist
-volHistH.set_norm(LogNorm(vmax=1000))
+volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
 plt.colorbar(volHistH)
 
 # Set up a colormap for ncut labels
@@ -178,7 +178,8 @@ flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)],
 
 # colorbar slider
 axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], axisbg=axcolor)
-flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
+flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
+                        valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # label slider
 axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], axisbg=axcolor)

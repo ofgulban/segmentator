@@ -72,7 +72,7 @@ ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
 
 # plot colorbar for 2d hist
-volHistH.set_norm(LogNorm(vmax=1000))
+volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
 plt.colorbar(volHistH)
 
 # plot 3D ima by default
@@ -156,7 +156,8 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 # colorbar slider
 axcolor = 'lightgoldenrodyellow'
 axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], axisbg=axcolor)
-flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, 5, valinit=3, valfmt='%0.1f')
+flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
+                        valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # ima browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
