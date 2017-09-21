@@ -36,17 +36,17 @@ def main(args=None):
         help="Path to nyp file with ncut labels"
         )
     parser.add_argument(
-        "--scale", metavar='500', required=False, type=float,
+        "--scale", metavar='400', required=False, type=float,
         default=config.scale,
         help="Data is scaled from 0 to this number."
         )
     parser.add_argument(
-        "--percmin", metavar='0.25', required=False, type=float,
+        "--percmin", metavar='2.5', required=False, type=float,
         default=config.perc_min,
         help="Minimum percentile used in truncation."
         )
     parser.add_argument(
-        "--percmax",  metavar='99.75', required=False,  type=float,
+        "--percmax",  metavar='97.5', required=False,  type=float,
         default=config.perc_max,
         help="Maximum percentile used in truncation."
         )
