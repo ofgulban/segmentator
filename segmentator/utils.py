@@ -114,7 +114,7 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
 
     """
     if discard_zeros:
-        msk = data != 0
+        msk = ~np.isclose(data, 0, rtol=-5.e-1, atol=1.)
         pMin, pMax = np.nanpercentile(data[msk], [percMin, percMax])
     else:
         pMin, pMax = np.nanpercentile(data, [percMin, percMax])
@@ -149,7 +149,7 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
 
     """
     if discard_zeros:
-        msk = data != 0
+        msk = ~np.isclose(data, 0, rtol=-5.e-1, atol=1.)
     else:
         msk = np.ones(data.shape, dtype=bool)
     scale_factor = scale_factor - delta
@@ -189,7 +189,8 @@ def prep_2D_hist(ima, gra, discard_zeros=True):
 
     """
     if discard_zeros:
-        ima, gra = ima[ima != 0], gra[ima != 0]
+        gra = gra[~np.isclose(ima, 0, rtol=-5.e-1, atol=1.)]
+        ima = ima[~np.isclose(ima, 0, rtol=-5.e-1, atol=1.)]
     d_min, d_max = np.round(np.nanpercentile(ima, [0, 100]))
     nr_bins = int(d_max - d_min)
     bin_edges = np.arange(d_min, d_max+1)
