@@ -14,8 +14,8 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 | Package                              | Tested version |
 |--------------------------------------|----------------|
+| [matplotlib](http://matplotlib.org/) | **1.5.3**      |
 | [NumPy](http://www.numpy.org/)       | 1.13.1         |
-| [matplotlib](http://matplotlib.org/) | 1.5.3          |
 | [NiBabel](http://nipy.org/nibabel/)  | 2.1.0          |
 | [SciPy](http://scipy.org/)           | 0.19.1         |
 
