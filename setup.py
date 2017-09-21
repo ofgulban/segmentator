@@ -1,4 +1,9 @@
-"""Segmentator setup."""
+"""Segmentator setup.
+
+To install for development, using the commandline do:
+    pip install -e /path/to/segmentator
+
+"""
 
 try:
     from setuptools import setup
