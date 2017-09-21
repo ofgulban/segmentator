@@ -51,14 +51,15 @@ def main(args=None):
         help="Maximum percentile used in truncation."
         )
     parser.add_argument(
-        "--cbar_init",  metavar='2.0', required=False,  type=float,
-        default=config.cbar_init,
-        help="Initial value (power of 10) of the colorbar slider."
-        )
-    parser.add_argument(
         "--cbar_max",  metavar='5.0', required=False,  type=float,
         default=config.cbar_max,
         help="Maximum value (power of 10) of the colorbar slider."
+        )
+    parser.add_argument(
+        "--cbar_init",  metavar='2.0', required=False,  type=float,
+        default=config.cbar_init,
+        help="Initial value (power of 10) of the colorbar slider. \
+              Also used with --ncut_prepare flag."
         )
     parser.add_argument(
         "--nogui", action='store_true',
@@ -109,8 +110,8 @@ def main(args=None):
     config.scale = args.scale
     config.perc_min = args.percmin
     config.perc_max = args.percmax
-    config.cbar_init = args.cbar_init
     config.cbar_max = args.cbar_max
+    config.cbar_init = args.cbar_init
     if args.include_zeros:
         config.discard_zeros = False
     # used in ncut preparation
@@ -128,7 +129,7 @@ def main(args=None):
         print '--No GUI option is selected. Saving 2D histogram image...'
         import hist2d_counts
     elif args.ncut_prepare:
-        print '--Preparing n-cut related files...'
+        print '--Preparing N-cut related files...'
         import ncut_prepare
     elif args.ncut:
         print '--Experimental N-cut feature is selected.'
