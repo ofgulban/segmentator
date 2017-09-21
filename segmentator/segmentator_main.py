@@ -62,10 +62,10 @@ palette.set_bad('m', 1.0)
 fig = plt.figure()
 ax = fig.add_subplot(121)
 
-counts, volHistH, dataMin, dataMax, nrBins, binEdges = prep_2D_hist(ima, gra)
+counts, volHistH, d_min, d_max, nr_bins, bin_edges = prep_2D_hist(ima, gra)
 
-ax.set_xlim(dataMin, dataMax)
-ax.set_ylim(dataMin, dataMax)
+ax.set_xlim(d_min, d_max)
+ax.set_ylim(d_min, d_max)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
@@ -104,7 +104,7 @@ plt.axis('off')
 """Initialisation"""
 # create first instance of sector mask
 sectorObj = sector_mask(
-    (nrBins, nrBins),
+    (nr_bins, nr_bins),
     cfg.init_centre,
     cfg.init_radius,
     cfg.init_theta
@@ -118,12 +118,12 @@ volHistMaskH, volHistMask = sectorObj.draw(
     vmin=0.1,
     interpolation='nearest',
     origin='lower',
-    extent=[0, nrBins, 0, nrBins]
+    extent=[0, nr_bins, 0, nr_bins]
     )
 
 # initiate a flexible figure object, pass to it usefull properties
 segmType = 'main'
-idxLasso = np.zeros(nrBins*nrBins, dtype=bool)
+idxLasso = np.zeros(nr_bins*nr_bins, dtype=bool)
 lassoSwitchCount = 0
 flexFig = responsiveObj(figure=ax.figure,
                         axes=ax.axes,
@@ -132,7 +132,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         orig=orig,
                         nii=nii,
                         sectorObj=sectorObj,
-                        nrBins=nrBins,
+                        nr_bins=nr_bins,
                         sliceNr=int(0.5*dims[2]),
                         slcH=slcH,
                         imaMask=imaMask,
@@ -147,7 +147,7 @@ flexFig = responsiveObj(figure=ax.figure,
 
 # make the figure responsive to clicks
 flexFig.connect()
-ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=binEdges)
+ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
 #
@@ -224,7 +224,7 @@ def lassoSwitch(event):
 
 
 # Pixel coordinates
-pix = np.arange(nrBins)
+pix = np.arange(nr_bins)
 xv, yv = np.meshgrid(pix, pix)
 pix = np.vstack((xv.flatten(), yv.flatten())).T
 

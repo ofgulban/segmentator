@@ -81,23 +81,23 @@ gra = np.ndarray.flatten(gra)
 fig = plt.figure()
 ax = fig.add_subplot(121)
 
-counts, volHistH, dataMin, dataMax, nrBins, binEdges = prep_2D_hist(ima, gra)
+counts, volHistH, d_min, d_max, nr_bins, bin_edges = prep_2D_hist(ima, gra)
 
-ax.set_xlim(dataMin, dataMax)
-ax.set_ylim(dataMin, dataMax)
+ax.set_xlim(d_min, d_max)
+ax.set_ylim(d_min, d_max)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
 
 # plot map for poltical borders
-pltMap = np.zeros((nrBins, nrBins, 1)).repeat(4, 2)
+pltMap = np.zeros((nr_bins, nr_bins, 1)).repeat(4, 2)
 cmapPltMap = ListedColormap(['w', 'black', 'red', 'blue'])
 boundsPltMap = [0, 1, 2, 3, 4]
 cmapPltMap.set_under('w', 0)
 normPltMap = BoundaryNorm(boundsPltMap, cmapPltMap.N)
 pltMapH = ax.imshow(pltMap, alpha=1, cmap=cmapPltMap, norm=normPltMap,
                     vmin=boundsPltMap[1], vmax=boundsPltMap[-1],
-                    extent=[0, nrBins, nrBins, 0], interpolation='none')
+                    extent=[0, nr_bins, nr_bins, 0], interpolation='none')
 
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=1000))
@@ -113,7 +113,7 @@ volHistMaskH = ax.imshow(volHistMask, interpolation='none',
                          alpha=0.2, cmap=ncut_palette,
                          vmin=np.min(ncut_labels)+1,  # to make 0 transparent
                          vmax=lMax,
-                         extent=[0, nrBins, nrBins, 0])
+                         extent=[0, nr_bins, nr_bins, 0])
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
@@ -144,7 +144,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         orig=orig,
                         nii=nii,
                         ima=ima,
-                        nrBins=nrBins,
+                        nr_bins=nr_bins,
                         sliceNr=int(0.5*dims[2]),
                         slcH=slcH,
                         imaMask=imaMask,
@@ -153,7 +153,7 @@ flexFig = responsiveObj(figure=ax.figure,
                         volHistMaskH=volHistMaskH,
                         pltMap=pltMap,
                         pltMapH=pltMapH,
-                        counterField=np.zeros((nrBins, nrBins)),
+                        counterField=np.zeros((nr_bins, nr_bins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
                         initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
@@ -163,7 +163,7 @@ flexFig = responsiveObj(figure=ax.figure,
 # make the figure responsive to clicks
 flexFig.connect()
 # get mapping from image slice to volume histogram
-ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=binEdges)
+ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
 # %%
