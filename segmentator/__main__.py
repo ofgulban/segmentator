@@ -53,7 +53,7 @@ def main(args=None):
     parser.add_argument(
         "--cbar_init",  metavar='2.0', required=False,  type=float,
         default=config.cbar_init,
-        help="Initial value (power of 10) of the colorbar slider. Useful when scripting."
+        help="Initial value (power of 10) of the colorbar slider."
         )
     parser.add_argument(
         "--cbar_max",  metavar='5.0', required=False,  type=float,
