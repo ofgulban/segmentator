@@ -12,10 +12,8 @@ install:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda config --add channels conda-forge
-  - conda info -a
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% --file requirements.txt"
-  - activate test-environment
+  - "conda env create --force -f environment.yml python=2.7"
+  - activate segmentator
   - python setup.py develop
 
 test_script:
