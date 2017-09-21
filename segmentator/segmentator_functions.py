@@ -209,8 +209,8 @@ class responsiveObj:
                     return
             elif event.button == 3:  # right button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
-                    xbin = np.floor(event.xdata)
-                    ybin = np.floor(event.ydata)
+                    xbin = int(np.floor(event.xdata))
+                    ybin = int(np.floor(event.ydata))
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
                     self.volHistMask[self.volHistMask == val] = \
