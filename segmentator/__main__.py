@@ -51,6 +51,16 @@ def main(args=None):
         help="Maximum percentile used in truncation."
         )
     parser.add_argument(
+        "--cbar_init",  metavar='2.0', required=False,  type=float,
+        default=config.cbar_init,
+        help="Initial value (power of 10) of the colorbar slider. Useful when scripting."
+        )
+    parser.add_argument(
+        "--cbar_max",  metavar='5.0', required=False,  type=float,
+        default=config.cbar_max,
+        help="Maximum value (power of 10) of the colorbar slider."
+        )
+    parser.add_argument(
         "--nogui", action='store_true',
         help="Only save 2D histogram image without showing GUI."
         )
@@ -99,6 +109,8 @@ def main(args=None):
     config.scale = args.scale
     config.perc_min = args.percmin
     config.perc_max = args.percmax
+    config.cbar_init = args.cbar_init
+    config.cbar_max = args.cbar_max
     if args.include_zeros:
         config.discard_zeros = False
     # used in ncut preparation
