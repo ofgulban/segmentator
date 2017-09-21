@@ -54,6 +54,10 @@ def main(args=None):
         "--nogui", action='store_true',
         help="Only save 2D histogram image without showing GUI."
         )
+    parser.add_argument(
+        "--include_zeros", action='store_true',
+        help="Include image zeros in histograms. Not used by default."
+        )
 
     # used in ncut preparation  (TODO: not yet tested after restructuring.)
     parser.add_argument(
@@ -95,6 +99,8 @@ def main(args=None):
     config.scale = args.scale
     config.perc_min = args.percmin
     config.perc_max = args.percmax
+    if args.include_zeros:
+        config.discard_zeros = False
     # used in ncut preparation
     config.ncut_figs = args.ncut_figs
     config.max_rec = args.ncut_maxRec

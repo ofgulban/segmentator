@@ -62,7 +62,8 @@ palette.set_bad('m', 1.0)
 fig = plt.figure()
 ax = fig.add_subplot(121)
 
-counts, volHistH, d_min, d_max, nr_bins, bin_edges = prep_2D_hist(ima, gra)
+counts, volHistH, d_min, d_max, nr_bins, bin_edges \
+    = prep_2D_hist(ima, gra, discard_zeros=cfg.discard_zeros)
 
 ax.set_xlim(d_min, d_max)
 ax.set_ylim(d_min, d_max)

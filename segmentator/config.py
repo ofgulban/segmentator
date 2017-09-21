@@ -15,6 +15,7 @@ gramag = '3D_scharr'
 perc_min = 2.5
 perc_max = 97.5
 scale = 400
+discard_zeros = True
 
 # possible gradient magnitude computation keyword options
 gramag_options = ['3D_scharr', '3D_sobel', '3D_prewitt', 'numpy']
