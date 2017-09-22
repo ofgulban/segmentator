@@ -23,17 +23,16 @@ Segmentator main.
 
 from __future__ import division
 import numpy as np
+import config as cfg
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from nibabel import load
-from segmentator_functions import responsiveObj
-from sector_mask import sector_mask
 from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
 from segmentator.utils import truncate_range, scale_range
 from segmentator.utils import set_gradient_magnitude
-import config as cfg
+from gui_utils import sector_mask, responsiveObj
 
 """Load Data"""
 nii = load(cfg.filename)

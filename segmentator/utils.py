@@ -296,7 +296,7 @@ def set_gradient_magnitude(image, gramag_option):
     image : np.ndarray
         First image, which is often the intensity image (eg. T1w).
     gramag_option : string
-        A keyword string or a path to a nigti file.
+        A keyword string or a path to a nifti file.
 
     Returns
     -------
@@ -323,7 +323,7 @@ def aniso_diff_3D(stack, niter=1, kappa=50, gamma=0.1, step=(1., 1., 1.),
     Disclosure
     ----------
     This script is adapted from a stackoverflow  post by user ali_m:
-    [1] http://stackoverflow.com/questions/10802611/anisotropic-diffusion-2d-images  #noqa
+    [1] http://stackoverflow.com/questions/10802611/anisotropic-diffusion-2d-images
     [2] http://pastebin.com/sBsPX4Y7
 
     Parameters

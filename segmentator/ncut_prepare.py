@@ -37,12 +37,11 @@ def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,
 
     Returns
     -------
-        sector_mask: np.ndarray (2D)
+        labels2, labels1: np.ndarray (2D)
             Segmented volume histogram mask image. Each label has a unique
             identifier.
 
     """
-
     # scale for uint8 conversion
     image = np.round(255 / image.max() * image)
     image = image.astype('uint8')
