@@ -118,14 +118,15 @@ volHistMaskH = ax.imshow(volHistMask, interpolation='none',
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
-slcH = ax2.imshow(orig[:, :, int(dims[2]/2)], cmap=plt.cm.gray,
-                  vmin=ima.min(), vmax=ima.max(), interpolation='none',
-                  extent=[0, dims[1], dims[0], 0])
-imaMask = np.zeros(dims[0:2])*total_labels[1]
-imaMaskH = ax2.imshow(imaMask, interpolation='none', alpha=0.5,
-                      cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
-                      vmax=lMax,
-                      extent=[0, dims[1], dims[0], 0])
+sliceNr = int(0.5*dims[2])
+imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray,
+                     vmin=ima.min(), vmax=ima.max(), interpolation='none',
+                     extent=[0, dims[1], dims[0], 0])
+imaSlcMask = np.zeros(dims[0:2])*total_labels[1]
+imaSlcMaskH = ax2.imshow(imaSlcMask, interpolation='none', alpha=0.5,
+                         cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
+                         vmax=lMax,
+                         extent=[0, dims[1], dims[0], 0])
 
 # adjust subplots on figure
 bottom = 0.30
@@ -136,30 +137,21 @@ plt.axis('off')
 
 # %%
 """Initialisation"""
-segmType = 'ncut'
 # initiate a flexible figure object, pass to it usefull properties
-flexFig = responsiveObj(figure=ax.figure,
-                        axes=ax.axes,
-                        axes2=ax2.axes,
-                        segmType=segmType,
-                        orig=orig,
-                        nii=nii,
-                        ima=ima,
+flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
+                        segmType='ncut', orig=orig, nii=nii, ima=ima,
                         nrBins=nr_bins,
-                        sliceNr=int(0.5*dims[2]),
-                        slcH=slcH,
-                        imaMask=imaMask,
-                        imaMaskH=imaMaskH,
+                        sliceNr=sliceNr,
+                        imaSlcH=imaSlcH,
+                        imaSlcMask=imaSlcMask, imaSlcMaskH=imaSlcMaskH,
                         volHistMask=volHistMask,
                         volHistMaskH=volHistMaskH,
-                        pltMap=pltMap,
-                        pltMapH=pltMapH,
+                        pltMap=pltMap, pltMapH=pltMapH,
                         counterField=np.zeros((nr_bins, nr_bins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
                         initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
-                        lMax=lMax
-                        )
+                        lMax=lMax)
 
 # make the figure responsive to clicks
 flexFig.connect()
@@ -169,7 +161,7 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
 # %%
 """Sliders and Buttons"""
-axcolor = 'lightgoldenrodyellow'
+axcolor, hovcolor = '0.875', '0.975'
 
 # radio buttons (ugly but good enough for now)
 rax = plt.axes([0.91, 0.35, 0.08, 0.5], axisbg=(0.75, 0.75, 0.75))
@@ -194,22 +186,28 @@ flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
 # cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
 flexFig.bCycle = Button(cycleax, 'Cycle\nView',
-                        color=axcolor, hovercolor='0.975')
+                        color=axcolor, hovercolor=hovcolor)
 flexFig.cycleCount = 0
+
+# rotate button
+rotateax = plt.axes([0.55, bottom-0.285, 0.075, 0.0375])
+flexFig.bRotate = Button(rotateax, 'Rotate',
+                         color=axcolor, hovercolor=hovcolor)
+flexFig.rotationCount = 0
 
 # export nii button
 exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
 flexFig.bExport = Button(exportax, 'Export\nNifti',
-                         color=axcolor, hovercolor='0.975')
+                         color=axcolor, hovercolor=hovcolor)
 
 # export nyp button
 exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
 flexFig.bExportNyp = Button(exportax, 'Export\nHist',
-                            color=axcolor, hovercolor='0.975')
+                            color=axcolor, hovercolor=hovcolor)
 
 # reset button
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
-flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
+flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
 
 
 # %%
@@ -218,6 +216,7 @@ flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
 flexFig.sLabelNr.on_changed(flexFig.updateLabels)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
+flexFig.bRotate.on_clicked(flexFig.rotateView)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)

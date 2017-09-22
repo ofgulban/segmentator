@@ -36,7 +36,7 @@ class responsiveObj:
         self.press = None
         self.ctrlHeld = False
         self.labelNr = 0
-        self.imaMaskSwitchCount = 0
+        self.imaSlcMaskSwitchCount = 0
         self.TranspVal = 0.5
         self.nrExports = 0
         self.entropWin = 0
@@ -53,21 +53,27 @@ class responsiveObj:
             self.labelContours()
             self.volHistMaskH.set_data(self.volHistMask)
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
-        # update imaMask
-        self.imaMask = map_2D_hist_to_ima(
+        self.updateImaSlcMsk()
+        self.figure.canvas.draw()  # draw to canvas
+
+    def updateImaSlcMsk(self):
+        """Update image slice mask."""
+        self.imaSlcMask = map_2D_hist_to_ima(
             self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
         if self.borderSwitch == 1:
-            self.imaMask = self.calcImaMaskBrd()
-        self.imaMaskH.set_data(self.imaMask)
-        self.imaMaskH.set_extent((0, self.imaMask.shape[1],
-                                  self.imaMask.shape[0], 0))
-        # draw to canvas
-        self.figure.canvas.draw()
+            self.imaSlcMask = self.calcImaMaskBrd()
+        self.updateSlcMsk(self.imaSlcMask)
 
-    def updateSlc(self):
-        """Update image browser slices."""
-        self.slcH.set_data(self.orig[:, :, self.sliceNr])
-        self.slcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
+    def updateSlc(self, array_2d):
+        """Update image browser slice."""
+        self.imaSlcH.set_data(array_2d)
+        self.imaSlcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
+
+    def updateSlcMsk(self, array_2d):
+        """Update image browser slice mask."""
+        self.imaSlcMaskH.set_data(array_2d)
+        self.imaSlcMaskH.set_extent((0, self.orig.shape[1], self.orig.shape[0],
+                                    0))
 
     def connect(self):
         """Make the object responsive."""
@@ -87,11 +93,11 @@ class responsiveObj:
         if event.key == 'control':
             self.ctrlHeld = True
         elif event.key == 'q':
-            self.imaMaskIncr(-0.1)
+            self.imaSlcMaskIncr(-0.1)
         elif event.key == 'w':
-            self.imaMaskTransSwitch()
+            self.imaSlcMaskTransSwitch()
         elif event.key == 'e':
-            self.imaMaskIncr(0.1)
+            self.imaSlcMaskIncr(0.1)
         elif event.key == '1':
             self.borderSwitch = (self.borderSwitch + 1) % 2
             self.updateMsks()
@@ -264,11 +270,16 @@ class responsiveObj:
         histVMax = np.power(10, self.sHistC.val)
         plt.clim(vmax=histVMax)
 
+    def updateSliceNr(self):
+        """Update slice number and the selected slice."""
+        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
+        self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
+
     def updateImaBrowser(self, val):
         """Update image browse."""
         # scale slider value [0,1) to dimension index
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        self.updateSlc()  # update brain slice
+        self.updateSliceNr()
+        self.updateSlc(self.imaSlc)  # update brain slice
         self.updateMsks()
 
     def cycleView(self, event):
@@ -279,10 +290,20 @@ class responsiveObj:
         # transpose ima2volHistMap
         self.invHistVolume = np.transpose(self.invHistVolume, (2, 0, 1))
         # update slice number
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
+        self.updateSliceNr()
         # update brain slice
-        self.updateSlc()
+        self.updateSlc(self.imaSlc)
         self.updateMsks()
+
+    def rotateView(self, event):
+        """Rotate image slice 90 degrees."""
+        # rotate data
+        self.imaSlc = np.rot90(self.imaSlc, axes=(0, 1))
+        self.imaSlcMask = np.rot90(self.imaSlcMask, axes=(0, 1))
+        # update brain slice
+        self.updateSlc(self.imaSlc)
+        self.updateSlcMsk(self.imaSlcMask)
+        self.figure.canvas.draw()  # draw to canvas
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
@@ -320,7 +341,7 @@ class responsiveObj:
         # reset transparency
         self.TranspVal = 0.5
         # update brain slice
-        self.updateSlc()
+        self.updateSlc(self.imaSlc)
         if self.segmType == 'main':
             if self.lassoSwitchCount == 1:  # reset only lasso drawing
                 self.idxLasso = np.zeros(self.nrBins*self.nrBins, dtype=bool)
@@ -395,20 +416,20 @@ class responsiveObj:
         else:
             return
 
-    def imaMaskIncr(self, incr):
+    def imaSlcMaskIncr(self, incr):
         """Update transparency of image mask by increment."""
         if (self.TranspVal + incr >= 0) & (self.TranspVal + incr <= 1):
             self.TranspVal += incr
-        self.imaMaskH.set_alpha(self.TranspVal)
+        self.imaSlcMaskH.set_alpha(self.TranspVal)
         self.updateMsks()
 
-    def imaMaskTransSwitch(self):
+    def imaSlcMaskTransSwitch(self):
         """Update transparency of image mask to toggle transparency of it."""
-        self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
-        if self.imaMaskSwitchCount == 1:  # set imaMask transp
-            self.imaMaskH.set_alpha(0)
-        else:  # set imaMask opaque
-            self.imaMaskH.set_alpha(self.TranspVal)
+        self.imaSlcMaskSwitchCount = (self.imaSlcMaskSwitchCount+1) % 2
+        if self.imaSlcMaskSwitchCount == 1:  # set imaSlcMask transp
+            self.imaSlcMaskH.set_alpha(0)
+        else:  # set imaSlcMask opaque
+            self.imaSlcMaskH.set_alpha(self.TranspVal)
         self.updateMsks()
 
     def updateLabelsRadio(self, val):
@@ -437,7 +458,7 @@ class responsiveObj:
 
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
-        grad = np.gradient(self.imaMask)
+        grad = np.gradient(self.imaSlcMask)
         return np.greater(np.sqrt(np.power(grad[0], 2) +
                           np.power(grad[1], 2)), 0)
 
