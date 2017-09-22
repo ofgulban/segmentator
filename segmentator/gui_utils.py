@@ -317,12 +317,8 @@ class responsiveObj:
         """Reset stuff."""
         # reset color bar
         self.sHistC.reset()
-        # reset ima browser slider
-        self.sSliceNr.reset()
         # reset transparency
         self.TranspVal = 0.5
-        # reset slice number
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
         # update brain slice
         self.updateSlc()
         if self.segmType == 'main':
