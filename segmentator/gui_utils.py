@@ -43,7 +43,7 @@ class responsiveObj:
         self.borderSwitch = 0
         self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
         self.cycleCount = 0
-        self.rotationCount = 0
+        self.cycRotHistory = [[0, 0], [0, 0], [0, 0]]
 
     def remapMsks(self, remap_slice=True):
         """Update volume histogram to image mapping.
@@ -343,7 +343,8 @@ class responsiveObj:
 
     def changeRotation(self, event):
         """Change rotation of image after clicking the button."""
-        self.rotationCount = (self.rotationCount + 1) % 4
+        self.cycRotHistory[self.cycleCount][1] += 1
+        self.cycRotHistory[self.cycleCount][1] %= 4
         self.rotateIma90()
         # update brain slice
         self.updatePanels(update_slice=True, update_rotation=False,
@@ -351,12 +352,13 @@ class responsiveObj:
 
     def checkRotation(self):
         """Check rotation update if changed."""
-        if self.rotationCount == 1:  # 90
+        cyc_rot = self.cycRotHistory[self.cycleCount][1]
+        if cyc_rot == 1:  # 90
             self.rotateIma90(axes=(0, 1))
-        elif self.rotationCount == 2:  # 180
+        elif cyc_rot == 2:  # 180
             self.imaSlc = self.imaSlc[::-1, ::-1]
             self.imaSlcMsk = self.imaSlcMsk[::-1, ::-1]
-        elif self.rotationCount == 3:  # 270
+        elif cyc_rot == 3:  # 270
             self.rotateIma90(axes=(1, 0))
 
     def exportNifti(self, event):

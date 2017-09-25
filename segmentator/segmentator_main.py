@@ -125,7 +125,6 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
 flexFig.connect()
 ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
-flexFig.updatePanels()
 
 #
 """Sliders and Buttons"""
@@ -232,5 +231,7 @@ def onselect(verts):
 
 
 bLasso.on_clicked(lassoSwitch)
-
+flexFig.remapMsks()
+flexFig.updatePanels(update_slice=True, update_rotation=False,
+                     update_extent=False)
 plt.show()
