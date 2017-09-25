@@ -337,7 +337,6 @@ class responsiveObj:
 
     def rotateIma90(self, axes=(0, 1)):
         """Rotate image slice 90 degrees."""
-        # rotate data
         self.imaSlc = np.rot90(self.imaSlc, axes=axes)
         self.imaSlcMsk = np.rot90(self.imaSlcMsk, axes=axes)
 
@@ -346,7 +345,6 @@ class responsiveObj:
         self.cycRotHistory[self.cycleCount][1] += 1
         self.cycRotHistory[self.cycleCount][1] %= 4
         self.rotateIma90()
-        # update brain slice
         self.updatePanels(update_slice=True, update_rotation=False,
                           update_extent=True)
 
