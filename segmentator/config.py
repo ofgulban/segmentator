@@ -16,7 +16,7 @@ perc_min = 2.5
 perc_max = 97.5
 scale = 400
 cbar_max = 5.0
-cbar_init = 2.0
+cbar_init = 3.0
 discard_zeros = True
 
 # possible gradient magnitude computation keyword options
