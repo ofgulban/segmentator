@@ -13,6 +13,7 @@ looks a bit messy as is.
 import sys
 import argparse
 import config as cfg
+from segmentator import __version__
 
 
 def main(args=None):
@@ -122,7 +123,9 @@ def main(args=None):
     # used in ncut
     cfg.ncut = args.ncut
 
-    print("===========\nSegmentator\n===========")
+    welcome_str = 'Segmentator ' + __version__
+    welcome_decoration = '=' * len(welcome_str)
+    print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
