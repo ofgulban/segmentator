@@ -36,14 +36,24 @@ class responsiveObj:
         self.press = None
         self.ctrlHeld = False
         self.labelNr = 0
-        self.imaSlcMaskSwitchCount = 0
+        self.imaSlcMskSwitchCount = 0
         self.TranspVal = 0.5
         self.nrExports = 0
         self.entropWin = 0
         self.borderSwitch = 0
+        self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
+        self.cycleCount = 0
+        self.rotationCount = 0
 
-    def updateMsks(self):
-        """Update volume histogram mask."""
+    def remapMsks(self, remap_slice=True):
+        """Update volume histogram to image mapping.
+
+        Parameters
+        ----------
+        remap_slice : bool
+            Do histogram to image mapping. Used to map displayed slice mask.
+
+        """
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
             self.volHistMask = self.lassoArr(self.volHistMask,
@@ -53,27 +63,24 @@ class responsiveObj:
             self.labelContours()
             self.volHistMaskH.set_data(self.volHistMask)
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
-        self.updateImaSlcMsk()
-        self.figure.canvas.draw()  # draw to canvas
+        # histogram to image mapping
+        if remap_slice:
+            self.imaSlcMsk = map_2D_hist_to_ima(
+                self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
+            if self.borderSwitch == 1:
+                self.imaSlcMsk = self.calcImaMaskBrd()
 
-    def updateImaSlcMsk(self):
-        """Update image slice mask."""
-        self.imaSlcMask = map_2D_hist_to_ima(
-            self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
-        if self.borderSwitch == 1:
-            self.imaSlcMask = self.calcImaMaskBrd()
-        self.updateSlcMsk(self.imaSlcMask)
-
-    def updateSlc(self, array_2d):
-        """Update image browser slice."""
-        self.imaSlcH.set_data(array_2d)
-        self.imaSlcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
-
-    def updateSlcMsk(self, array_2d):
-        """Update image browser slice mask."""
-        self.imaSlcMaskH.set_data(array_2d)
-        self.imaSlcMaskH.set_extent((0, self.orig.shape[1], self.orig.shape[0],
-                                    0))
+    def updatePanels(self, update_slice=True, update_rotation=False,
+                     update_extent=False):
+        """Update histogram and image panels."""
+        if update_rotation:
+            self.checkRotation()
+        if update_extent:
+            self.updateImaExtent()
+        if update_slice:
+            self.imaSlcH.set_data(self.imaSlc)
+        self.imaSlcMskH.set_data(self.imaSlcMsk)
+        self.figure.canvas.draw()
 
     def connect(self):
         """Make the object responsive."""
@@ -93,27 +100,38 @@ class responsiveObj:
         if event.key == 'control':
             self.ctrlHeld = True
         elif event.key == 'q':
-            self.imaSlcMaskIncr(-0.1)
+            self.imaSlcMskIncr(-0.1)
         elif event.key == 'w':
-            self.imaSlcMaskTransSwitch()
+            self.imaSlcMskTransSwitch()
         elif event.key == 'e':
-            self.imaSlcMaskIncr(0.1)
+            self.imaSlcMskIncr(0.1)
         elif event.key == '1':
             self.borderSwitch = (self.borderSwitch + 1) % 2
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=False,
+                              update_extent=False)
+
         if self.segmType == 'main':
             if event.key == 'up':
                 self.sectorObj.scale_r(1.05)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'down':
                 self.sectorObj.scale_r(0.95)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'right':
                 self.sectorObj.rotate(-10.0)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'left':
                 self.sectorObj.rotate(10.0)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             else:
                 return
 
@@ -167,10 +185,14 @@ class responsiveObj:
                 # increase/decrease radius of the sector mask
                 if self.ctrlHeld is False:  # ctrl no
                     self.sectorObj.scale_r(1.05)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 elif self.ctrlHeld is True:  # ctrl yes
                     self.sectorObj.rotate(10.0)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 else:
                     return
             elif event.button == 3:  # right button
@@ -179,10 +201,14 @@ class responsiveObj:
                 # rotate the sector mask
                 if self.ctrlHeld is False:  # ctrl no
                     self.sectorObj.scale_r(0.95)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 elif self.ctrlHeld is True:  # ctrl yes
                     self.sectorObj.rotate(-10.0)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 else:
                     return
         elif self.segmType == 'ncut':
@@ -207,7 +233,9 @@ class responsiveObj:
                     # replace old values with new values (in clicked subfield)
                     self.volHistMask[oLabels == val] = np.copy(
                         nLabels[oLabels == val])
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
 
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
                     self.findVoxInHist(event)
@@ -221,7 +249,9 @@ class responsiveObj:
                     # fetch the slider value to get label nr
                     self.volHistMask[self.volHistMask == val] = \
                         np.copy(self.labelNr)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
 
     def on_motion(self, event):
         """Determine what happens if mouse button moves."""
@@ -242,10 +272,12 @@ class responsiveObj:
             dx = event.ydata - ypress
             # update x and y position of sector,
             # based on past motion of cursor
-            self.sectorObj.set_x(x0+dx)
-            self.sectorObj.set_y(y0+dy)
+            self.sectorObj.set_x(x0 + dx)
+            self.sectorObj.set_y(y0 + dy)
             # update masks
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
@@ -273,37 +305,59 @@ class responsiveObj:
     def updateSliceNr(self):
         """Update slice number and the selected slice."""
         self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
+        self.imaSlc = self.orig[:, :, self.sliceNr]
 
     def updateImaBrowser(self, val):
         """Update image browse."""
         # scale slider value [0,1) to dimension index
         self.updateSliceNr()
-        self.updateSlc(self.imaSlc)  # update brain slice
-        self.updateMsks()
+        self.remapMsks()
+        self.updatePanels(update_slice=True, update_rotation=True,
+                          update_extent=True)
+
+    def updateImaExtent(self):
+        """Update both image and mask extent in image browser."""
+        self.imaSlcH.set_extent((0, self.imaSlc.shape[1],
+                                 self.imaSlc.shape[0], 0))
+        self.imaSlcMskH.set_extent((0, self.imaSlc.shape[1],
+                                    self.imaSlc.shape[0], 0))
 
     def cycleView(self, event):
         """Cycle through views."""
-        self.cycleCount = (self.cycleCount+1) % 3
+        self.cycleCount = (self.cycleCount + 1) % 3
         # transpose data
         self.orig = np.transpose(self.orig, (2, 0, 1))
         # transpose ima2volHistMap
         self.invHistVolume = np.transpose(self.invHistVolume, (2, 0, 1))
-        # update slice number
+        # updates
         self.updateSliceNr()
-        # update brain slice
-        self.updateSlc(self.imaSlc)
-        self.updateMsks()
+        self.remapMsks()
+        self.updatePanels(update_slice=True, update_rotation=True,
+                          update_extent=True)
 
-    def rotateView(self, event):
+    def rotateIma90(self, axes=(0, 1)):
         """Rotate image slice 90 degrees."""
         # rotate data
-        self.imaSlc = np.rot90(self.imaSlc, axes=(0, 1))
-        self.imaSlcMask = np.rot90(self.imaSlcMask, axes=(0, 1))
+        self.imaSlc = np.rot90(self.imaSlc, axes=axes)
+        self.imaSlcMsk = np.rot90(self.imaSlcMsk, axes=axes)
+
+    def changeRotation(self, event):
+        """Change rotation of image after clicking the button."""
+        self.rotationCount = (self.rotationCount + 1) % 4
+        self.rotateIma90()
         # update brain slice
-        self.updateSlc(self.imaSlc)
-        self.updateSlcMsk(self.imaSlcMask)
-        self.figure.canvas.draw()  # draw to canvas
+        self.updatePanels(update_slice=True, update_rotation=False,
+                          update_extent=True)
+
+    def checkRotation(self):
+        """Check rotation update if changed."""
+        if self.rotationCount == 1:  # 90
+            self.rotateIma90(axes=(0, 1))
+        elif self.rotationCount == 2:  # 180
+            self.imaSlc = self.imaSlc[::-1, ::-1]
+            self.imaSlcMsk = self.imaSlcMsk[::-1, ::-1]
+        elif self.rotationCount == 3:  # 270
+            self.rotateIma90(axes=(1, 0))
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
@@ -340,8 +394,6 @@ class responsiveObj:
         self.sHistC.reset()
         # reset transparency
         self.TranspVal = 0.5
-        # update brain slice
-        self.updateSlc(self.imaSlc)
         if self.segmType == 'main':
             if self.lassoSwitchCount == 1:  # reset only lasso drawing
                 self.idxLasso = np.zeros(self.nrBins*self.nrBins, dtype=bool)
@@ -368,14 +420,19 @@ class responsiveObj:
             # reset political borders
             self.pltMap = np.zeros((self.nrBins, self.nrBins))
             self.pltMapH.set_data(self.pltMap)
-        self.updateMsks()
+        self.updateSliceNr()
+        self.remapMsks()
+        self.updatePanels(update_slice=False, update_rotation=True,
+                          update_extent=False)
 
     def updateThetaMin(self, val):
         """Update theta (min) in volume histogram mask."""
         if self.segmType == 'main':
             theta_val = self.sThetaMin.val  # get theta value from slider
             self.sectorObj.theta_min(theta_val)
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
@@ -384,7 +441,9 @@ class responsiveObj:
         if self.segmType == 'main':
             theta_val = self.sThetaMax.val  # get theta value from slider
             self.sectorObj.theta_max(theta_val)
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
@@ -416,21 +475,21 @@ class responsiveObj:
         else:
             return
 
-    def imaSlcMaskIncr(self, incr):
+    def imaSlcMskIncr(self, incr):
         """Update transparency of image mask by increment."""
         if (self.TranspVal + incr >= 0) & (self.TranspVal + incr <= 1):
             self.TranspVal += incr
-        self.imaSlcMaskH.set_alpha(self.TranspVal)
-        self.updateMsks()
+        self.imaSlcMskH.set_alpha(self.TranspVal)
+        self.figure.canvas.draw()
 
-    def imaSlcMaskTransSwitch(self):
+    def imaSlcMskTransSwitch(self):
         """Update transparency of image mask to toggle transparency of it."""
-        self.imaSlcMaskSwitchCount = (self.imaSlcMaskSwitchCount+1) % 2
-        if self.imaSlcMaskSwitchCount == 1:  # set imaSlcMask transp
-            self.imaSlcMaskH.set_alpha(0)
-        else:  # set imaSlcMask opaque
-            self.imaSlcMaskH.set_alpha(self.TranspVal)
-        self.updateMsks()
+        self.imaSlcMskSwitchCount = (self.imaSlcMskSwitchCount+1) % 2
+        if self.imaSlcMskSwitchCount == 1:  # set imaSlcMsk transp
+            self.imaSlcMskH.set_alpha(0)
+        else:  # set imaSlcMsk opaque
+            self.imaSlcMskH.set_alpha(self.TranspVal)
+        self.figure.canvas.draw()
 
     def updateLabelsRadio(self, val):
         """Update labels with radio buttons."""
@@ -458,7 +517,7 @@ class responsiveObj:
 
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
-        grad = np.gradient(self.imaSlcMask)
+        grad = np.gradient(self.imaSlcMsk)
         return np.greater(np.sqrt(np.power(grad[0], 2) +
                           np.power(grad[1], 2)), 0)
 

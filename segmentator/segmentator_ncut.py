@@ -122,11 +122,11 @@ sliceNr = int(0.5*dims[2])
 imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray,
                      vmin=ima.min(), vmax=ima.max(), interpolation='none',
                      extent=[0, dims[1], dims[0], 0])
-imaSlcMask = np.zeros(dims[0:2])*total_labels[1]
-imaSlcMaskH = ax2.imshow(imaSlcMask, interpolation='none', alpha=0.5,
-                         cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
-                         vmax=lMax,
-                         extent=[0, dims[1], dims[0], 0])
+imaSlcMsk = np.zeros(dims[0:2])*total_labels[1]
+imaSlcMskH = ax2.imshow(imaSlcMsk, interpolation='none', alpha=0.5,
+                        cmap=ncut_palette, vmin=np.min(ncut_labels)+1,
+                        vmax=lMax,
+                        extent=[0, dims[1], dims[0], 0])
 
 # adjust subplots on figure
 bottom = 0.30
@@ -143,7 +143,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         nrBins=nr_bins,
                         sliceNr=sliceNr,
                         imaSlcH=imaSlcH,
-                        imaSlcMask=imaSlcMask, imaSlcMaskH=imaSlcMaskH,
+                        imaSlcMsk=imaSlcMsk, imaSlcMskH=imaSlcMskH,
                         volHistMask=volHistMask,
                         volHistMaskH=volHistMaskH,
                         pltMap=pltMap, pltMapH=pltMapH,
@@ -216,7 +216,7 @@ flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
 flexFig.sLabelNr.on_changed(flexFig.updateLabels)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
-flexFig.bRotate.on_clicked(flexFig.rotateView)
+flexFig.bRotate.on_clicked(flexFig.changeRotation)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)

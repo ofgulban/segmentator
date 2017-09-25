@@ -81,10 +81,10 @@ imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray, vmin=ima.min(),
                      vmax=ima.max(), interpolation='none',
                      extent=[0, dims[1], dims[0], 0])
 
-imaSlcMask = np.ones(dims[0:2])
-imaSlcMaskH = ax2.imshow(imaSlcMask, cmap=palette, vmin=0.1,
-                         interpolation='none', alpha=0.5,
-                         extent=[0, dims[1], dims[0], 0])
+imaSlcMsk = np.ones(dims[0:2])
+imaSlcMskH = ax2.imshow(imaSlcMsk, cmap=palette, vmin=0.1,
+                        interpolation='none', alpha=0.5,
+                        extent=[0, dims[1], dims[0], 0])
 
 # adjust subplots on figure
 bottom = 0.30
@@ -113,7 +113,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         nrBins=nr_bins,
                         sliceNr=sliceNr,
                         imaSlcH=imaSlcH,
-                        imaSlcMask=imaSlcMask, imaSlcMaskH=imaSlcMaskH,
+                        imaSlcMsk=imaSlcMsk, imaSlcMskH=imaSlcMskH,
                         volHistMask=volHistMask, volHistMaskH=volHistMaskH,
                         contains=volHistMaskH.contains,
                         counts=counts,
@@ -125,6 +125,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
 flexFig.connect()
 ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
+flexFig.updatePanels()
 
 #
 """Sliders and Buttons"""
@@ -151,13 +152,11 @@ flexFig.sThetaMax = Slider(aThetaMax, 'ThetaMax', 0, 359.9,
 cycleax = plt.axes([0.55, bottom-0.2475, 0.075, 0.0375])
 flexFig.bCycle = Button(cycleax, 'Cycle',
                         color=axcolor, hovercolor=hovcolor)
-flexFig.cycleCount = 0
 
 # rotate button
 rotateax = plt.axes([0.55, bottom-0.285, 0.075, 0.0375])
 flexFig.bRotate = Button(rotateax, 'Rotate',
                          color=axcolor, hovercolor=hovcolor)
-flexFig.rotationCount = 0
 
 # export nii button
 exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
@@ -181,7 +180,7 @@ flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
 flexFig.sThetaMin.on_changed(flexFig.updateThetaMin)
 flexFig.sThetaMax.on_changed(flexFig.updateThetaMax)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
-flexFig.bRotate.on_clicked(flexFig.rotateView)
+flexFig.bRotate.on_clicked(flexFig.changeRotation)
 flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
@@ -190,8 +189,11 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 #
 """New stuff: Lasso (Experimental)"""
 # Lasso button
+lasso_inactive_colors = ['0.875', '1']
+lasso_active_colors = ['1', '0.875']
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
-bLasso = Button(lassoax, 'Lasso\nON OFF', color=axcolor, hovercolor='0.975')
+bLasso = Button(lassoax, 'Lasso', color=lasso_inactive_colors[0],
+                hovercolor=lasso_inactive_colors[1])
 
 
 def lassoSwitch(event):
@@ -202,9 +204,13 @@ def lassoSwitch(event):
     if flexFig.lassoSwitchCount == 1:  # enable lasso
         flexFig.disconnect()  # disable drag function of sector mask
         lasso = LassoSelector(ax, onselect)
+        bLasso.color = lasso_active_colors[0]
+        bLasso.hovercolor = lasso_active_colors[1]
     else:  # disable lasso
-        lasso = []  # I am not sure we want to reset lasso with this button
+        # lasso = []  # I am not sure we want to reset lasso with this button
         flexFig.connect()  # enable drag function of sector mask
+        bLasso.color = lasso_inactive_colors[0]
+        bLasso.hovercolor = lasso_inactive_colors[1]
 
 
 # Pixel coordinates
@@ -220,7 +226,9 @@ def onselect(verts):
     newLasIdx = p.contains_points(pix, radius=1.5)  # new lasso indices
     flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
     # update volume histogram mask
-    flexFig.updateMsks()
+    flexFig.remapMsks()
+    flexFig.updatePanels(update_slice=False, update_rotation=True,
+                         update_extent=False)
 
 
 bLasso.on_clicked(lassoSwitch)
