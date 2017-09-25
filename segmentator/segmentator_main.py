@@ -227,7 +227,7 @@ def onselect(verts):
     # update volume histogram mask
     flexFig.remapMsks()
     flexFig.updatePanels(update_slice=False, update_rotation=True,
-                         update_extent=False)
+                         update_extent=True)
 
 
 bLasso.on_clicked(lassoSwitch)
