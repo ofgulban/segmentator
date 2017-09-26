@@ -36,7 +36,7 @@ class responsiveObj:
         self.press = None
         self.ctrlHeld = False
         self.labelNr = 0
-        self.imaSlcMskSwitchCount = 0
+        self.imaSlcMskSwitch, self.volHistHighlightSwitch = 0, 0
         self.TranspVal = 0.5
         self.nrExports = 0
         self.entropWin = 0
@@ -44,6 +44,7 @@ class responsiveObj:
         self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
         self.cycleCount = 0
         self.cycRotHistory = [[0, 0], [0, 0], [0, 0]]
+        self.highlights = []  # to hold image to histogram circles
 
     def remapMsks(self, remap_slice=True):
         """Update volume histogram to image mapping.
@@ -103,6 +104,8 @@ class responsiveObj:
             self.imaSlcMskIncr(-0.1)
         elif event.key == 'w':
             self.imaSlcMskTransSwitch()
+        elif event.key == 'h':
+            self.volHistHighlightTransSwitch()
         elif event.key == 'e':
             self.imaSlcMskIncr(0.1)
         elif event.key == '1':
@@ -162,10 +165,11 @@ class responsiveObj:
         # Switch x and y for circle centre since back to Cartesian.
         self.circle1 = plt.Circle((ypix, xpix), radius=5,  edgecolor=None,
                                   color=np.array([33, 113, 181, 255])/255)
-        self.circle2 = plt.Circle((ypix, xpix), radius=1, edgecolor=None,
-                                  color=np.array([8, 48, 107, 255])/255)
+        self.highlights.append(
+            plt.Circle((ypix, xpix), radius=1, edgecolor=None,
+                       color=np.array([8, 48, 107, 255])/255))
         self.axes.add_artist(self.circle1)
-        self.axes.add_artist(self.circle2)
+        self.axes.add_artist(self.highlights[-1])
         self.figure.canvas.draw()
 
     def on_press(self, event):
@@ -396,8 +400,16 @@ class responsiveObj:
         print "successfully exported image labels as: \n" + \
             self.basename + self.flexfilename
 
+    def clearOverlays(self):
+        """Clear overlaid items such as circle highlights."""
+        if self.highlights:
+            {h.remove() for h in self.highlights}
+        self.highlights = []
+
     def resetGlobal(self, event):
         """Reset stuff."""
+        # reset highlights
+        self.clearOverlays()
         # reset color bar
         self.sHistC.reset()
         # reset transparency
@@ -491,12 +503,22 @@ class responsiveObj:
         self.figure.canvas.draw()
 
     def imaSlcMskTransSwitch(self):
-        """Update transparency of image mask to toggle transparency of it."""
-        self.imaSlcMskSwitchCount = (self.imaSlcMskSwitchCount+1) % 2
-        if self.imaSlcMskSwitchCount == 1:  # set imaSlcMsk transp
+        """Update transparency of image mask to toggle transparency."""
+        self.imaSlcMskSwitch = (self.imaSlcMskSwitch+1) % 2
+        if self.imaSlcMskSwitch == 1:  # set imaSlcMsk transp
             self.imaSlcMskH.set_alpha(0)
         else:  # set imaSlcMsk opaque
             self.imaSlcMskH.set_alpha(self.TranspVal)
+        self.figure.canvas.draw()
+
+    def volHistHighlightTransSwitch(self):
+        """Update transparency of highlights to toggle transparency."""
+        self.volHistHighlightSwitch = (self.volHistHighlightSwitch+1) % 2
+        if self.volHistHighlightSwitch == 1 and self.highlights:
+            if self.highlights:
+                {h.set_visible(False) for h in self.highlights}
+        elif self.volHistHighlightSwitch == 0 and self.highlights:
+                {h.set_visible(True) for h in self.highlights}
         self.figure.canvas.draw()
 
     def updateLabelsRadio(self, val):
