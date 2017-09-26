@@ -20,7 +20,21 @@ The goal is to provide a complementary tool to the already available brain tissu
 | [SciPy](http://scipy.org/)           | 0.19.1         |
 
 ## Installation & Quick Start
-Please visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see how to install and use Segmentator.
+- Make sure you have [**Python 2.7**](https://www.python.org/download/releases/2.7/) and [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed.
+- Change directory in your command line:
+```
+cd \path\to\segmentator
+```
+- Install the requirements by running the following command:
+```
+pip install -r requirements.txt
+```
+- Install Segmentator:
+```
+python setup.py install
+```
+
+Visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see alternative installation methods.
 
 ## Support
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
