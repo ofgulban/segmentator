@@ -143,20 +143,29 @@ class responsiveObj:
     def findVoxInHist(self, event):
         """Find voxel's location in histogram."""
         self.press = event.xdata, event.ydata
-        xvoxel = int(np.floor(event.xdata))
-        yvoxel = int(np.floor(event.ydata))
-        # SWITCH x and y voxel to get linear index
-        # since NOT Cartes.!!!
-        pixelLin = self.invHistVolume[
-            yvoxel, xvoxel, self.sliceNr]
+        pixel_x = int(np.floor(event.xdata))
+        pixel_y = int(np.floor(event.ydata))
+        aoi = self.invHistVolume[:, :, self.sliceNr]  # array of interest
+        # Check rotation (TODO: code repetition!)
+        cyc_rot = self.cycRotHistory[self.cycleCount][1]
+        if cyc_rot == 1:  # 90
+            aoi = np.rot90(aoi, axes=(0, 1))
+        elif cyc_rot == 2:  # 180
+            aoi = aoi[::-1, ::-1]
+        elif cyc_rot == 3:  # 270
+            aoi = np.rot90(aoi, axes=(1, 0))
+        # Switch x and y voxel to get linear index since not Cartesian!!!
+        pixelLin = aoi[pixel_y, pixel_x]
         # ind2sub
         xpix = (pixelLin / self.nrBins)
         ypix = (pixelLin % self.nrBins)
-        # SWITCH x and y for circle centre
-        # since back TO Cartesian!!!
-        self.circle1 = plt.Circle(
-            (ypix, xpix), radius=5, color='b')
+        # Switch x and y for circle centre since back to Cartesian.
+        self.circle1 = plt.Circle((ypix, xpix), radius=5,  edgecolor=None,
+                                  color=np.array([33, 113, 181, 255])/255)
+        self.circle2 = plt.Circle((ypix, xpix), radius=1, edgecolor=None,
+                                  color=np.array([8, 48, 107, 255])/255)
         self.axes.add_artist(self.circle1)
+        self.axes.add_artist(self.circle2)
         self.figure.canvas.draw()
 
     def on_press(self, event):
@@ -284,8 +293,7 @@ class responsiveObj:
     def on_release(self, event):
         """Determine what happens if mouse button is released."""
         self.press = None
-        # try to remove the blue circle
-        try:
+        try:  # remove highlight circle
             self.circle1.remove()
         except:
             return
