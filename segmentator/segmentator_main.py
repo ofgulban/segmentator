@@ -188,11 +188,8 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 #
 """New stuff: Lasso (Experimental)"""
 # Lasso button
-lasso_inactive_colors = ['0.875', '1']
-lasso_active_colors = ['1', '0.875']
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
-bLasso = Button(lassoax, 'Lasso', color=lasso_inactive_colors[0],
-                hovercolor=lasso_inactive_colors[1])
+bLasso = Button(lassoax, 'Lasso\nOff', color=axcolor, hovercolor=hovcolor)
 
 
 def lassoSwitch(event):
@@ -203,13 +200,11 @@ def lassoSwitch(event):
     if flexFig.lassoSwitchCount == 1:  # enable lasso
         flexFig.disconnect()  # disable drag function of sector mask
         lasso = LassoSelector(ax, onselect)
-        bLasso.color = lasso_active_colors[0]
-        bLasso.hovercolor = lasso_active_colors[1]
+        bLasso.label.set_text("Lasso\nOn")
     else:  # disable lasso
         # lasso = []  # I am not sure we want to reset lasso with this button
         flexFig.connect()  # enable drag function of sector mask
-        bLasso.color = lasso_inactive_colors[0]
-        bLasso.hovercolor = lasso_inactive_colors[1]
+        bLasso.label.set_text("Lasso\nOff")
 
 
 # Pixel coordinates
