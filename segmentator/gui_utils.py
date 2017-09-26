@@ -497,11 +497,7 @@ class responsiveObj:
         self.labelNr = int(float(val) * labelScale)
 
     def labelContours(self):
-        """
-        Calculate and plot political borders.
-
-        Used in ncut version.
-        """
+        """Plot political borders used in ncut version."""
         grad = np.gradient(self.volHistMask)
         self.pltMap = np.greater(np.sqrt(np.power(grad[0], 2) +
                                          np.power(grad[1], 2)), 0)
