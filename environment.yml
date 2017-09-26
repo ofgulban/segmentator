@@ -8,5 +8,5 @@ dependencies:
 - pytest-cov>=2.5*
 - numpy>=1.13*
 - scipy>=0.19*
-- matplotlib=1.5*
+- matplotlib=2.0*
 - nibabel>=2.1*

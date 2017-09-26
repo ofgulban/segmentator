@@ -58,7 +58,7 @@ palette.set_under('w', 0)
 palette.set_bad('m', 1.0)
 
 # Plot 2D histogram
-fig = plt.figure()
+fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
 
 counts, volHistH, d_min, d_max, nr_bins, bin_edges \
@@ -130,20 +130,20 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 """Sliders and Buttons"""
 # colorbar slider
 axcolor, hovcolor = '0.875', '0.975'
-axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], axisbg=axcolor)
+axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # ima browser slider
-axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
+axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
                           valfmt='%0.2f')
 
 # theta sliders
-aThetaMin = plt.axes([0.15, bottom-0.10, 0.25, 0.025], axisbg=axcolor)
+aThetaMin = plt.axes([0.15, bottom-0.10, 0.25, 0.025], facecolor=axcolor)
 flexFig.sThetaMin = Slider(aThetaMin, 'ThetaMin', 0, 359.9,
                            valinit=cfg.init_theta[0], valfmt='%0.1f')
-aThetaMax = plt.axes([0.15, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
+aThetaMax = plt.axes([0.15, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
 flexFig.sThetaMax = Slider(aThetaMax, 'ThetaMax', 0, 359.9,
                            valinit=cfg.init_theta[1]-0.1, valfmt='%0.1f')
 

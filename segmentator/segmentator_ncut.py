@@ -78,7 +78,7 @@ gra = np.ndarray.flatten(gra)
 # %%
 """Plots"""
 # Plot 2D histogram
-fig = plt.figure()
+fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
 
 counts, volHistH, d_min, d_max, nr_bins, bin_edges \
@@ -92,11 +92,13 @@ ax.set_title("2D Histogram")
 
 # plot map for poltical borders
 pltMap = np.zeros((nr_bins, nr_bins, 1)).repeat(4, 2)
-cmapPltMap = ListedColormap(['w', 'black', 'red', 'blue'])
+cmapPltMap = ListedColormap([[1, 1, 1, 0],  # transparent zeros
+                             [0, 0, 0, 0.75],  # political borders
+                             [1, 0, 0, 0.5],  # other colors for future use
+                             [0, 0, 1, 0.5]])
 boundsPltMap = [0, 1, 2, 3, 4]
-cmapPltMap.set_under('w', 0)
 normPltMap = BoundaryNorm(boundsPltMap, cmapPltMap.N)
-pltMapH = ax.imshow(pltMap, alpha=1, cmap=cmapPltMap, norm=normPltMap,
+pltMapH = ax.imshow(pltMap, cmap=cmapPltMap, norm=normPltMap,
                     vmin=boundsPltMap[1], vmax=boundsPltMap[-1],
                     extent=[0, nr_bins, nr_bins, 0], interpolation='none')
 
@@ -164,22 +166,22 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 axcolor, hovcolor = '0.875', '0.975'
 
 # radio buttons (ugly but good enough for now)
-rax = plt.axes([0.91, 0.35, 0.08, 0.5], axisbg=(0.75, 0.75, 0.75))
+rax = plt.axes([0.91, 0.35, 0.08, 0.5], facecolor=(0.75, 0.75, 0.75))
 flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)],
                              activecolor=(0.25, 0.25, 0.25))
 
 # colorbar slider
-axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], axisbg=axcolor)
+axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # label slider
-axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], axisbg=axcolor)
+axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], facecolor=axcolor)
 flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax,
                           valinit=lMax, valfmt='%i')
 
 # ima browser slider
-axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], axisbg=axcolor)
+axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
                           valinit=0.5, valfmt='%0.3f')
 
