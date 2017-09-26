@@ -37,7 +37,7 @@ python setup.py install
 ```
 segmentator /path/to/file.nii.gz
 ```
-- See the help for further options:
+- Or see the help for available options:
 ```
 segmentator --help
 ```
