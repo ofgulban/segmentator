@@ -44,7 +44,7 @@ class responsiveObj:
         self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
         self.cycleCount = 0
         self.cycRotHistory = [[0, 0], [0, 0], [0, 0]]
-        self.highlights = []  # to hold image to histogram circles
+        self.highlights = [[], []]  # to hold image to histogram circles
 
     def remapMsks(self, remap_slice=True):
         """Update volume histogram to image mapping.
@@ -163,13 +163,14 @@ class responsiveObj:
         xpix = (pixelLin / self.nrBins)
         ypix = (pixelLin % self.nrBins)
         # Switch x and y for circle centre since back to Cartesian.
-        self.circle1 = plt.Circle((ypix, xpix), radius=5,  edgecolor=None,
-                                  color=np.array([33, 113, 181, 255])/255)
-        self.highlights.append(
-            plt.Circle((ypix, xpix), radius=1, edgecolor=None,
-                       color=np.array([8, 48, 107, 255])/255))
-        self.axes.add_artist(self.circle1)
-        self.axes.add_artist(self.highlights[-1])
+        circle_colors = [np.array([8, 48, 107, 255])/255,
+                         np.array([33, 113, 181, 255])/255]
+        self.highlights[0].append(plt.Circle((ypix, xpix), radius=1,
+                                  edgecolor=None, color=circle_colors[0]))
+        self.highlights[1].append(plt.Circle((ypix, xpix), radius=5,
+                                  edgecolor=None, color=circle_colors[1]))
+        self.axes.add_artist(self.highlights[0][-1])  # small circle
+        self.axes.add_artist(self.highlights[1][-1])  # large circle
         self.figure.canvas.draw()
 
     def on_press(self, event):
@@ -297,10 +298,9 @@ class responsiveObj:
     def on_release(self, event):
         """Determine what happens if mouse button is released."""
         self.press = None
-        try:  # remove highlight circle
-            self.circle1.remove()
-        except:
-            return
+        # Remove highlight circle
+        if self.highlights[1]:
+            self.highlights[1][-1].set_visible(False)
         self.figure.canvas.draw()
 
     def disconnect(self):
@@ -402,9 +402,10 @@ class responsiveObj:
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""
-        if self.highlights:
-            {h.remove() for h in self.highlights}
-        self.highlights = []
+        if self.highlights[0]:
+            {h.remove() for h in self.highlights[0]}
+            {h.remove() for h in self.highlights[1]}
+        self.highlights[0] = []
 
     def resetGlobal(self, event):
         """Reset stuff."""
@@ -514,11 +515,11 @@ class responsiveObj:
     def volHistHighlightTransSwitch(self):
         """Update transparency of highlights to toggle transparency."""
         self.volHistHighlightSwitch = (self.volHistHighlightSwitch+1) % 2
-        if self.volHistHighlightSwitch == 1 and self.highlights:
-            if self.highlights:
-                {h.set_visible(False) for h in self.highlights}
-        elif self.volHistHighlightSwitch == 0 and self.highlights:
-                {h.set_visible(True) for h in self.highlights}
+        if self.volHistHighlightSwitch == 1 and self.highlights[0]:
+            if self.highlights[0]:
+                {h.set_visible(False) for h in self.highlights[0]}
+        elif self.volHistHighlightSwitch == 0 and self.highlights[0]:
+                {h.set_visible(True) for h in self.highlights[0]}
         self.figure.canvas.draw()
 
     def updateLabelsRadio(self, val):
