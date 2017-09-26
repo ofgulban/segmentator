@@ -1,12 +1,11 @@
 name: segmentator
 channels:
 - conda-forge
-- clinicalgraphics
 dependencies:
 - setuptools>=19.6*
 - pytest>=3*
 - pytest-cov>=2.5*
 - numpy>=1.13*
 - scipy>=0.19*
-- matplotlib=2.0*
+- matplotlib>=2.0*
 - nibabel>=2.1*
