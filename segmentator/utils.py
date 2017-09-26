@@ -198,7 +198,7 @@ def prep_2D_hist(ima, gra, discard_zeros=True):
     return counts, volHistH, d_min, d_max, nr_bins, bin_edges
 
 
-def create_3D_kernel(operator='3D_sobel'):
+def create_3D_kernel(operator='sobel'):
     """Create various 3D kernels.
 
     Parameters
@@ -211,17 +211,17 @@ def create_3D_kernel(operator='3D_sobel'):
     kernel : np.ndarray, shape(6, n, n, 3)
 
     """
-    if operator == '3D_sobel':
+    if operator == 'sobel':
         operator = np.array([[[1, 2, 1], [2, 4, 2], [1, 2, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]],
                             dtype='float')
-    elif operator == '3D_prewitt':
+    elif operator == 'prewitt':
         operator = np.array([[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]],
                             dtype='float')
-    elif operator == '3D_scharr':
+    elif operator == 'scharr':
         operator = np.array([[[9, 30, 9], [30, 100, 30], [9, 30, 9]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-9, -30, -9], [-30, -100, -30], [-9, -30, -9]]],
@@ -240,7 +240,7 @@ def create_3D_kernel(operator='3D_sobel'):
     return kernel
 
 
-def compute_gradient_magnitude(ima, method='3D_scharr'):
+def compute_gradient_magnitude(ima, method='scharr'):
     """Compute gradient magnitude of images.
 
     Parameters
@@ -248,15 +248,16 @@ def compute_gradient_magnitude(ima, method='3D_scharr'):
     ima : np.ndarray
         First image, which is often the intensity image (eg. T1w).
     method : string
-        Gradient computation method. Available options are '3D_sobel',
-        'scipy_sobel', 'scipy_prewitt', 'numpy'.
+        Gradient computation method. Available options are 'scharr',
+        'sobel', 'prewitt', 'numpy'.
     Returns
     -------
     gra_mag : np.ndarray
         Second image, which is often the gradient magnitude image
         derived from the first image
+
     """
-    if method == '3D_sobel':  # magnitude scale is similar to numpy method
+    if method == 'sobel':  # magnitude scale is similar to numpy method
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -264,7 +265,7 @@ def compute_gradient_magnitude(ima, method='3D_scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == '3D_prewitt':
+    elif method == 'prewitt':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -272,7 +273,7 @@ def compute_gradient_magnitude(ima, method='3D_scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == '3D_scharr':
+    elif method == 'scharr':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):

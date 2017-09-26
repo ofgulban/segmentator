@@ -29,7 +29,7 @@ def main(args=None):
     parser.add_argument(
         "--gramag", metavar=str(cfg.gramag), required=False,
         default=cfg.gramag,
-        help="'3D_scharr', '3D_sobel', '3D_prewitt', 'numpy' \
+        help="'scharr', 'sobel', 'prewitt', 'numpy' \
         or path to a gradient magnitude nifti."
         )
     parser.add_argument(

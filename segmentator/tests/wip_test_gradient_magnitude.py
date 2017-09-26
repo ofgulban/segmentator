@@ -14,19 +14,19 @@ ima = nii.get_data()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # 3D Scharr gradient magnitude
-gra_mag = compute_gradient_magnitude(ima, method='3D_scharr')
+gra_mag = compute_gradient_magnitude(ima, method='scharr')
 out = Nifti1Image(gra_mag, affine=nii.affine)
-save(out, basename + '_3D_scharr.nii.gz')
+save(out, basename + '_scharr.nii.gz')
 
 # 3D Sobel gradient magnitude
-gra_mag = compute_gradient_magnitude(ima, method='3D_sobel')
+gra_mag = compute_gradient_magnitude(ima, method='sobel')
 out = Nifti1Image(gra_mag, affine=nii.affine)
-save(out, basename + '_3D_sobel.nii.gz')
+save(out, basename + '_sobel.nii.gz')
 
 # 3D Prewitt gradient magnitude
-gra_mag = compute_gradient_magnitude(ima, method='3D_prewitt')
+gra_mag = compute_gradient_magnitude(ima, method='prewitt')
 out = Nifti1Image(gra_mag, affine=nii.affine)
-save(out, basename + '_3D_prewitt.nii.gz')
+save(out, basename + '_prewitt.nii.gz')
 
 # numpy gradient magnitude
 gra_mag = compute_gradient_magnitude(ima, method='numpy')
