@@ -514,8 +514,7 @@ class responsiveObj:
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
         grad = np.gradient(self.imaSlcMsk)
-        return np.greater(np.sqrt(np.power(grad[0], 2) +
-                          np.power(grad[1], 2)), 0)
+        return np.greater(np.abs(grad[0], 2) + np.abs(grad[1], 2), 0)
 
 
 class sector_mask:
