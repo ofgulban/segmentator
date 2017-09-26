@@ -23,7 +23,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 - Make sure you have [**Python 2.7**](https://www.python.org/download/releases/2.7/) and [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed.
 - Change directory in your command line:
 ```
-cd \path\to\segmentator
+cd /path/to/segmentator
 ```
 - Install the requirements by running the following command:
 ```
@@ -32,6 +32,14 @@ pip install -r requirements.txt
 - Install Segmentator:
 ```
 python setup.py install
+```
+- Simply call segmentator with a nifti file:
+```
+segmentator /path/to/file.nii.gz
+```
+- See the help for further options:
+```
+segmentator --help
 ```
 
 Visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see alternative installation methods.
