@@ -11,13 +11,16 @@ init_theta = (0, 360)
 
 # segmentator main command line variables
 filename = 'sample_filename_here'
-gramag = 'gradient_magnitude_sample_here'
-perc_min = 0.25
-perc_max = 99.75
+gramag = 'scharr'
+perc_min = 2.5
+perc_max = 97.5
 scale = 400
+cbar_max = 5.0
+cbar_init = 3.0
+discard_zeros = True
 
-# used in Deriche filter
-deriche_alpha = 2
+# possible gradient magnitude computation keyword options
+gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy']
 
 # used in segmentator ncut
 ncut = False

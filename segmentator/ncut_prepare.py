@@ -37,15 +37,11 @@ def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,
 
     Returns
     -------
-        sector_mask: np.ndarray (2D)
+        labels2, labels1: np.ndarray (2D)
             Segmented volume histogram mask image. Each label has a unique
             identifier.
 
     """
-    # truncate very high values
-    perc = np.percentile(image, 99.99)
-    image[image > perc] = perc
-
     # scale for uint8 conversion
     image = np.round(255 / image.max() * image)
     image = image.astype('uint8')
@@ -66,8 +62,14 @@ def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,
 path = cfg.filename
 basename = path.split(os.extsep, 1)[0]
 
+# load data
 img = np.load(path)
-img = np.log10(img+1)
+# take logarithm of every count to make it similar to what is seen in gui
+img = np.log10(img+1.)
+
+# truncate very high values
+img_max = cfg.cbar_init
+img[img > img_max] = img_max
 
 max_recursion = cfg.max_rec
 ncut = np.zeros((img.shape[0], img.shape[1], max_recursion + 1))

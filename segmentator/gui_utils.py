@@ -20,7 +20,7 @@ from __future__ import division
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import VolHist2ImaMapping
+from utils import map_2D_hist_to_ima
 from nibabel import save, Nifti1Image
 import config as cfg
 
@@ -36,14 +36,25 @@ class responsiveObj:
         self.press = None
         self.ctrlHeld = False
         self.labelNr = 0
-        self.imaMaskSwitchCount = 0
+        self.imaSlcMskSwitch, self.volHistHighlightSwitch = 0, 0
         self.TranspVal = 0.5
         self.nrExports = 0
         self.entropWin = 0
         self.borderSwitch = 0
+        self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
+        self.cycleCount = 0
+        self.cycRotHistory = [[0, 0], [0, 0], [0, 0]]
+        self.highlights = [[], []]  # to hold image to histogram circles
 
-    def updateMsks(self):
-        """Update volume histogram mask."""
+    def remapMsks(self, remap_slice=True):
+        """Update volume histogram to image mapping.
+
+        Parameters
+        ----------
+        remap_slice : bool
+            Do histogram to image mapping. Used to map displayed slice mask.
+
+        """
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
             self.volHistMask = self.lassoArr(self.volHistMask,
@@ -53,21 +64,24 @@ class responsiveObj:
             self.labelContours()
             self.volHistMaskH.set_data(self.volHistMask)
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
-        # update imaMask
-        self.imaMask = VolHist2ImaMapping(
-            self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
-        if self.borderSwitch == 1:
-            self.imaMask = self.calcImaMaskBrd()
-        self.imaMaskH.set_data(self.imaMask)
-        self.imaMaskH.set_extent((0, self.imaMask.shape[1],
-                                  self.imaMask.shape[0], 0))
-        # draw to canvas
-        self.figure.canvas.draw()
+        # histogram to image mapping
+        if remap_slice:
+            self.imaSlcMsk = map_2D_hist_to_ima(
+                self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
+            if self.borderSwitch == 1:
+                self.imaSlcMsk = self.calcImaMaskBrd()
 
-    def updateSlc(self):
-        """Update image browser slices."""
-        self.slcH.set_data(self.orig[:, :, self.sliceNr])
-        self.slcH.set_extent((0, self.orig.shape[1], self.orig.shape[0], 0))
+    def updatePanels(self, update_slice=True, update_rotation=False,
+                     update_extent=False):
+        """Update histogram and image panels."""
+        if update_rotation:
+            self.checkRotation()
+        if update_extent:
+            self.updateImaExtent()
+        if update_slice:
+            self.imaSlcH.set_data(self.imaSlc)
+        self.imaSlcMskH.set_data(self.imaSlcMsk)
+        self.figure.canvas.draw()
 
     def connect(self):
         """Make the object responsive."""
@@ -87,27 +101,40 @@ class responsiveObj:
         if event.key == 'control':
             self.ctrlHeld = True
         elif event.key == 'q':
-            self.imaMaskIncr(-0.1)
+            self.imaSlcMskIncr(-0.1)
         elif event.key == 'w':
-            self.imaMaskTransSwitch()
+            self.imaSlcMskTransSwitch()
+        elif event.key == 'h':
+            self.volHistHighlightTransSwitch()
         elif event.key == 'e':
-            self.imaMaskIncr(0.1)
+            self.imaSlcMskIncr(0.1)
         elif event.key == '1':
             self.borderSwitch = (self.borderSwitch + 1) % 2
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=False,
+                              update_extent=False)
+
         if self.segmType == 'main':
             if event.key == 'up':
                 self.sectorObj.scale_r(1.05)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'down':
                 self.sectorObj.scale_r(0.95)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'right':
                 self.sectorObj.rotate(-10.0)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             elif event.key == 'left':
                 self.sectorObj.rotate(10.0)
-                self.updateMsks()
+                self.remapMsks()
+                self.updatePanels(update_slice=False, update_rotation=True,
+                                  update_extent=False)
             else:
                 return
 
@@ -119,20 +146,31 @@ class responsiveObj:
     def findVoxInHist(self, event):
         """Find voxel's location in histogram."""
         self.press = event.xdata, event.ydata
-        xvoxel = int(np.floor(event.xdata))
-        yvoxel = int(np.floor(event.ydata))
-        # SWITCH x and y voxel to get linear index
-        # since NOT Cartes.!!!
-        pixelLin = self.invHistVolume[
-            yvoxel, xvoxel, self.sliceNr]
+        pixel_x = int(np.floor(event.xdata))
+        pixel_y = int(np.floor(event.ydata))
+        aoi = self.invHistVolume[:, :, self.sliceNr]  # array of interest
+        # Check rotation (TODO: code repetition!)
+        cyc_rot = self.cycRotHistory[self.cycleCount][1]
+        if cyc_rot == 1:  # 90
+            aoi = np.rot90(aoi, axes=(0, 1))
+        elif cyc_rot == 2:  # 180
+            aoi = aoi[::-1, ::-1]
+        elif cyc_rot == 3:  # 270
+            aoi = np.rot90(aoi, axes=(1, 0))
+        # Switch x and y voxel to get linear index since not Cartesian!!!
+        pixelLin = aoi[pixel_y, pixel_x]
         # ind2sub
         xpix = (pixelLin / self.nrBins)
         ypix = (pixelLin % self.nrBins)
-        # SWITCH x and y for circle centre
-        # since back TO Cartesian!!!
-        self.circle1 = plt.Circle(
-            (ypix, xpix), radius=5, color='b')
-        self.axes.add_artist(self.circle1)
+        # Switch x and y for circle centre since back to Cartesian.
+        circle_colors = [np.array([8, 48, 107, 255])/255,
+                         np.array([33, 113, 181, 255])/255]
+        self.highlights[0].append(plt.Circle((ypix, xpix), radius=1,
+                                  edgecolor=None, color=circle_colors[0]))
+        self.highlights[1].append(plt.Circle((ypix, xpix), radius=5,
+                                  edgecolor=None, color=circle_colors[1]))
+        self.axes.add_artist(self.highlights[0][-1])  # small circle
+        self.axes.add_artist(self.highlights[1][-1])  # large circle
         self.figure.canvas.draw()
 
     def on_press(self, event):
@@ -161,10 +199,14 @@ class responsiveObj:
                 # increase/decrease radius of the sector mask
                 if self.ctrlHeld is False:  # ctrl no
                     self.sectorObj.scale_r(1.05)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 elif self.ctrlHeld is True:  # ctrl yes
                     self.sectorObj.rotate(10.0)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 else:
                     return
             elif event.button == 3:  # right button
@@ -173,10 +215,14 @@ class responsiveObj:
                 # rotate the sector mask
                 if self.ctrlHeld is False:  # ctrl no
                     self.sectorObj.scale_r(0.95)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 elif self.ctrlHeld is True:  # ctrl yes
                     self.sectorObj.rotate(-10.0)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
                 else:
                     return
         elif self.segmType == 'ncut':
@@ -201,7 +247,9 @@ class responsiveObj:
                     # replace old values with new values (in clicked subfield)
                     self.volHistMask[oLabels == val] = np.copy(
                         nLabels[oLabels == val])
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
 
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
                     self.findVoxInHist(event)
@@ -209,13 +257,15 @@ class responsiveObj:
                     return
             elif event.button == 3:  # right button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
-                    xbin = np.floor(event.xdata)
-                    ybin = np.floor(event.ydata)
+                    xbin = int(np.floor(event.xdata))
+                    ybin = int(np.floor(event.ydata))
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
                     self.volHistMask[self.volHistMask == val] = \
                         np.copy(self.labelNr)
-                    self.updateMsks()
+                    self.remapMsks()
+                    self.updatePanels(update_slice=False, update_rotation=True,
+                                      update_extent=False)
 
     def on_motion(self, event):
         """Determine what happens if mouse button moves."""
@@ -236,21 +286,21 @@ class responsiveObj:
             dx = event.ydata - ypress
             # update x and y position of sector,
             # based on past motion of cursor
-            self.sectorObj.set_x(x0+dx)
-            self.sectorObj.set_y(y0+dy)
+            self.sectorObj.set_x(x0 + dx)
+            self.sectorObj.set_y(y0 + dy)
             # update masks
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
     def on_release(self, event):
         """Determine what happens if mouse button is released."""
         self.press = None
-        # try to remove the blue circle
-        try:
-            self.circle1.remove()
-        except:
-            return
+        # Remove highlight circle
+        if self.highlights[1]:
+            self.highlights[1][-1].set_visible(False)
         self.figure.canvas.draw()
 
     def disconnect(self):
@@ -264,25 +314,62 @@ class responsiveObj:
         histVMax = np.power(10, self.sHistC.val)
         plt.clim(vmax=histVMax)
 
+    def updateSliceNr(self):
+        """Update slice number and the selected slice."""
+        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
+        self.imaSlc = self.orig[:, :, self.sliceNr]
+
     def updateImaBrowser(self, val):
         """Update image browse."""
         # scale slider value [0,1) to dimension index
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        self.updateSlc()  # update brain slice
-        self.updateMsks()
+        self.updateSliceNr()
+        self.remapMsks()
+        self.updatePanels(update_slice=True, update_rotation=True,
+                          update_extent=True)
+
+    def updateImaExtent(self):
+        """Update both image and mask extent in image browser."""
+        self.imaSlcH.set_extent((0, self.imaSlc.shape[1],
+                                 self.imaSlc.shape[0], 0))
+        self.imaSlcMskH.set_extent((0, self.imaSlc.shape[1],
+                                    self.imaSlc.shape[0], 0))
 
     def cycleView(self, event):
         """Cycle through views."""
-        self.cycleCount = (self.cycleCount+1) % 3
+        self.cycleCount = (self.cycleCount + 1) % 3
         # transpose data
         self.orig = np.transpose(self.orig, (2, 0, 1))
         # transpose ima2volHistMap
         self.invHistVolume = np.transpose(self.invHistVolume, (2, 0, 1))
-        # update slice number
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        # update brain slice
-        self.updateSlc()
-        self.updateMsks()
+        # updates
+        self.updateSliceNr()
+        self.remapMsks()
+        self.updatePanels(update_slice=True, update_rotation=True,
+                          update_extent=True)
+
+    def rotateIma90(self, axes=(0, 1)):
+        """Rotate image slice 90 degrees."""
+        self.imaSlc = np.rot90(self.imaSlc, axes=axes)
+        self.imaSlcMsk = np.rot90(self.imaSlcMsk, axes=axes)
+
+    def changeRotation(self, event):
+        """Change rotation of image after clicking the button."""
+        self.cycRotHistory[self.cycleCount][1] += 1
+        self.cycRotHistory[self.cycleCount][1] %= 4
+        self.rotateIma90()
+        self.updatePanels(update_slice=True, update_rotation=False,
+                          update_extent=True)
+
+    def checkRotation(self):
+        """Check rotation update if changed."""
+        cyc_rot = self.cycRotHistory[self.cycleCount][1]
+        if cyc_rot == 1:  # 90
+            self.rotateIma90(axes=(0, 1))
+        elif cyc_rot == 2:  # 180
+            self.imaSlc = self.imaSlc[::-1, ::-1]
+            self.imaSlcMsk = self.imaSlcMsk[::-1, ::-1]
+        elif cyc_rot == 3:  # 270
+            self.rotateIma90(axes=(1, 0))
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
@@ -298,7 +385,7 @@ class responsiveObj:
             out_volHistMask[out_volHistMask == label] = intLabels[newLabel]
         # get 3D brain mask
         temp = np.transpose(self.invHistVolume, cycBackPerm)
-        outNii = VolHist2ImaMapping(temp, out_volHistMask)
+        outNii = map_2D_hist_to_ima(temp, out_volHistMask)
         outNii = outNii.reshape(temp.shape)
         # save mask image as nii
         new_image = Nifti1Image(outNii, header=self.nii.get_header(),
@@ -313,18 +400,21 @@ class responsiveObj:
         print "successfully exported image labels as: \n" + \
             self.basename + self.flexfilename
 
+    def clearOverlays(self):
+        """Clear overlaid items such as circle highlights."""
+        if self.highlights[0]:
+            {h.remove() for h in self.highlights[0]}
+            {h.remove() for h in self.highlights[1]}
+        self.highlights[0] = []
+
     def resetGlobal(self, event):
         """Reset stuff."""
+        # reset highlights
+        self.clearOverlays()
         # reset color bar
         self.sHistC.reset()
-        # reset ima browser slider
-        self.sSliceNr.reset()
         # reset transparency
         self.TranspVal = 0.5
-        # reset slice number
-        self.sliceNr = int(self.sSliceNr.val*self.orig.shape[2])
-        # update brain slice
-        self.updateSlc()
         if self.segmType == 'main':
             if self.lassoSwitchCount == 1:  # reset only lasso drawing
                 self.idxLasso = np.zeros(self.nrBins*self.nrBins, dtype=bool)
@@ -351,14 +441,19 @@ class responsiveObj:
             # reset political borders
             self.pltMap = np.zeros((self.nrBins, self.nrBins))
             self.pltMapH.set_data(self.pltMap)
-        self.updateMsks()
+        self.updateSliceNr()
+        self.remapMsks()
+        self.updatePanels(update_slice=False, update_rotation=True,
+                          update_extent=False)
 
     def updateThetaMin(self, val):
         """Update theta (min) in volume histogram mask."""
         if self.segmType == 'main':
             theta_val = self.sThetaMin.val  # get theta value from slider
             self.sectorObj.theta_min(theta_val)
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
@@ -367,7 +462,9 @@ class responsiveObj:
         if self.segmType == 'main':
             theta_val = self.sThetaMax.val  # get theta value from slider
             self.sectorObj.theta_max(theta_val)
-            self.updateMsks()
+            self.remapMsks()
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=False)
         else:
             return
 
@@ -399,21 +496,31 @@ class responsiveObj:
         else:
             return
 
-    def imaMaskIncr(self, incr):
+    def imaSlcMskIncr(self, incr):
         """Update transparency of image mask by increment."""
         if (self.TranspVal + incr >= 0) & (self.TranspVal + incr <= 1):
             self.TranspVal += incr
-        self.imaMaskH.set_alpha(self.TranspVal)
-        self.updateMsks()
+        self.imaSlcMskH.set_alpha(self.TranspVal)
+        self.figure.canvas.draw()
 
-    def imaMaskTransSwitch(self):
-        """Update transparency of image mask to toggle transparency of it."""
-        self.imaMaskSwitchCount = (self.imaMaskSwitchCount+1) % 2
-        if self.imaMaskSwitchCount == 1:  # set imaMask transp
-            self.imaMaskH.set_alpha(0)
-        else:  # set imaMask opaque
-            self.imaMaskH.set_alpha(self.TranspVal)
-        self.updateMsks()
+    def imaSlcMskTransSwitch(self):
+        """Update transparency of image mask to toggle transparency."""
+        self.imaSlcMskSwitch = (self.imaSlcMskSwitch+1) % 2
+        if self.imaSlcMskSwitch == 1:  # set imaSlcMsk transp
+            self.imaSlcMskH.set_alpha(0)
+        else:  # set imaSlcMsk opaque
+            self.imaSlcMskH.set_alpha(self.TranspVal)
+        self.figure.canvas.draw()
+
+    def volHistHighlightTransSwitch(self):
+        """Update transparency of highlights to toggle transparency."""
+        self.volHistHighlightSwitch = (self.volHistHighlightSwitch+1) % 2
+        if self.volHistHighlightSwitch == 1 and self.highlights[0]:
+            if self.highlights[0]:
+                {h.set_visible(False) for h in self.highlights[0]}
+        elif self.volHistHighlightSwitch == 0 and self.highlights[0]:
+                {h.set_visible(True) for h in self.highlights[0]}
+        self.figure.canvas.draw()
 
     def updateLabelsRadio(self, val):
         """Update labels with radio buttons."""
@@ -421,11 +528,7 @@ class responsiveObj:
         self.labelNr = int(float(val) * labelScale)
 
     def labelContours(self):
-        """
-        Calculate and plot political borders.
-
-        Used in ncut version.
-        """
+        """Plot political borders used in ncut version."""
         grad = np.gradient(self.volHistMask)
         self.pltMap = np.greater(np.sqrt(np.power(grad[0], 2) +
                                          np.power(grad[1], 2)), 0)
@@ -441,6 +544,125 @@ class responsiveObj:
 
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
-        grad = np.gradient(self.imaMask)
-        return np.greater(np.sqrt(np.power(grad[0], 2) +
-                          np.power(grad[1], 2)), 0)
+        grad = np.gradient(self.imaSlcMsk)
+        return np.greater(np.abs(grad[0], 2) + np.abs(grad[1], 2), 0)
+
+
+class sector_mask:
+    """A pacman-like shape with useful parameters.
+
+    Disclaimer
+    ----------
+    This script is adapted from a stackoverflow  post by user ali_m:
+    [1] http://stackoverflow.com/questions/18352973/mask-a-circular-sector-in-a-numpy-array
+
+    """
+
+    def __init__(self, shape, centre, radius, angle_range):
+        self.radius = radius
+        self.shape = shape
+        self.x, self.y = np.ogrid[:shape[0], :shape[1]]
+        self.cx, self.cy = centre
+        self.tmin, self.tmax = np.deg2rad(angle_range)
+        # ensure stop angle > start angle
+        if self.tmax < self.tmin:
+            self.tmax += 2*np.pi
+        # convert cartesian --> polar coordinates
+        self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
+            self.y-self.cy)*(self.y-self.cy)
+        self.theta = np.arctan2(self.x-self.cx, self.y-self.cy) - self.tmin
+        # wrap angles between 0 and 2*pi
+        self.theta %= (2*np.pi)
+
+    def set_polCrd(self):
+        """Convert cartesian to polar coordinates."""
+        self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
+            self.y-self.cy)*(self.y-self.cy)
+        self.theta = np.arctan2(self.x-self.cx, self.y-self.cy) - self.tmin
+        # wrap angles between 0 and 2*pi
+        self.theta %= (2*np.pi)
+
+    def set_x(self, x):
+        """Set x axis value."""
+        self.cx = x
+        self.set_polCrd()  # update polar coordinates
+
+    def set_y(self, y):
+        """Set y axis value."""
+        self.cy = y
+        self.set_polCrd()  # update polar coordinates
+
+    def set_r(self, radius):
+        """Set radius of the circle."""
+        self.radius = radius
+
+    def scale_r(self, scale):
+        """Scale (multiply) the radius."""
+        self.radius = self.radius * scale
+
+    def rotate(self, degree):
+        """Rotate shape."""
+        rad = np.deg2rad(degree)
+        self.tmin += rad
+        self.tmax += rad
+        self.set_polCrd()  # update polar coordinates
+
+    def theta_min(self, degree):
+        """Angle to determine one the cut out piece in circular mask."""
+        rad = np.deg2rad(degree)
+        self.tmin = rad
+        # ensure stop angle > start angle
+        if self.tmax <= self.tmin:
+            self.tmax += 2*np.pi
+        # ensure stop angle- 2*np.pi NOT > start angle
+        if self.tmax - 2*np.pi >= self.tmin:
+            self.tmax -= 2*np.pi
+        # update polar coordinates
+        self.set_polCrd()
+
+    def theta_max(self, degree):
+        """Angle to determine one the cut out piece in circular mask."""
+        rad = np.deg2rad(degree)
+        self.tmax = rad
+        # ensure stop angle > start angle
+        if self.tmax <= self.tmin:
+            self.tmax += 2*np.pi
+        # ensure stop angle- 2*np.pi NOT > start angle
+        if self.tmax - 2*np.pi >= self.tmin:
+            self.tmax -= 2*np.pi
+        # update polar coordinates
+        self.set_polCrd()
+
+    def binaryMask(self):
+        """Return a boolean mask for a circular sector."""
+        # circular mask
+        self.circmask = self.r2 <= self.radius*self.radius
+        # angular mask
+        self.anglemask = self.theta <= (self.tmax-self.tmin)
+        # return binary mask
+        return self.circmask*self.anglemask
+
+    def contains(self, event):
+        """Check if a cursor pointer is inside the sector mask."""
+        xbin = np.floor(event.xdata)
+        ybin = np.floor(event.ydata)
+        Mask = self.binaryMask()
+        # the next line doesn't follow pep 8 (otherwise it fails)
+        if Mask[ybin][xbin] is True:  # switch x and ybin, volHistMask not Cart
+            return True
+        else:
+            return False
+
+    def draw(self, ax, cmap='Reds', alpha=0.2, vmin=0.1,
+             interpolation='nearest', origin='lower', extent=[0, 100, 0, 100]):
+        """Draw stuff."""
+        BinMask = self.binaryMask()
+        FigObj = ax.imshow(
+            BinMask,
+            cmap=cmap,
+            alpha=alpha,
+            vmin=vmin,
+            interpolation=interpolation,
+            origin=origin,
+            extent=extent)
+        return (FigObj, BinMask)
