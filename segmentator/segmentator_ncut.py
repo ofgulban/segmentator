@@ -68,6 +68,9 @@ ima_ncut_labels = ncut_labels.copy()
 orig = np.squeeze(nii.get_data())
 dims = orig.shape
 orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
+# Save truncated min max to be used in axis labeling
+orig_range = np.percentile(orig, [0, 100])
+# Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 
@@ -104,7 +107,7 @@ pltMapH = ax.imshow(pltMap, cmap=cmapPltMap, norm=normPltMap,
 
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
-plt.colorbar(volHistH)
+fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical perfect scaling
 
 # Set up a colormap for ncut labels
 ncut_palette = plt.cm.gist_rainbow
@@ -223,5 +226,29 @@ flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
 flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
+
+
+# TODO: Temporary solution for displaying original x-y axis labels
+def update_axis_labels(event):
+    """Swap histogram bin indices with original values."""
+    xlabels = [item.get_text() for item in ax.get_xticklabels()]
+    orig_range_labels = np.linspace(orig_range[0], orig_range[1], len(xlabels))
+
+    # Adjust displayed decimals based on data range
+    data_range = orig_range[1] - orig_range[0]
+    if data_range > 200:  # arbitrary value
+        xlabels = [('%i' % i) for i in orig_range_labels]
+    elif data_range > 20:
+        xlabels = [('%.1f' % i) for i in orig_range_labels]
+    elif data_range > 2:
+        xlabels = [('%.2f' % i) for i in orig_range_labels]
+    else:
+        xlabels = [('%.3f' % i) for i in orig_range_labels]
+
+    ax.set_xticklabels(xlabels)
+    ax.set_yticklabels(xlabels)  # limits of y axis assumed to be the same as x
+
+
+fig.canvas.mpl_connect('resize_event', update_axis_labels)
 
 plt.show()
