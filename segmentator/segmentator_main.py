@@ -76,7 +76,7 @@ ax.set_title("2D Histogram")
 
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
-plt.colorbar(volHistH)
+fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical perfect scaling
 
 # plot 3D ima by default
 ax2 = fig.add_subplot(122)
@@ -256,4 +256,5 @@ bLasso.on_clicked(lassoSwitch)
 flexFig.remapMsks()
 flexFig.updatePanels(update_slice=True, update_rotation=False,
                      update_extent=False)
+
 plt.show()

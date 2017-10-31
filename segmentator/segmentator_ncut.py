@@ -107,7 +107,7 @@ pltMapH = ax.imshow(pltMap, cmap=cmapPltMap, norm=normPltMap,
 
 # plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
-plt.colorbar(volHistH)
+fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical perfect scaling
 
 # Set up a colormap for ncut labels
 ncut_palette = plt.cm.gist_rainbow
