@@ -41,9 +41,10 @@ nii = load(cfg.filename)
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
 dims = orig.shape
-orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
-# Save truncated min max to be used in axis labeling
-orig_range = np.percentile(orig, [0, 100])
+orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
+                                  percMax=cfg.perc_max)
+# Save min and max truncation thresholds to be used in axis labels
+orig_range = [pMin, pMax]
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
