@@ -7,21 +7,19 @@ Use config.py to hold arguments to be accessed by imported scripts.
 
 TODO: Argument parsing can be better structured, maybe by using parents. help
 looks a bit messy as is.
-
 """
 
-import sys
 import argparse
 import config as cfg
 from segmentator import __version__
 
 
-def main(args=None):
+def main():
     """Command line call argument parsing."""
-    if args is None:
-        args = sys.argv[1:]
-    # Main arguments
+    # Instantiate argument parser object:
     parser = argparse.ArgumentParser()
+
+    # Add arguments to namespace:
     parser.add_argument(
         'filename', metavar='path',
         help="Path to input. Mostly a nifti file with image data."
