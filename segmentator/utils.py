@@ -111,6 +111,11 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     Returns
     -------
     data : np.ndarray
+        Truncated data.
+    pMin : float
+        Minimum truncation threshold which is used.
+    pMax : float
+        Maximum truncation threshold which is used.
 
     """
     if discard_zeros:
@@ -123,7 +128,7 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     data[~np.isnan(data)] = temp
     if discard_zeros:
         data[~msk] = 0  # put back masked out voxels
-    return data
+    return data, pMin, pMax
 
 
 def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):

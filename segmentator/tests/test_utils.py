@@ -13,8 +13,8 @@ def test_truncate_range():
     p_min, p_max = 2.5, 97.5
     expected = np.nanpercentile(data, [p_min, p_max])
     # When
-    output = truncate_range(data, percMin=p_min, percMax=p_max,
-                            discard_zeros=False)
+    output, _, _ = truncate_range(data, percMin=p_min, percMax=p_max,
+                                  discard_zeros=False)
     # Then
     assert all(np.nanpercentile(output, [0, 100]) == expected)
 
