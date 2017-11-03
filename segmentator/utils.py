@@ -17,11 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+import os
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 import config as cfg
-from nibabel import load
+from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
 
 
@@ -469,3 +470,12 @@ def aniso_diff_3D(stack, niter=1, kappa=50, gamma=0.1, step=(1., 1., 1.),
                     # sleep(0.01)
 
     return stackout
+
+
+def export_gradient_magnitude_image(img, filename, affine):
+    """Export computed gradient magnitude image as a nifti file."""
+    basename = filename.split(os.extsep, 1)[0]
+    out_img = Nifti1Image(img, affine=affine)
+    out_path = basename + '_gramag.nii.gz'
+    save(out_img, out_path)
+    print('Gradient magnitude image exported in this path:\n' + out_path)
