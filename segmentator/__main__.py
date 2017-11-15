@@ -68,6 +68,10 @@ def main():
         "--include_zeros", action='store_true',
         help="Include image zeros in histograms. Not used by default."
         )
+    parser.add_argument(
+        "--export_gramag", action='store_true',
+        help="Export the gradient magnitude image. Not used by default."
+        )
 
     # used in ncut preparation  (TODO: not yet tested after restructuring.)
     parser.add_argument(
@@ -113,6 +117,7 @@ def main():
     cfg.cbar_init = args.cbar_init
     if args.include_zeros:
         cfg.discard_zeros = False
+    cfg.export_gramag = args.export_gramag
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec

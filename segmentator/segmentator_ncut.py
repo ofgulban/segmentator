@@ -30,6 +30,7 @@ from nibabel import load
 from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
 from segmentator.utils import truncate_range, scale_range
 from segmentator.utils import set_gradient_magnitude
+from segmentator.utils import export_gradient_magnitude_image
 from gui_utils import responsiveObj
 
 # %%
@@ -74,6 +75,8 @@ orig_range = [pMin, pMax]
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
+if cfg.export_gramag:
+    export_gradient_magnitude_image(gra, nii.get_filename(), nii.affine)
 
 # reshape ima (more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(orig)
