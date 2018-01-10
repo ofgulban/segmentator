@@ -37,7 +37,7 @@ def main():
     parser.add_argument(
         "--scale", metavar=str(cfg.scale), required=False, type=float,
         default=cfg.scale,
-        help="Data is scaled from 0 to this number."
+        help="Determines nr of bins. Data is scaled between 0 to this number."
         )
     parser.add_argument(
         "--percmin", metavar=str(cfg.perc_min), required=False, type=float,
