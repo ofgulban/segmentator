@@ -9,14 +9,12 @@ init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
 
 install:
-  - pip install -U pytest
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - "conda env create --force -f environment.yml python=2.7"
   - activate segmentator
-  - pytest --version
   - python setup.py develop
 
 test_script:
-  - py.test
+  - python -m pytest
