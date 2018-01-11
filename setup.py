@@ -11,7 +11,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='segmentator',
-      version='1.3.0',
+      version='1.4.0',
       description=('Multi-dimensional data exploration and segmentation for 3D \
                    images.'),
       url='https://github.com/ofgulban/segmentator',
