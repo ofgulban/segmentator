@@ -17,4 +17,5 @@ install:
   - python setup.py develop
 
 test_script:
+  - activate segmentator
   - py.test
