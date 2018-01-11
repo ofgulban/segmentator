@@ -120,7 +120,7 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
 
     """
     if discard_zeros:
-        msk = ~np.isclose(data, 0)
+        msk = ~np.isclose(data, 0.)
         pMin, pMax = np.nanpercentile(data[msk], [percMin, percMax])
     else:
         pMin, pMax = np.nanpercentile(data, [percMin, percMax])

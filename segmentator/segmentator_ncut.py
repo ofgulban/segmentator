@@ -33,9 +33,8 @@ from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
 from gui_utils import responsiveObj
 
-# %%
-"""Load Data"""
 #
+"""Load Data"""
 nii = load(cfg.filename)
 ncut_labels = np.load(cfg.ncut)
 
@@ -64,7 +63,7 @@ orig_ncut_labels = ncut_labels.copy()
 ima_ncut_labels = ncut_labels.copy()
 
 
-# %%
+#
 """Data Processing"""
 orig = np.squeeze(nii.get_data())
 dims = orig.shape
@@ -78,11 +77,11 @@ gra = set_gradient_magnitude(orig, cfg.gramag)
 if cfg.export_gramag:
     export_gradient_magnitude_image(gra, nii.get_filename(), nii.affine)
 
-# reshape ima (more intuitive for voxel-wise operations)
+# Reshape ima (more intuitive for voxel-wise operations)
 ima = np.ndarray.flatten(orig)
 gra = np.ndarray.flatten(gra)
 
-# %%
+#
 """Plots"""
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
@@ -97,7 +96,7 @@ ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
 
-# plot map for poltical borders
+# Plot map for poltical borders
 pltMap = np.zeros((nr_bins, nr_bins, 1)).repeat(4, 2)
 cmapPltMap = ListedColormap([[1, 1, 1, 0],  # transparent zeros
                              [0, 0, 0, 0.75],  # political borders
@@ -109,7 +108,7 @@ pltMapH = ax.imshow(pltMap, cmap=cmapPltMap, norm=normPltMap,
                     vmin=boundsPltMap[1], vmax=boundsPltMap[-1],
                     extent=[0, nr_bins, nr_bins, 0], interpolation='none')
 
-# plot colorbar for 2d hist
+# Plot colorbar for 2d hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
 fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical perfect scaling
 
@@ -117,7 +116,7 @@ fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical perfect scaling
 ncut_palette = plt.cm.gist_rainbow
 ncut_palette.set_under('w', 0)
 
-# plot hist mask (with ncut labels)
+# Plot hist mask (with ncut labels)
 volHistMask = np.squeeze(ncut_labels[:, :, 0])
 volHistMaskH = ax.imshow(volHistMask, interpolation='none',
                          alpha=0.2, cmap=ncut_palette,
@@ -125,7 +124,7 @@ volHistMaskH = ax.imshow(volHistMask, interpolation='none',
                          vmax=lMax,
                          extent=[0, nr_bins, nr_bins, 0])
 
-# plot 3D ima by default
+# Plot 3D ima by default
 ax2 = fig.add_subplot(122)
 sliceNr = int(0.5*dims[2])
 imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray,
@@ -137,7 +136,7 @@ imaSlcMskH = ax2.imshow(imaSlcMsk, interpolation='none', alpha=0.5,
                         vmax=lMax,
                         extent=[0, dims[1], dims[0], 0])
 
-# adjust subplots on figure
+# Adjust subplots on figure
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
 fig.canvas.set_window_title(nii.get_filename())
@@ -146,7 +145,7 @@ plt.axis('off')
 
 # %%
 """Initialisation"""
-# initiate a flexible figure object, pass to it usefull properties
+# Initiate a flexible figure object, pass to it usefull properties
 flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         segmType='ncut', orig=orig, nii=nii, ima=ima,
                         nrBins=nr_bins,
@@ -162,9 +161,9 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
                         lMax=lMax)
 
-# make the figure responsive to clicks
+# Make the figure responsive to clicks
 flexFig.connect()
-# get mapping from image slice to volume histogram
+# Get mapping from image slice to volume histogram
 ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 
@@ -172,49 +171,49 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 """Sliders and Buttons"""
 axcolor, hovcolor = '0.875', '0.975'
 
-# radio buttons (ugly but good enough for now)
+# Radio buttons (ugly but good enough for now)
 rax = plt.axes([0.91, 0.35, 0.08, 0.5], facecolor=(0.75, 0.75, 0.75))
 flexFig.radio = RadioButtons(rax, [str(i) for i in range(7)],
                              activecolor=(0.25, 0.25, 0.25))
 
-# colorbar slider
+# Colorbar slider
 axHistC = plt.axes([0.15, bottom-0.230, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
 
-# label slider
+# Label slider
 axLabels = plt.axes([0.15, bottom-0.270, 0.25, 0.025], facecolor=axcolor)
 flexFig.sLabelNr = Slider(axLabels, 'Labels', 0, lMax,
                           valinit=lMax, valfmt='%i')
 
-# ima browser slider
+# Image browser slider
 axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999,
                           valinit=0.5, valfmt='%0.3f')
 
-# cycle button
+# Cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
 flexFig.bCycle = Button(cycleax, 'Cycle\nView',
                         color=axcolor, hovercolor=hovcolor)
 flexFig.cycleCount = 0
 
-# rotate button
+# Rotate button
 rotateax = plt.axes([0.55, bottom-0.285, 0.075, 0.0375])
 flexFig.bRotate = Button(rotateax, 'Rotate',
                          color=axcolor, hovercolor=hovcolor)
 flexFig.rotationCount = 0
 
-# export nii button
+# Export nii button
 exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
 flexFig.bExport = Button(exportax, 'Export\nNifti',
                          color=axcolor, hovercolor=hovcolor)
 
-# export nyp button
+# Export nyp button
 exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
 flexFig.bExportNyp = Button(exportax, 'Export\nHist',
                             color=axcolor, hovercolor=hovcolor)
 
-# reset button
+# Reset button
 resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
 flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
 

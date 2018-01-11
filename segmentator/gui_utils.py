@@ -149,7 +149,7 @@ class responsiveObj:
         pixel_x = int(np.floor(event.xdata))
         pixel_y = int(np.floor(event.ydata))
         aoi = self.invHistVolume[:, :, self.sliceNr]  # array of interest
-        # Check rotation (TODO: code repetition!)
+        # Check rotation
         cyc_rot = self.cycRotHistory[self.cycleCount][1]
         if cyc_rot == 1:  # 90
             aoi = np.rot90(aoi, axes=(0, 1))
