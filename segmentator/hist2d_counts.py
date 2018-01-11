@@ -44,4 +44,4 @@ outName = (basename + '_volHist'
            )
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
-print '----Image saved as:\n ' + outName
+print('----Image saved as:\n ' + outName)

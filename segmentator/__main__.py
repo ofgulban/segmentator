@@ -132,13 +132,13 @@ def main():
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print '--No GUI option is selected. Saving 2D histogram image...'
+        print('--No GUI option is selected. Saving 2D histogram image...')
         import hist2d_counts
     elif args.ncut_prepare:
-        print '--Preparing N-cut related files...'
+        print('--Preparing N-cut related files...')
         import ncut_prepare
     elif args.ncut:
-        print '--Experimental N-cut feature is selected.'
+        print('--Experimental N-cut feature is selected.')
         import segmentator_ncut
     else:
         import segmentator_main

@@ -54,9 +54,9 @@ gra_z = deriche_3D(data_t2, alpha=alpha)
 gra_z = np.transpose(gra_z, (2, 0, 1))
 
 end = time.time()
-print 'Gradients are computed in:', (end - start), 'seconds'
+print('Gradients are computed in:', (end - start), 'seconds')
 
-print 'Saving the gradient magnitude image.'
+print('Saving the gradient magnitude image.')
 # put the data in 4D format and save
 temp = np.array([gra_x, gra_y, gra_z])
 temp = np.transpose(temp, (1, 2, 3, 0))
@@ -71,4 +71,4 @@ out = Nifti1Image(graMag, affine=nii.get_affine())
 outName = basename+'_deriche_a' + str(alpha) + '_graMag'
 outName = outName.replace('.', 'pt')
 save(out, outName + '.nii.gz')
-print 'Saved as:', outName
+print('Saved as:', outName)

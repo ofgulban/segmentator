@@ -195,7 +195,7 @@ class responsiveObj:
                     if self.ctrlHeld is False:  # ctrl no
                         contains = self.contains(event)
                         if not contains:
-                            print 'cursor outside circle mask'
+                            print('cursor outside circle mask')
                         if not contains:
                             return
                         # get sector centre x and y positions
@@ -249,12 +249,12 @@ class responsiveObj:
                     # the first click the entire field constitutes the subfield
                     counter = int(self.counterField[ybin][xbin])
                     if counter+1 >= self.ima_ncut_labels.shape[2]:
-                        print "already at maximum ncut dimension"
+                        print("already at maximum ncut dimension")
                         return
                     self.counterField[(
                         self.ima_ncut_labels[:, :, counter] ==
                         self.ima_ncut_labels[[ybin], [xbin], counter])] += 1
-                    print "counter:" + str(counter+1)
+                    print("counter:" + str(counter+1))
                     # define arrays with old and new labels for later indexing
                     oLabels = self.ima_ncut_labels[:, :, counter]
                     nLabels = self.ima_ncut_labels[:, :, counter+1]
@@ -387,7 +387,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
-        print "start exporting labels..."
+        print("Start exporting labels...")
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -419,8 +419,8 @@ class responsiveObj:
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
-        print "successfully exported image labels as: \n" + \
-            self.basename + self.flexfilename
+        print("successfully exported image labels as: \n"
+              + self.basename + self.flexfilename)
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""
@@ -500,14 +500,14 @@ class responsiveObj:
             outFileName = outFileName.replace('identifier', 'volHistLabels')
             outFileName = outFileName.replace('.', 'pt')
             np.save(outFileName, self.volHistMask)
-            print "successfully exported histogram colors as: \n" + \
-                outFileName
+            print("Successfully exported histogram colors as: \n"
+                  + outFileName)
         elif self.segmType == 'main':
             outFileName = outFileName.replace('identifier', 'volHist')
             outFileName = outFileName.replace('.', 'pt')
             np.save(outFileName, self.counts)
-            print "successfully exported histogram counts as: \n" + \
-                outFileName
+            print("successfully exported histogram counts as: \n"
+                  + outFileName)
         else:
             return
 
