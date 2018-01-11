@@ -2,7 +2,7 @@
 
 # Segmentator
 
-<img src="logo/logo.png" width=420 align="right" />
+<img src="visuals/logo.png" width=420 align="right" />
 
 Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation for 3D images. This application is mainly developed and tested using ultra-high field magnetic resonance imaging (MRI) brain data.
 
@@ -12,6 +12,8 @@ The goal is to provide a complementary tool to the already available brain tissu
 ### Citation:
 - Our preprint can be accessed from __[this link.](http://biorxiv.org/cgi/content/short/245738v1)__
 - Released versions of this package can be cited by using our __[Zenodo DOI](https://zenodo.org/badge/latestdoi/59303623).__
+
+<img src="visuals/animation_01.gif" width=840 align="center" />
 
 ## Core dependencies
 [**Python 2.7**](https://www.python.org/download/releases/2.7/)
