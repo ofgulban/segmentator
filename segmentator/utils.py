@@ -75,23 +75,25 @@ def map_2D_hist_to_ima(imaSlc2volHistMap, volHistMask):
 
     Parameters
     ----------
-    imaSlc2volHistMap : TODO
-    volHistMask : TODO
+    imaSlc2volHistMap : 1D numpy array
+        Flattened image slice.
+    volHistMask : 1D numpy array
+        Flattened volume histogram mask.
 
     Returns
     -------
-    imaSlcMask :  TODO
+    imaSlcMask : 1D numpy array
+        Flat image slice mask based on labeled pixels in volume histogram.
 
     """
-    imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
+    imaSlcMask = np.zeros(imaSlc2volHistMap.shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:
         linIndices = np.where(volHistMask.flatten() == idx)[0]
         # return logical array with length equal to nr of voxels
-        voxMask = np.in1d(imaSlc2volHistMap.flatten(), linIndices)
+        voxMask = np.in1d(imaSlc2volHistMap, linIndices)
         # reset mask and apply logical indexing
         imaSlcMask[voxMask] = idx
-    imaSlcMask = imaSlcMask.reshape(imaSlc2volHistMap.shape)
     return imaSlcMask
 
 

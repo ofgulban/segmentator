@@ -66,8 +66,22 @@ class responsiveObj:
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
         # histogram to image mapping
         if remap_slice:
-            self.imaSlcMsk = map_2D_hist_to_ima(
-                self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
+            temp_slice = self.invHistVolume[:, :, self.sliceNr]
+            image_slice_shape = self.invHistVolume[:, :, self.sliceNr].shape
+            if cfg.discard_zeros:
+                zmask = temp_slice != 0
+                image_slice_mask = map_2D_hist_to_ima(temp_slice[zmask],
+                                                      self.volHistMask)
+                # reshape to image slice shape
+                self.imaSlcMsk = np.zeros(image_slice_shape)
+                self.imaSlcMsk[zmask] = image_slice_mask
+            else:
+                image_slice_mask = map_2D_hist_to_ima(temp_slice.flatten(),
+                                                      self.volHistMask)
+                # reshape to image slice shape
+                self.imaSlcMsk = image_slice_mask.reshape(image_slice_shape)
+
+            # for optional border visualization
             if self.borderSwitch == 1:
                 self.imaSlcMsk = self.calcImaMaskBrd()
 
@@ -384,11 +398,19 @@ class responsiveObj:
         for label, newLabel in zip(labels, intLabels):
             out_volHistMask[out_volHistMask == label] = intLabels[newLabel]
         # get 3D brain mask
-        temp = np.transpose(self.invHistVolume, cycBackPerm)
-        outNii = map_2D_hist_to_ima(temp, out_volHistMask)
-        outNii = outNii.reshape(temp.shape)
+        volume_image = np.transpose(self.invHistVolume, cycBackPerm)
+        if cfg.discard_zeros:
+            zmask = volume_image != 0
+            temp_labeled_image = map_2D_hist_to_ima(volume_image[zmask],
+                                                    out_volHistMask)
+            out_nii = np.zeros(volume_image.shape)
+            out_nii[zmask] = temp_labeled_image  # put back flat labels
+        else:
+            out_nii = map_2D_hist_to_ima(volume_image.flatten(),
+                                         out_volHistMask)
+            out_nii = out_nii.reshape(volume_image.shape)
         # save mask image as nii
-        new_image = Nifti1Image(outNii, header=self.nii.get_header(),
+        new_image = Nifti1Image(out_nii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
         self.nrExports = 0
