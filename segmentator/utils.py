@@ -265,7 +265,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         derived from the first image
 
     """
-    if method.lower == 'sobel':  # magnitude scale is similar to numpy method
+    if method.lower() == 'sobel':  # magnitude scale is similar to numpy method
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -273,7 +273,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method.lower == 'prewitt':
+    elif method.lower() == 'prewitt':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -281,7 +281,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method.lower == 'scharr':
+    elif method.lower() == 'scharr':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -289,7 +289,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method.lower == 'numpy':
+    elif method.lower() == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
         return gra_mag
