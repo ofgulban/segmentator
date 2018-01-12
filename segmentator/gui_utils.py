@@ -66,8 +66,22 @@ class responsiveObj:
             self.volHistMaskH.set_extent((0, self.nrBins, self.nrBins, 0))
         # histogram to image mapping
         if remap_slice:
-            self.imaSlcMsk = map_2D_hist_to_ima(
-                self.invHistVolume[:, :, self.sliceNr], self.volHistMask)
+            temp_slice = self.invHistVolume[:, :, self.sliceNr]
+            image_slice_shape = self.invHistVolume[:, :, self.sliceNr].shape
+            if cfg.discard_zeros:
+                zmask = temp_slice != 0
+                image_slice_mask = map_2D_hist_to_ima(temp_slice[zmask],
+                                                      self.volHistMask)
+                # reshape to image slice shape
+                self.imaSlcMsk = np.zeros(image_slice_shape)
+                self.imaSlcMsk[zmask] = image_slice_mask
+            else:
+                image_slice_mask = map_2D_hist_to_ima(temp_slice.flatten(),
+                                                      self.volHistMask)
+                # reshape to image slice shape
+                self.imaSlcMsk = image_slice_mask.reshape(image_slice_shape)
+
+            # for optional border visualization
             if self.borderSwitch == 1:
                 self.imaSlcMsk = self.calcImaMaskBrd()
 
@@ -149,7 +163,7 @@ class responsiveObj:
         pixel_x = int(np.floor(event.xdata))
         pixel_y = int(np.floor(event.ydata))
         aoi = self.invHistVolume[:, :, self.sliceNr]  # array of interest
-        # Check rotation (TODO: code repetition!)
+        # Check rotation
         cyc_rot = self.cycRotHistory[self.cycleCount][1]
         if cyc_rot == 1:  # 90
             aoi = np.rot90(aoi, axes=(0, 1))
@@ -181,7 +195,7 @@ class responsiveObj:
                     if self.ctrlHeld is False:  # ctrl no
                         contains = self.contains(event)
                         if not contains:
-                            print 'cursor outside circle mask'
+                            print('cursor outside circle mask')
                         if not contains:
                             return
                         # get sector centre x and y positions
@@ -235,12 +249,12 @@ class responsiveObj:
                     # the first click the entire field constitutes the subfield
                     counter = int(self.counterField[ybin][xbin])
                     if counter+1 >= self.ima_ncut_labels.shape[2]:
-                        print "already at maximum ncut dimension"
+                        print("already at maximum ncut dimension")
                         return
                     self.counterField[(
                         self.ima_ncut_labels[:, :, counter] ==
                         self.ima_ncut_labels[[ybin], [xbin], counter])] += 1
-                    print "counter:" + str(counter+1)
+                    print("counter:" + str(counter+1))
                     # define arrays with old and new labels for later indexing
                     oLabels = self.ima_ncut_labels[:, :, counter]
                     nLabels = self.ima_ncut_labels[:, :, counter+1]
@@ -373,7 +387,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
-        print "start exporting labels..."
+        print("Start exporting labels...")
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -384,11 +398,19 @@ class responsiveObj:
         for label, newLabel in zip(labels, intLabels):
             out_volHistMask[out_volHistMask == label] = intLabels[newLabel]
         # get 3D brain mask
-        temp = np.transpose(self.invHistVolume, cycBackPerm)
-        outNii = map_2D_hist_to_ima(temp, out_volHistMask)
-        outNii = outNii.reshape(temp.shape)
+        volume_image = np.transpose(self.invHistVolume, cycBackPerm)
+        if cfg.discard_zeros:
+            zmask = volume_image != 0
+            temp_labeled_image = map_2D_hist_to_ima(volume_image[zmask],
+                                                    out_volHistMask)
+            out_nii = np.zeros(volume_image.shape)
+            out_nii[zmask] = temp_labeled_image  # put back flat labels
+        else:
+            out_nii = map_2D_hist_to_ima(volume_image.flatten(),
+                                         out_volHistMask)
+            out_nii = out_nii.reshape(volume_image.shape)
         # save mask image as nii
-        new_image = Nifti1Image(outNii, header=self.nii.get_header(),
+        new_image = Nifti1Image(out_nii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
         self.nrExports = 0
@@ -397,8 +419,8 @@ class responsiveObj:
             self.nrExports += 1
             self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
         save(new_image, self.basename + self.flexfilename)
-        print "successfully exported image labels as: \n" + \
-            self.basename + self.flexfilename
+        print("successfully exported image labels as: \n"
+              + self.basename + self.flexfilename)
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""
@@ -478,14 +500,14 @@ class responsiveObj:
             outFileName = outFileName.replace('identifier', 'volHistLabels')
             outFileName = outFileName.replace('.', 'pt')
             np.save(outFileName, self.volHistMask)
-            print "successfully exported histogram colors as: \n" + \
-                outFileName
+            print("Successfully exported histogram colors as: \n"
+                  + outFileName)
         elif self.segmType == 'main':
             outFileName = outFileName.replace('identifier', 'volHist')
             outFileName = outFileName.replace('.', 'pt')
             np.save(outFileName, self.counts)
-            print "successfully exported histogram counts as: \n" + \
-                outFileName
+            print("successfully exported histogram counts as: \n"
+                  + outFileName)
         else:
             return
 
@@ -655,14 +677,9 @@ class sector_mask:
 
     def draw(self, ax, cmap='Reds', alpha=0.2, vmin=0.1,
              interpolation='nearest', origin='lower', extent=[0, 100, 0, 100]):
-        """Draw stuff."""
+        """Draw sector mask."""
         BinMask = self.binaryMask()
-        FigObj = ax.imshow(
-            BinMask,
-            cmap=cmap,
-            alpha=alpha,
-            vmin=vmin,
-            interpolation=interpolation,
-            origin=origin,
-            extent=extent)
+        FigObj = ax.imshow(BinMask, cmap=cmap, alpha=alpha, vmin=vmin,
+                           interpolation=interpolation, origin=origin,
+                           extent=extent)
         return (FigObj, BinMask)

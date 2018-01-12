@@ -29,7 +29,7 @@ basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # data processing
 orig = np.squeeze(nii.get_data())
-orig = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
+orig, _, _ = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 
@@ -44,4 +44,4 @@ outName = (basename + '_volHist'
            )
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
-print '----Image saved as:\n ' + outName
+print('----Image saved as:\n ' + outName)

@@ -7,21 +7,19 @@ Use config.py to hold arguments to be accessed by imported scripts.
 
 TODO: Argument parsing can be better structured, maybe by using parents. help
 looks a bit messy as is.
-
 """
 
-import sys
 import argparse
 import config as cfg
 from segmentator import __version__
 
 
-def main(args=None):
+def main():
     """Command line call argument parsing."""
-    if args is None:
-        args = sys.argv[1:]
-    # Main arguments
+    # Instantiate argument parser object:
     parser = argparse.ArgumentParser()
+
+    # Add arguments to namespace:
     parser.add_argument(
         'filename', metavar='path',
         help="Path to input. Mostly a nifti file with image data."
@@ -39,7 +37,7 @@ def main(args=None):
     parser.add_argument(
         "--scale", metavar=str(cfg.scale), required=False, type=float,
         default=cfg.scale,
-        help="Data is scaled from 0 to this number."
+        help="Determines nr of bins. Data is scaled between 0 to this number."
         )
     parser.add_argument(
         "--percmin", metavar=str(cfg.perc_min), required=False, type=float,
@@ -69,6 +67,10 @@ def main(args=None):
     parser.add_argument(
         "--include_zeros", action='store_true',
         help="Include image zeros in histograms. Not used by default."
+        )
+    parser.add_argument(
+        "--export_gramag", action='store_true',
+        help="Export the gradient magnitude image. Not used by default."
         )
 
     # used in ncut preparation  (TODO: not yet tested after restructuring.)
@@ -115,6 +117,7 @@ def main(args=None):
     cfg.cbar_init = args.cbar_init
     if args.include_zeros:
         cfg.discard_zeros = False
+    cfg.export_gramag = args.export_gramag
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec
@@ -129,13 +132,13 @@ def main(args=None):
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print '--No GUI option is selected. Saving 2D histogram image...'
+        print('--No GUI option is selected. Saving 2D histogram image...')
         import hist2d_counts
     elif args.ncut_prepare:
-        print '--Preparing N-cut related files...'
+        print('--Preparing N-cut related files...')
         import ncut_prepare
     elif args.ncut:
-        print '--Experimental N-cut feature is selected.'
+        print('--Experimental N-cut feature is selected.')
         import segmentator_ncut
     else:
         import segmentator_main

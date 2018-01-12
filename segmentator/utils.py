@@ -17,11 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
+import os
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 import config as cfg
-from nibabel import load
+from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
 
 
@@ -74,23 +75,25 @@ def map_2D_hist_to_ima(imaSlc2volHistMap, volHistMask):
 
     Parameters
     ----------
-    imaSlc2volHistMap : TODO
-    volHistMask : TODO
+    imaSlc2volHistMap : 1D numpy array
+        Flattened image slice.
+    volHistMask : 1D numpy array
+        Flattened volume histogram mask.
 
     Returns
     -------
-    imaSlcMask :  TODO
+    imaSlcMask : 1D numpy array
+        Flat image slice mask based on labeled pixels in volume histogram.
 
     """
-    imaSlcMask = np.zeros(imaSlc2volHistMap.flatten().shape)
+    imaSlcMask = np.zeros(imaSlc2volHistMap.shape)
     idxUnique = np.unique(volHistMask)
     for idx in idxUnique:
         linIndices = np.where(volHistMask.flatten() == idx)[0]
         # return logical array with length equal to nr of voxels
-        voxMask = np.in1d(imaSlc2volHistMap.flatten(), linIndices)
+        voxMask = np.in1d(imaSlc2volHistMap, linIndices)
         # reset mask and apply logical indexing
         imaSlcMask[voxMask] = idx
-    imaSlcMask = imaSlcMask.reshape(imaSlc2volHistMap.shape)
     return imaSlcMask
 
 
@@ -111,10 +114,15 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     Returns
     -------
     data : np.ndarray
+        Truncated data.
+    pMin : float
+        Minimum truncation threshold which is used.
+    pMax : float
+        Maximum truncation threshold which is used.
 
     """
     if discard_zeros:
-        msk = ~np.isclose(data, 0)
+        msk = ~np.isclose(data, 0.)
         pMin, pMax = np.nanpercentile(data[msk], [percMin, percMax])
     else:
         pMin, pMax = np.nanpercentile(data, [percMin, percMax])
@@ -123,7 +131,7 @@ def truncate_range(data, percMin=0.25, percMax=99.75, discard_zeros=True):
     data[~np.isnan(data)] = temp
     if discard_zeros:
         data[~msk] = 0  # put back masked out voxels
-    return data
+    return data, pMin, pMax
 
 
 def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
@@ -257,7 +265,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         derived from the first image
 
     """
-    if method == 'sobel':  # magnitude scale is similar to numpy method
+    if method.lower() == 'sobel':  # magnitude scale is similar to numpy method
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -265,7 +273,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == 'prewitt':
+    elif method.lower() == 'prewitt':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -273,7 +281,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == 'scharr':
+    elif method.lower() == 'scharr':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
@@ -281,12 +289,12 @@ def compute_gradient_magnitude(ima, method='scharr'):
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
         return gra_mag
-    elif method == 'numpy':
+    elif method.lower() == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
         return gra_mag
     else:
-        print 'Gradient magnitude method is invalid!'
+        print('Gradient magnitude method is invalid!')
 
 
 def set_gradient_magnitude(image, gramag_option):
@@ -464,3 +472,12 @@ def aniso_diff_3D(stack, niter=1, kappa=50, gamma=0.1, step=(1., 1., 1.),
                     # sleep(0.01)
 
     return stackout
+
+
+def export_gradient_magnitude_image(img, filename, affine):
+    """Export computed gradient magnitude image as a nifti file."""
+    basename = filename.split(os.extsep, 1)[0]
+    out_img = Nifti1Image(img, affine=affine)
+    out_path = basename + '_gramag.nii.gz'
+    save(out_img, out_path)
+    print('Gradient magnitude image exported in this path:\n' + out_path)

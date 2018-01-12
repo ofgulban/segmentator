@@ -2,12 +2,18 @@
 
 # Segmentator
 
-<img src="logo/logo.png" width=420 align="right" />
+<img src="visuals/logo.png" width=420 align="right" />
 
 Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation for 3D images. This application is mainly developed and tested using ultra-high field magnetic resonance imaging (MRI) brain data.
 
 
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, itk-SNAP, etc.).
+
+### Citation:
+- Our preprint can be accessed from __[this link.](http://biorxiv.org/cgi/content/short/245738v1)__
+- Released versions of this package can be cited by using our __[Zenodo DOI](https://zenodo.org/badge/latestdoi/59303623).__
+
+<img src="visuals/animation_01.gif" width=840 align="center" />
 
 ## Core dependencies
 [**Python 2.7**](https://www.python.org/download/releases/2.7/)
@@ -43,7 +49,7 @@ segmentator /path/to/file.nii.gz
 segmentator --help
 ```
 
-Visit [our wiki](https://github.com/ofgulban/segmentator/wiki/Installation) to see alternative installation methods.
+Check out __[our wiki](https://github.com/ofgulban/segmentator/wiki)__ for further details such as [GUI controls](https://github.com/ofgulban/segmentator/wiki/Controls), [alternative installation methods](https://github.com/ofgulban/segmentator/wiki/Installation) and more...
 
 ## Support
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
