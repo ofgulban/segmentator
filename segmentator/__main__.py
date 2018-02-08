@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Entry point.
 
 Mostly following this example:
