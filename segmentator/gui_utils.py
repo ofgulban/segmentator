@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Functions covering the user interaction with the GUI."""
 
 # Part of the Segmentator library

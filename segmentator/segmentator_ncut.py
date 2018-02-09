@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Processing input and plotting, for experimental ncut feature.
 
 Lots of code repetition, will be integrated better in the future.
@@ -23,6 +24,8 @@ Lots of code repetition, will be integrated better in the future.
 from __future__ import division
 import numpy as np
 import config as cfg
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm, ListedColormap, BoundaryNorm
 from matplotlib.widgets import Slider, Button, RadioButtons

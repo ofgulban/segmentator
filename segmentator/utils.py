@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Some utility functions."""
 
 # Part of the Segmentator library

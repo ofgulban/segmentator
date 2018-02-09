@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Save 2D histogram image without displaying GUI."""
 
 # Part of the Segmentator library

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Processing input and plotting."""
 
 # Part of the Segmentator library
@@ -20,6 +21,8 @@
 from __future__ import division
 import numpy as np
 import config as cfg
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Normalized graph cuts for segmentator (experimental).
 
 TODO: Replacing the functionality using scikit-learn?
