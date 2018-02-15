@@ -475,10 +475,10 @@ def aniso_diff_3D(stack, niter=1, kappa=50, gamma=0.1, step=(1., 1., 1.),
     return stackout
 
 
-def export_gradient_magnitude_image(img, filename, affine):
+def export_gradient_magnitude_image(img, filename, filtername, affine):
     """Export computed gradient magnitude image as a nifti file."""
     basename = filename.split(os.extsep, 1)[0]
     out_img = Nifti1Image(img, affine=affine)
-    out_path = basename + '_gramag.nii.gz'
+    out_path = basename + '_GraMag' + filtername.title() + '.nii.gz'
     save(out_img, out_path)
     print('Gradient magnitude image exported in this path:\n' + out_path)

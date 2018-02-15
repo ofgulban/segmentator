@@ -47,8 +47,8 @@ orig_range = [pMin, pMax]
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 if cfg.export_gramag:
-    export_gradient_magnitude_image(gra, nii.get_filename(), nii.affine)
-
+    export_gradient_magnitude_image(gra, nii.get_filename(), cfg.gramag,
+                                    nii.affine)
 # Reshape for voxel-wise operations
 ima = np.copy(orig.flatten())
 gra = gra.flatten()
