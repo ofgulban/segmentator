@@ -12,6 +12,7 @@ looks a bit messy as is.
 
 import argparse
 import config as cfg
+import segmentator
 
 
 def main():

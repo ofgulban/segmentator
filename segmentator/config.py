@@ -21,7 +21,7 @@ discard_zeros = True
 export_gramag = False
 
 # possible gradient magnitude computation keyword options
-gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy']
+gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy', 'deriche']
 
 # used in segmentator ncut
 ncut = False

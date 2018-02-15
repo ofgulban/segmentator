@@ -29,46 +29,54 @@ import time
 
 print('-------------------------')
 print('Deriche filter initiated.')
-start = time.time()
 
-for alpha in cfg.deriche_alpha:
-    print('  Computing gradients for alpha: ' + str(alpha))
-    nii = load(cfg.filename)
-    basename = nii.get_filename().split(os.extsep, 1)[0]
-    data = nii.get_data()
-    data = np.ascontiguousarray(data, dtype=np.float32)
 
+def Deriche_Gradient_Magnitude(image, alpha, return_gradients=False):
+    """Compute Deriche gradient magnitude of a volumetric image."""
+    start = time.time()
+    print('  Computing gradients with alpha: ' + str(alpha))
     # calculate gradients
     print("  .")
-    gra_x = deriche_3D(data, alpha=alpha)
+    gra_x = deriche_3D(image, alpha=alpha)
 
     print("  .")
-    data = np.transpose(data, (2, 0, 1))
-    data_t1 = np.ascontiguousarray(data, dtype=np.float32)
+    image = np.transpose(image, (2, 0, 1))
+    data_t1 = np.ascontiguousarray(image, dtype=np.float32)
     gra_y = deriche_3D(data_t1, alpha=alpha)
     gra_y = np.transpose(gra_y, (1, 2, 0))
 
     print("  .")
-    data = np.transpose(data, (2, 0, 1))
-    data_t2 = np.ascontiguousarray(data, dtype=np.float32)
+    image = np.transpose(image, (2, 0, 1))
+    data_t2 = np.ascontiguousarray(image, dtype=np.float32)
     gra_z = deriche_3D(data_t2, alpha=alpha)
     gra_z = np.transpose(gra_z, (2, 0, 1))
 
     end = time.time()
-    print('  Gradients are computed in: ' + str(int(end-start)) + ' seconds.')
-
+    print("  Gradients are computed in: " + str(int(end-start)) + " seconds.")
     print("  Saving the gradient magnitude image...")
-    # put the data in 4D format and save
-    temp = np.array([gra_x, gra_y, gra_z])
-    temp = np.transpose(temp, (1, 2, 3, 0))
-    # out = Nifti1Image(temp, affine=nii.get_affine())
-    # save(out, basename+'_deriche_a' + str(alpha) + '.nii.gz')
+
+    # Put the image gradients in 4D format
+    gradients = np.array([gra_x, gra_y, gra_z])
+    gradients = np.transpose(gradients, (1, 2, 3, 0))
 
     # Deriche gradient magnitude
-    graMag = np.sqrt(np.power(temp[:, :, :, 0], 2) +
-                     np.power(temp[:, :, :, 1], 2) +
-                     np.power(temp[:, :, :, 2], 2))
-    out = Nifti1Image(graMag, affine=nii.get_affine())
+    gra_mag = np.sqrt(np.power(gradients[:, :, :, 0], 2.0) +
+                      np.power(gradients[:, :, :, 1], 2.0) +
+                      np.power(gradients[:, :, :, 2], 2.0))
+    return gra_mag
+
+
+for alpha in cfg.deriche_alpha:
+    # Load nifti
+    nii = load(cfg.filename)
+    basename = nii.get_filename().split(os.extsep, 1)[0]
+    image = nii.get_data()
+    image = np.ascontiguousarray(image, dtype=np.float32)
+
+    # Compute gradient magnitude image with Deriche filter
+    gra_mag = Deriche_Gradient_Magnitude(image, alpha=alpha)
+
+    out = Nifti1Image(gra_mag, affine=nii.get_affine())
     outName = basename+'_deriche_a' + str(alpha) + '_graMag'
     outName = outName.replace('.', 'pt')
     save(out, outName + '.nii.gz')
