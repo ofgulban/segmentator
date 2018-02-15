@@ -7,6 +7,7 @@ https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-
 Use config.py to hold arguments to be accessed by imported scripts.
 """
 
+from __future__ import print_function
 import argparse
 import segmentator.config as cfg
 from segmentator import __version__
@@ -114,11 +115,12 @@ def main():
               Use this flag with the following arguments:")
         )
     parser.add_argument(
-        "--der_alpha", required=False, type=float,
+        "--deriche_alpha", required=False, type=float,
         default=cfg.deriche_alpha, metavar=cfg.deriche_alpha, nargs='+',
         help="This parameter controls smoothness of the Deriche filter \
         gradients, lower is smoother. Multiple numbers can be passed \
-        (i.e --der_alpha_list 0.5 1.0 2.0)"
+        when used in combination with '--deriche_prepare' flag \
+        (i.e --deriche_prepare --deriche_alpha 0.5 1.0 2.0)"
         )
 
     # set cfg file variables to be accessed from other scripts
@@ -144,7 +146,7 @@ def main():
     # used in ncut
     cfg.ncut = args.ncut
     # used in deriche filter
-    cfg.deriche_alpha = args.der_alpha
+    cfg.deriche_alpha = args.deriche_alpha
 
     welcome_str = 'Segmentator ' + __version__
     welcome_decoration = '=' * len(welcome_str)
@@ -161,7 +163,8 @@ def main():
         print('--Experimental N-cut feature is selected.')
         import segmentator.segmentator_ncut
     elif args.deriche_prepare:
-        import segmentator.deriche_prepare
+        from segmentator.deriche_prepare import export_deriche_gramag
+        export_deriche_gramag()
     else:
         import segmentator.segmentator_main
 

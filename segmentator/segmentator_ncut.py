@@ -21,7 +21,7 @@ TODO: Lots of code repetition, will be integrated better in the future.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
 import segmentator.config as cfg
 import matplotlib
@@ -69,10 +69,9 @@ ima_ncut_labels = ncut_labels.copy()
 #
 """Data Processing"""
 orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
+# Save min and max truncation thresholds to be used in axis labels
 orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
                                   percMax=cfg.perc_max)
-# Save min and max truncation thresholds to be used in axis labels
-orig_range = [pMin, pMax]
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
@@ -237,10 +236,10 @@ flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
 def update_axis_labels(event):
     """Swap histogram bin indices with original values."""
     xlabels = [item.get_text() for item in ax.get_xticklabels()]
-    orig_range_labels = np.linspace(orig_range[0], orig_range[1], len(xlabels))
+    orig_range_labels = np.linspace(pMin, pMax, len(xlabels))
 
     # Adjust displayed decimals based on data range
-    data_range = orig_range[1] - orig_range[0]
+    data_range = pMax - pMin
     if data_range > 200:  # arbitrary value
         xlabels = [('%i' % i) for i in orig_range_labels]
     elif data_range > 20:

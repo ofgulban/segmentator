@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+from __future__ import division, print_function
 import os
 import numpy as np
 import warnings
@@ -26,6 +26,7 @@ import segmentator.config as cfg
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
 from time import time
+from segmentator.deriche_prepare import Deriche_Gradient_Magnitude
 
 
 def sub2ind(array_shape, rows, cols):
@@ -306,6 +307,14 @@ def compute_gradient_magnitude(ima, method='scharr'):
     elif method.lower() == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
+    elif method.lower() == 'deriche':
+        if len(cfg.deriche_alpha) > 1:  # TODO: may have multiple in the future
+            print("    Multiple alpha values detected, using the first one.")
+        alpha = cfg.deriche_alpha[0]
+        print('    Selected alpha: ' + str(alpha)
+              + ' (smaller values give smoother gradient estimates)')
+        ima = np.ascontiguousarray(ima, dtype=np.float32)
+        gra_mag = Deriche_Gradient_Magnitude(ima, alpha, normalize=True)
     else:
         print('  Gradient magnitude method is invalid!')
     end = time()
