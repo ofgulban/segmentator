@@ -11,7 +11,7 @@ from matplotlib import animation
 from matplotlib import pyplot as plt
 from skimage.future import graph
 from skimage.segmentation import slic
-import config as cfg
+import segmentator.config as cfg
 
 
 def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,

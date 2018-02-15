@@ -22,7 +22,7 @@ import os
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
-import config as cfg
+import segmentator.config as cfg
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
 

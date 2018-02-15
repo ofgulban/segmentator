@@ -19,7 +19,7 @@
 
 import os
 import numpy as np
-import config as cfg
+import segmentator.config as cfg
 from segmentator.utils import truncate_range, scale_range
 from segmentator.utils import set_gradient_magnitude, prep_2D_hist
 from nibabel import load

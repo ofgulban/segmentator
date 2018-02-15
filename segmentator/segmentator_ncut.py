@@ -23,7 +23,7 @@ Lots of code repetition, will be integrated better in the future.
 
 from __future__ import division
 import numpy as np
-import config as cfg
+import segmentator.config as cfg
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -34,7 +34,7 @@ from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
 from segmentator.utils import truncate_range, scale_range
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
-from gui_utils import responsiveObj
+from segmentator.gui_utils import responsiveObj
 
 #
 """Load Data"""

@@ -11,8 +11,8 @@ looks a bit messy as is.
 """
 
 import argparse
-import config as cfg
-import segmentator
+import segmentator.config as cfg
+from segmentator import __version__
 
 
 def main():
@@ -143,24 +143,24 @@ def main():
     # used in deriche filter
     cfg.deriche_alpha = args.der_alpha
 
-    welcome_str = 'Segmentator ' + segmentator.__version__
+    welcome_str = 'Segmentator ' + __version__
     welcome_decoration = '=' * len(welcome_str)
     print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
         print('--No GUI option is selected. Saving 2D histogram image...')
-        import hist2d_counts
+        import segmentator.hist2d_counts
     elif args.ncut_prepare:
         print('--Preparing N-cut related files...')
-        import ncut_prepare
+        import segmentator.ncut_prepare
     elif args.ncut:
         print('--Experimental N-cut feature is selected.')
-        import segmentator_ncut
+        import segmentator.segmentator_ncut
     elif args.deriche_prepare:
-        import deriche_prepare
+        import segmentator.deriche_prepare
     else:
-        import segmentator_main
+        import segmentator.segmentator_main
 
 
 if __name__ == "__main__":

@@ -21,9 +21,9 @@ from __future__ import division
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import map_2D_hist_to_ima
+import segmentator.config as cfg
+from segmentator.utils import map_2D_hist_to_ima
 from nibabel import save, Nifti1Image
-import config as cfg
 
 
 class responsiveObj:
@@ -31,7 +31,7 @@ class responsiveObj:
 
     def __init__(self, **kwargs):
         if kwargs is not None:
-            for key, value in kwargs.iteritems():
+            for key, value in kwargs.items():
                 setattr(self, key, value)
         self.basename = self.nii.get_filename().split(os.extsep, 1)[0]
         self.press = None
