@@ -12,7 +12,6 @@ looks a bit messy as is.
 
 import argparse
 import config as cfg
-from segmentator import __version__
 
 
 def main():
@@ -74,7 +73,7 @@ def main():
         help="Export the gradient magnitude image. Not used by default."
         )
 
-    # used in ncut preparation  (TODO: not yet tested after restructuring.)
+    # used in ncut preparation
     parser.add_argument(
         "--ncut_prepare", action='store_true',
         help=("------------------(utility feature)------------------ \
@@ -105,6 +104,20 @@ def main():
         objects in the image."
         )
 
+    # used in Deriche filter gradient magnitude computation
+    parser.add_argument(
+        "--deriche_prepare", action='store_true',
+        help=("------------------(utility feature)------------------ \
+              Use this flag with the following arguments:")
+        )
+    parser.add_argument(
+        "--der_alpha", required=False, type=float,
+        default=cfg.deriche_alpha, metavar=cfg.deriche_alpha, nargs='+',
+        help="This parameter controls smoothness of the Deriche filter \
+        gradients, lower is smoother. Multiple numbers can be passed \
+        (i.e --der_alpha_list 0.5 1.0 2.0)"
+        )
+
     # set cfg file variables to be accessed from other scripts
     args = parser.parse_args()
     # used in all
@@ -126,8 +139,10 @@ def main():
     cfg.compactness = args.ncut_compactness
     # used in ncut
     cfg.ncut = args.ncut
+    # used in deriche filter
+    cfg.deriche_alpha = args.der_alpha
 
-    welcome_str = 'Segmentator ' + __version__
+    welcome_str = 'Segmentator ' + segmentator.__version__
     welcome_decoration = '=' * len(welcome_str)
     print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
 
@@ -141,6 +156,8 @@ def main():
     elif args.ncut:
         print('--Experimental N-cut feature is selected.')
         import segmentator_ncut
+    elif args.deriche_prepare:
+        import deriche_prepare
     else:
         import segmentator_main
 
