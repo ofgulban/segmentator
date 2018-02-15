@@ -16,7 +16,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 <img src="visuals/animation_01.gif" width=840 align="center" />
 
 ## Core dependencies
-[**Python 2.7**](https://www.python.org/download/releases/2.7/)
+**[Python 2.7](https://www.python.org/download/releases/2.7/)** or **[Python 3.6](https://www.python.org/downloads/release/python-363/)** (compatible with both).
 
 | Package                              | Tested version |
 |--------------------------------------|----------------|
