@@ -2,7 +2,6 @@
 """Normalized graph cuts for segmentator (experimental).
 
 TODO: Replacing the functionality using scikit-learn?
-
 """
 
 import os

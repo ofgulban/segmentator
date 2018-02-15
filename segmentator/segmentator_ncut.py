@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Processing input and plotting, for experimental ncut feature.
 
-Lots of code repetition, will be integrated better in the future.
+TODO: Lots of code repetition, will be integrated better in the future.
 """
 
 # Part of the Segmentator library

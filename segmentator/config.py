@@ -1,6 +1,6 @@
 """This file contains variables that are shared by several modules.
 
-Also useful to hold command line arguments.
+Useful to hold command line arguments.
 
 """
 

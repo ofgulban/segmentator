@@ -1,7 +1,6 @@
 """Calculate gradient magnitude with 3D Deriche filter.
 
-This is not very well integrated into segmentator for now. Plase use --graMag
-flag with segmentator.py to load the output of this script (suffix: '_graMag').
+You can use --graMag flag to pass resulting nifti files from this script.
 """
 
 # Part of the Segmentator library

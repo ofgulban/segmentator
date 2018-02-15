@@ -5,9 +5,6 @@ Mostly following this example:
 https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-and-scripts/
 
 Use config.py to hold arguments to be accessed by imported scripts.
-
-TODO: Argument parsing can be better structured, maybe by using parents. help
-looks a bit messy as is.
 """
 
 import argparse
