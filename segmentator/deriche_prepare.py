@@ -25,15 +25,12 @@ from segmentator.deriche_3D import deriche_3D
 import os
 import numpy as np
 from nibabel import load, save, Nifti1Image
-import time
-
-print('-------------------------')
-print('Deriche filter initiated.')
+from time import time
 
 
 def Deriche_Gradient_Magnitude(image, alpha, return_gradients=False):
     """Compute Deriche gradient magnitude of a volumetric image."""
-    start = time.time()
+    start = time()
     print('  Computing gradients with alpha: ' + str(alpha))
     # calculate gradients
     print("  .")
@@ -51,7 +48,7 @@ def Deriche_Gradient_Magnitude(image, alpha, return_gradients=False):
     gra_z = deriche_3D(data_t2, alpha=alpha)
     gra_z = np.transpose(gra_z, (2, 0, 1))
 
-    end = time.time()
+    end = time()
     print("  Gradients are computed in: " + str(int(end-start)) + " seconds.")
     print("  Saving the gradient magnitude image...")
 
@@ -66,6 +63,8 @@ def Deriche_Gradient_Magnitude(image, alpha, return_gradients=False):
     return gra_mag
 
 
+print('-------------------------')
+print('Deriche filter initiated.')
 for alpha in cfg.deriche_alpha:
     # Load nifti
     nii = load(cfg.filename)

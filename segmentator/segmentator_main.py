@@ -29,7 +29,7 @@ from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from nibabel import load
 from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
-from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
 from segmentator.gui_utils import sector_mask, responsiveObj
@@ -37,8 +37,7 @@ from segmentator.gui_utils import sector_mask, responsiveObj
 #
 """Data Processing"""
 nii = load(cfg.filename)
-orig = np.squeeze(nii.get_data())
-dims = orig.shape
+orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
 orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
                                   percMax=cfg.perc_max)
 # Save min and max truncation thresholds to be used in axis labels
@@ -258,4 +257,5 @@ flexFig.remapMsks()
 flexFig.updatePanels(update_slice=True, update_rotation=False,
                      update_extent=False)
 
+print("GUI is ready.")
 plt.show()

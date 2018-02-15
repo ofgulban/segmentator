@@ -19,6 +19,7 @@ cbar_max = 5.0
 cbar_init = 3.0
 discard_zeros = True
 export_gramag = False
+force_original_precision = False
 
 # possible gradient magnitude computation keyword options
 gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy', 'deriche']

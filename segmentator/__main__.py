@@ -73,6 +73,11 @@ def main():
         "--export_gramag", action='store_true',
         help="Export the gradient magnitude image. Not used by default."
         )
+    parser.add_argument(
+        "--force_original_precision", action='store_true',
+        help="Do not change the data type of the input image. Can be useful \
+        for very large images. Off by default."
+        )
 
     # used in ncut preparation
     parser.add_argument(
@@ -133,6 +138,7 @@ def main():
     if args.include_zeros:
         cfg.discard_zeros = False
     cfg.export_gramag = args.export_gramag
+    cfg.force_original_precision = args.force_original_precision
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec

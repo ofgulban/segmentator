@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import segmentator.config as cfg
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
+from time import time
 
 
 def sub2ind(array_shape, rows, cols):
@@ -169,6 +170,19 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
     return data
 
 
+def check_data(data, force_original_precision=True):
+    """Do casting stuff here."""
+    data = np.squeeze(data)  # to prevent singular dimension error
+    dims = data.shape
+    print("Input image data type is " + data.dtype.name + '.')
+    if force_original_precision:
+        pass
+    else:
+        data = data.astype(float)
+        print("  Data type is casted to " + data.dtype.name + '.')
+    return data, dims
+
+
 def prep_2D_hist(ima, gra, discard_zeros=True):
     """Prepare 2D histogram related variables.
 
@@ -266,6 +280,8 @@ def compute_gradient_magnitude(ima, method='scharr'):
         derived from the first image
 
     """
+    start = time()
+    print('  Computing gradients...')
     if method.lower() == 'sobel':  # magnitude scale is similar to numpy method
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
@@ -273,7 +289,6 @@ def compute_gradient_magnitude(ima, method='scharr'):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
-        return gra_mag
     elif method.lower() == 'prewitt':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
@@ -281,7 +296,6 @@ def compute_gradient_magnitude(ima, method='scharr'):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
-        return gra_mag
     elif method.lower() == 'scharr':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
@@ -289,13 +303,15 @@ def compute_gradient_magnitude(ima, method='scharr'):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
-        return gra_mag
     elif method.lower() == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
-        return gra_mag
     else:
-        print('Gradient magnitude method is invalid!')
+        print('  Gradient magnitude method is invalid!')
+    end = time()
+    print("  Gradient magnitude computed in: " + str(int(end-start))
+          + " seconds.")
+    return gra_mag
 
 
 def set_gradient_magnitude(image, gramag_option):
@@ -315,6 +331,8 @@ def set_gradient_magnitude(image, gramag_option):
 
     """
     if gramag_option not in cfg.gramag_options:
+        print("Selected gradient magnitude method is not available,"
+              + " interpreting as a file path...")
         gra_mag_nii = load(gramag_option)
         gra_mag = np.squeeze(gra_mag_nii.get_data())
         gra_mag = truncate_range(gra_mag, percMin=cfg.perc_min,
@@ -322,6 +340,7 @@ def set_gradient_magnitude(image, gramag_option):
         gra_mag = scale_range(gra_mag, scale_factor=cfg.scale, delta=0.0001)
 
     else:
+        print(gramag_option.title() + ' gradient method is selected.')
         gra_mag = compute_gradient_magnitude(image, method=gramag_option)
     return gra_mag
 
