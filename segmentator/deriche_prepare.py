@@ -46,17 +46,20 @@ def Deriche_Gradient_Magnitude(image, alpha, normalize=False,
     gradients = np.array([gra_x, gra_y, gra_z])
     gradients = np.transpose(gradients, (1, 2, 3, 0))
 
-    # Deriche gradient magnitude
-    gra_mag = np.sqrt(np.power(gradients[:, :, :, 0], 2.0) +
-                      np.power(gradients[:, :, :, 1], 2.0) +
-                      np.power(gradients[:, :, :, 2], 2.0))
-    if normalize:
-        min_ima, max_ima = np.percentile(image, [0, 100])
-        min_der, max_der = np.percentile(gra_mag, [0, 100])
-        range_ima, range_der = max_ima - min_ima, max_der - min_der
+    if return_gradients:
+        return gradients
 
-        gra_mag = gra_mag * (range_ima / range_der)
-    return gra_mag
+    else:  # Deriche gradient magnitude
+        gra_mag = np.sqrt(np.power(gradients[:, :, :, 0], 2.0) +
+                          np.power(gradients[:, :, :, 1], 2.0) +
+                          np.power(gradients[:, :, :, 2], 2.0))
+        if normalize:
+            min_ima, max_ima = np.percentile(image, [0, 100])
+            min_der, max_der = np.percentile(gra_mag, [0, 100])
+            range_ima, range_der = max_ima - min_ima, max_der - min_der
+
+            gra_mag = gra_mag * (range_ima / range_der)
+        return gra_mag
 
 
 def export_deriche_gramag():
