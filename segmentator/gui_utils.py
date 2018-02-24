@@ -31,6 +31,7 @@ class responsiveObj:
     """Stuff to interact in the user interface."""
 
     def __init__(self, **kwargs):
+        """Initialize variables used acros functions here."""
         if kwargs is not None:
             for key, value in kwargs.items():
                 setattr(self, key, value)
@@ -41,7 +42,6 @@ class responsiveObj:
         self.imaSlcMskSwitch, self.volHistHighlightSwitch = 0, 0
         self.TranspVal = 0.5
         self.nrExports = 0
-        self.entropWin = 0
         self.borderSwitch = 0
         self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
         self.cycleCount = 0
@@ -389,7 +389,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
-        print("Start exporting labels...")
+        print("  Exporting nifti file...")
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -415,14 +415,14 @@ class responsiveObj:
         new_image = Nifti1Image(out_nii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
-        self.nrExports = 0
-        self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        while os.path.isfile(self.basename + self.flexfilename):
+        labels_out = '{}_labels_{}.nii.gz'.format(
+            self.basename, self.nrExports)
+        while os.path.isfile(labels_out):
             self.nrExports += 1
-            self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        save(new_image, self.basename + self.flexfilename)
-        print("successfully exported image labels as: \n"
-              + self.basename + self.flexfilename)
+            labels_out = '{}_labels_{}.nii.gz'.format(
+                self.basename, self.nrExports)
+        save(new_image, labels_out)
+        print("    Saved as: {}".format(labels_out))
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""
@@ -494,30 +494,24 @@ class responsiveObj:
 
     def exportNyp(self, event):
         """Export histogram counts as a numpy array."""
-        outFileName = self.basename + '_identifier' \
-            + '_pcMax' + str(self.initTpl[0]) \
-            + '_pcMin' + str(self.initTpl[1]) \
-            + '_sc' + str(int(self.initTpl[2]))
+        print("  Exporting numpy file...")
+        outFileName = '{}_identifier_pcMax{}_pcMin{}_sc{}'.format(
+            self.basename, cfg.perc_max, cfg.perc_min, int(cfg.scale))
         if self.segmType == 'ncut':
             outFileName = outFileName.replace('identifier', 'volHistLabels')
-            outFileName = outFileName.replace('.', 'pt')
-            np.save(outFileName, self.volHistMask)
-            print("Successfully exported histogram colors as: \n"
-                  + outFileName)
+            out_data = self.volHistMask
         elif self.segmType == 'main':
             outFileName = outFileName.replace('identifier', 'volHist')
-            outFileName = outFileName.replace('.', 'pt')
-            np.save(outFileName, self.counts)
-            print("successfully exported histogram counts as: \n"
-                  + outFileName)
-        else:
-            return
+            out_data = self.counts
+        outFileName = outFileName.replace('.', 'pt')
+        np.save(outFileName, out_data)
+        print("    Saved as: {}{}".format(outFileName, '.npy'))
 
     def updateLabels(self, val):
         """Update labels in volume histogram with slider."""
         if self.segmType == 'ncut':
             self.labelNr = self.sLabelNr.val
-        else:
+        else:  # NOTE: might be used in the future
             return
 
     def imaSlcMskIncr(self, incr):
@@ -582,20 +576,20 @@ class sector_mask:
     """
 
     def __init__(self, shape, centre, radius, angle_range):
-        self.radius = radius
-        self.shape = shape
+        """Initialize variables used acros functions here."""
+        self.radius, self.shape = radius, shape
         self.x, self.y = np.ogrid[:shape[0], :shape[1]]
         self.cx, self.cy = centre
         self.tmin, self.tmax = np.deg2rad(angle_range)
         # ensure stop angle > start angle
         if self.tmax < self.tmin:
-            self.tmax += 2*np.pi
-        # convert cartesian --> polar coordinates
-        self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
-            self.y-self.cy)*(self.y-self.cy)
-        self.theta = np.arctan2(self.x-self.cx, self.y-self.cy) - self.tmin
+            self.tmax += 2 * np.pi
+        # convert cartesian to polar coordinates
+        self.r2 = (self.x - self.cx) * (self.x - self.cx) + (
+            self.y-self.cy) * (self.y - self.cy)
+        self.theta = np.arctan2(self.x - self.cx, self.y - self.cy) - self.tmin
         # wrap angles between 0 and 2*pi
-        self.theta %= (2*np.pi)
+        self.theta %= 2 * np.pi
 
     def set_polCrd(self):
         """Convert cartesian to polar coordinates."""
