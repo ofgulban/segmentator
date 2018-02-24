@@ -35,6 +35,7 @@ from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
 from segmentator.gui_utils import responsiveObj
+from segmentator.config_gui import palette, axcolor, hovcolor
 
 #
 """Load Data"""

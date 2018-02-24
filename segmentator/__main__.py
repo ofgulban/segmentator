@@ -26,7 +26,7 @@ def main():
     parser.add_argument(
         "--gramag", metavar=str(cfg.gramag), required=False,
         default=cfg.gramag,
-        help="'scharr', 'sobel', 'prewitt', 'numpy' \
+        help="'scharr', 'deriche', 'sobel', 'prewitt', 'numpy' \
         or path to a gradient magnitude nifti."
         )
     parser.add_argument(
@@ -148,19 +148,19 @@ def main():
     # used in deriche filter
     cfg.deriche_alpha = args.deriche_alpha
 
-    welcome_str = 'Segmentator ' + __version__
-    welcome_decoration = '=' * len(welcome_str)
-    print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
+    welcome_str = 'Segmentator {}'.format(__version__)
+    welcome_decor = '=' * len(welcome_str)
+    print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print('--No GUI option is selected. Saving 2D histogram image...')
+        print('  No GUI option is selected. Saving 2D histogram image...')
         import segmentator.hist2d_counts
     elif args.ncut_prepare:
-        print('--Preparing N-cut related files...')
+        print('  Preparing N-cut related files...')
         import segmentator.ncut_prepare
     elif args.ncut:
-        print('--Experimental N-cut feature is selected.')
+        print('  Experimental N-cut feature is selected.')
         import segmentator.segmentator_ncut
     elif args.deriche_prepare:
         from segmentator.deriche_prepare import export_deriche_gramag

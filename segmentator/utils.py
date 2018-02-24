@@ -20,7 +20,6 @@
 from __future__ import division, print_function
 import os
 import numpy as np
-import warnings
 import matplotlib.pyplot as plt
 import segmentator.config as cfg
 from nibabel import load, Nifti1Image, save
@@ -172,15 +171,15 @@ def scale_range(data, scale_factor=500, delta=0, discard_zeros=True):
 
 
 def check_data(data, force_original_precision=True):
-    """Do casting stuff here."""
+    """Do type casting here."""
     data = np.squeeze(data)  # to prevent singular dimension error
     dims = data.shape
-    print("Input image data type is " + data.dtype.name + '.')
+    print('Input image data type is {}.'.format(data.dtype.name))
     if force_original_precision:
         pass
     else:
-        data = data.astype(float)
-        print("  Data type is casted to " + data.dtype.name + '.')
+        data = data.astype('float32')
+        print('  Data type is casted to {}.'.format(data.dtype.name))
     return data, dims
 
 
@@ -239,17 +238,17 @@ def create_3D_kernel(operator='sobel'):
         operator = np.array([[[1, 2, 1], [2, 4, 2], [1, 2, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -2, -1], [-2, -4, -2], [-1, -2, -1]]],
-                            dtype='float')
+                            dtype='float32')
     elif operator == 'prewitt':
         operator = np.array([[[1, 1, 1], [1, 1, 1], [1, 1, 1]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]],
-                            dtype='float')
+                            dtype='float32')
     elif operator == 'scharr':
         operator = np.array([[[9, 30, 9], [30, 100, 30], [9, 30, 9]],
                              [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
                              [[-9, -30, -9], [-30, -100, -30], [-9, -30, -9]]],
-                            dtype='float')
+                            dtype='float32')
     scale_normalization_factor = np.sum(np.abs(operator))
     operator = np.divide(operator, scale_normalization_factor)
 
@@ -311,8 +310,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         if len(cfg.deriche_alpha) > 1:  # TODO: may have multiple in the future
             print("    Multiple alpha values detected, using the first one.")
         alpha = cfg.deriche_alpha[0]
-        print('    Selected alpha: ' + str(alpha)
-              + ' (smaller values give smoother gradient estimates)')
+        print('    Selected alpha: {}'.format(alpha))
         ima = np.ascontiguousarray(ima, dtype=np.float32)
         gra_mag = Deriche_Gradient_Magnitude(ima, alpha, normalize=True)
     else:
@@ -349,7 +347,7 @@ def set_gradient_magnitude(image, gramag_option):
         gra_mag = scale_range(gra_mag, scale_factor=cfg.scale, delta=0.0001)
 
     else:
-        print(gramag_option.title() + ' gradient method is selected.')
+        print('{} gradient method is selected.'.format(gramag_option.title()))
         gra_mag = compute_gradient_magnitude(image, method=gramag_option)
     return gra_mag
 
@@ -358,6 +356,12 @@ def export_gradient_magnitude_image(img, filename, filtername, affine):
     """Export computed gradient magnitude image as a nifti file."""
     basename = filename.split(os.extsep, 1)[0]
     out_img = Nifti1Image(img, affine=affine)
-    out_path = basename + '_GraMag' + filtername.title() + '.nii.gz'
+    if filtername == 'deriche':  # add alpha as suffix for extra information
+        filtername = '{}_alpha{}'.format(filtername.title(),
+                                         cfg.deriche_alpha[0])
+        filtername = filtername.replace('.', 'pt')
+    else:
+        filtername = filtername.title()
+    out_path = '{}_GraMag{}.nii.gz'.format(basename, filtername)
     save(out_img, out_path)
     print('Gradient magnitude image exported in this path:\n' + out_path)

@@ -33,6 +33,7 @@ from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
 from segmentator.gui_utils import sector_mask, responsiveObj
+from segmentator.config_gui import palette, axcolor, hovcolor
 
 #
 """Data Processing"""
@@ -53,12 +54,6 @@ gra = gra.flatten()
 
 #
 """Plots"""
-# Set up a colormap:
-palette = plt.cm.Reds
-palette.set_over('r', 1.0)
-palette.set_under('w', 0)
-palette.set_bad('m', 1.0)
-
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
@@ -102,7 +97,7 @@ sectorObj = sector_mask((nr_bins, nr_bins), cfg.init_centre, cfg.init_radius,
                         cfg.init_theta)
 
 # Draw sector mask for the first time
-volHistMaskH, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2,
+volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
                                            vmin=0.1, interpolation='nearest',
                                            origin='lower',
                                            extent=[0, nr_bins, 0, nr_bins])
@@ -132,7 +127,6 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 #
 """Sliders and Buttons"""
 # Colorbar slider
-axcolor, hovcolor = '0.875', '0.975'
 axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
@@ -212,7 +206,7 @@ def update_axis_labels(event):
 fig.canvas.mpl_connect('resize_event', update_axis_labels)
 
 #
-"""New stuff: Lasso (Experimental)"""
+"""Lasso selection"""
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nOff', color=axcolor, hovercolor=hovcolor)

@@ -75,16 +75,15 @@ def export_deriche_gramag():
         # Compute gradient magnitude image with Deriche filter
         start = time()
         image = np.ascontiguousarray(image, dtype=np.float32)
-        print('  Computing gradients with alpha: ' + str(alpha))
+        print('  Computing gradients with alpha: {}'.format(alpha))
         gra_mag = Deriche_Gradient_Magnitude(image, alpha=alpha)
         end = time()
-        print("    Gradients are computed in: " + str(int(end-start))
-              + " seconds.")
-        print("    Saving the gradient magnitude image...")
+        print('    Gradients are computed in: {} sec'.format(int(end-start)))
+        print('    Saving the gradient magnitude image...')
 
         out = Nifti1Image(gra_mag, affine=nii.get_affine())
-        outName = basename + '_GraMagDeriche_alpha' + str(alpha)
-        outName = outName.replace('.', 'pt') + '.nii.gz'
-        save(out, outName)
-        print('    Saved as: ' + outName)
+        outName = '{}_GraMagDeriche_alpha{}'.format(basename, alpha)
+        outName = outName.replace('.', 'pt')
+        save(out, outName + '.nii.gz')
+        print('    Saved as: {}'.format(outName))
     print('Finished.')
