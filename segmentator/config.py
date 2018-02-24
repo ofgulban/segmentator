@@ -1,6 +1,6 @@
 """This file contains variables that are shared by several modules.
 
-Also useful to hold command line arguments.
+Useful to hold command line arguments.
 
 """
 
@@ -19,12 +19,16 @@ cbar_max = 5.0
 cbar_init = 3.0
 discard_zeros = True
 export_gramag = False
+force_original_precision = False
 
 # possible gradient magnitude computation keyword options
-gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy']
+gramag_options = ['scharr', 'sobel', 'prewitt', 'numpy', 'deriche']
 
 # used in segmentator ncut
 ncut = False
 max_rec = 8
 nr_sup_pix = 2500
 compactness = 2
+
+# used in Deriche gradient magnitude preparation
+deriche_alpha = [3.0]

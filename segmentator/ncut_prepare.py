@@ -2,7 +2,6 @@
 """Normalized graph cuts for segmentator (experimental).
 
 TODO: Replacing the functionality using scikit-learn?
-
 """
 
 import os
@@ -11,7 +10,7 @@ from matplotlib import animation
 from matplotlib import pyplot as plt
 from skimage.future import graph
 from skimage.segmentation import slic
-import config as cfg
+import segmentator.config as cfg
 
 
 def norm_grap_cut(image, max_edge=10000000, max_rec=4, compactness=2,
@@ -115,7 +114,7 @@ if cfg.ncut_figs:
     plt.show()
 
 # save output
-outName = basename + '_ncut' + '_sp' + str(cfg.nr_sup_pix) \
-          + '_c' + str(cfg.compactness)
+outName = '{}_ncut_sp{}_c{}'.format(basename, cfg.nr_sup_pix, cfg.compactness)
 outName = outName.replace('.', 'pt')
 np.save(outName, ncut)
+print("    Saved as: {}{}".format(outName, '.npy'))

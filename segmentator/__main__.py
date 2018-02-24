@@ -5,13 +5,11 @@ Mostly following this example:
 https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-and-scripts/
 
 Use config.py to hold arguments to be accessed by imported scripts.
-
-TODO: Argument parsing can be better structured, maybe by using parents. help
-looks a bit messy as is.
 """
 
+from __future__ import print_function
 import argparse
-import config as cfg
+import segmentator.config as cfg
 from segmentator import __version__
 
 
@@ -28,7 +26,7 @@ def main():
     parser.add_argument(
         "--gramag", metavar=str(cfg.gramag), required=False,
         default=cfg.gramag,
-        help="'scharr', 'sobel', 'prewitt', 'numpy' \
+        help="'scharr', 'deriche', 'sobel', 'prewitt', 'numpy' \
         or path to a gradient magnitude nifti."
         )
     parser.add_argument(
@@ -73,8 +71,13 @@ def main():
         "--export_gramag", action='store_true',
         help="Export the gradient magnitude image. Not used by default."
         )
+    parser.add_argument(
+        "--force_original_precision", action='store_true',
+        help="Do not change the data type of the input image. Can be useful \
+        for very large images. Off by default."
+        )
 
-    # used in ncut preparation  (TODO: not yet tested after restructuring.)
+    # used in ncut preparation
     parser.add_argument(
         "--ncut_prepare", action='store_true',
         help=("------------------(utility feature)------------------ \
@@ -105,6 +108,22 @@ def main():
         objects in the image."
         )
 
+    # used in Deriche filter gradient magnitude computation
+    parser.add_argument(
+        "--deriche_prepare", action='store_true',
+        help=("------------------(utility feature)------------------ \
+              Use this flag with the following arguments:")
+        )
+    parser.add_argument(
+        "--deriche_alpha", required=False, type=float,
+        default=cfg.deriche_alpha, metavar=cfg.deriche_alpha, nargs='+',
+        help="Smaller alpha values suppress more noise but can dislocate \
+        edges. Useful when there is strong noise in the input image.\
+        Multiple numbers can be passed when used in combination with \
+        '--deriche_prepare' flag \
+        (i.e --deriche_prepare --deriche_alpha 0.5 1.0 2.0)"
+        )
+
     # set cfg file variables to be accessed from other scripts
     args = parser.parse_args()
     # used in all
@@ -119,6 +138,7 @@ def main():
     if args.include_zeros:
         cfg.discard_zeros = False
     cfg.export_gramag = args.export_gramag
+    cfg.force_original_precision = args.force_original_precision
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec
@@ -126,23 +146,29 @@ def main():
     cfg.compactness = args.ncut_compactness
     # used in ncut
     cfg.ncut = args.ncut
+    # used in deriche filter
+    cfg.deriche_alpha = args.deriche_alpha
 
-    welcome_str = 'Segmentator ' + __version__
-    welcome_decoration = '=' * len(welcome_str)
-    print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
+    welcome_str = 'Segmentator {}'.format(__version__)
+    welcome_decor = '=' * len(welcome_str)
+    print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print('--No GUI option is selected. Saving 2D histogram image...')
-        import hist2d_counts
+        print('No GUI option is selected. Saving 2D histogram image...')
+        import segmentator.hist2d_counts
     elif args.ncut_prepare:
-        print('--Preparing N-cut related files...')
-        import ncut_prepare
+        print('Preparing N-cut file...')
+        import segmentator.ncut_prepare
     elif args.ncut:
-        print('--Experimental N-cut feature is selected.')
-        import segmentator_ncut
+        print('N-cut GUI is selected.')
+        import segmentator.segmentator_ncut
+    elif args.deriche_prepare:
+        from segmentator.deriche_prepare import export_deriche_gramag
+        export_deriche_gramag()
     else:
-        import segmentator_main
+        print('Default GUI is selected.')
+        import segmentator.segmentator_main
 
 
 if __name__ == "__main__":

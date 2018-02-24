@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
-import config as cfg
+import segmentator.config as cfg
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -29,38 +29,31 @@ from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from nibabel import load
 from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
-from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
-from gui_utils import sector_mask, responsiveObj
+from segmentator.gui_utils import sector_mask, responsiveObj
+from segmentator.config_gui import palette, axcolor, hovcolor
 
 #
 """Data Processing"""
 nii = load(cfg.filename)
-orig = np.squeeze(nii.get_data())
-dims = orig.shape
+orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
+# Save min and max truncation thresholds to be used in axis labels
 orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
                                   percMax=cfg.perc_max)
-# Save min and max truncation thresholds to be used in axis labels
-orig_range = [pMin, pMax]
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 if cfg.export_gramag:
-    export_gradient_magnitude_image(gra, nii.get_filename(), nii.affine)
-
+    export_gradient_magnitude_image(gra, nii.get_filename(), cfg.gramag,
+                                    nii.affine)
 # Reshape for voxel-wise operations
 ima = np.copy(orig.flatten())
 gra = gra.flatten()
 
 #
 """Plots"""
-# Set up a colormap:
-palette = plt.cm.Reds
-palette.set_over('r', 1.0)
-palette.set_under('w', 0)
-palette.set_bad('m', 1.0)
-
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
@@ -104,7 +97,7 @@ sectorObj = sector_mask((nr_bins, nr_bins), cfg.init_centre, cfg.init_radius,
                         cfg.init_theta)
 
 # Draw sector mask for the first time
-volHistMaskH, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2,
+volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
                                            vmin=0.1, interpolation='nearest',
                                            origin='lower',
                                            extent=[0, nr_bins, 0, nr_bins])
@@ -134,7 +127,6 @@ flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
 #
 """Sliders and Buttons"""
 # Colorbar slider
-axcolor, hovcolor = '0.875', '0.975'
 axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
@@ -194,10 +186,10 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 def update_axis_labels(event):
     """Swap histogram bin indices with original values."""
     xlabels = [item.get_text() for item in ax.get_xticklabels()]
-    orig_range_labels = np.linspace(orig_range[0], orig_range[1], len(xlabels))
+    orig_range_labels = np.linspace(pMin, pMax, len(xlabels))
 
     # Adjust displayed decimals based on data range
-    data_range = orig_range[1] - orig_range[0]
+    data_range = pMax - pMin
     if data_range > 200:  # arbitrary value
         xlabels = [('%i' % i) for i in orig_range_labels]
     elif data_range > 20:
@@ -214,7 +206,7 @@ def update_axis_labels(event):
 fig.canvas.mpl_connect('resize_event', update_axis_labels)
 
 #
-"""New stuff: Lasso (Experimental)"""
+"""Lasso selection"""
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nOff', color=axcolor, hovercolor=hovcolor)
@@ -258,4 +250,5 @@ flexFig.remapMsks()
 flexFig.updatePanels(update_slice=True, update_rotation=False,
                      update_extent=False)
 
+print("GUI is ready.")
 plt.show()
