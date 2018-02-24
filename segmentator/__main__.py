@@ -155,18 +155,19 @@ def main():
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print('  No GUI option is selected. Saving 2D histogram image...')
+        print('No GUI option is selected. Saving 2D histogram image...')
         import segmentator.hist2d_counts
     elif args.ncut_prepare:
-        print('  Preparing N-cut related files...')
+        print('Preparing N-cut file...')
         import segmentator.ncut_prepare
     elif args.ncut:
-        print('  Experimental N-cut feature is selected.')
+        print('N-cut GUI is selected.')
         import segmentator.segmentator_ncut
     elif args.deriche_prepare:
         from segmentator.deriche_prepare import export_deriche_gramag
         export_deriche_gramag()
     else:
+        print('Default GUI is selected.')
         import segmentator.segmentator_main
 
 
