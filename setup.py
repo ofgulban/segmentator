@@ -7,10 +7,11 @@ To install for development, using the commandline do:
 
 from setuptools import setup
 from setuptools.extension import Extension
+from os.path import join
 import numpy
 
 ext_modules = [Extension(
-    "segmentator.deriche_3D", ['segmentator/deriche/deriche_3D.c'],
+    "segmentator.deriche_3D", [join('segmentator', 'cython', 'deriche_3D.c')],
     include_dirs=[numpy.get_include()])
     ]
 
@@ -23,12 +24,10 @@ setup(name='segmentator',
       author_email='faruk.gulban@maastrichtuniversity.nl',
       license='GNU General Public License Version 3',
       packages=['segmentator'],
-      install_requires=['numpy', 'matplotlib', 'scipy'],
+      install_requires=['numpy>=1.14', 'matplotlib>=2.1', 'scipy>=1.0.0'],
       keywords=['mri', 'segmentation', 'image', 'voxel'],
       zip_safe=True,
       entry_points={
-          'console_scripts': [
-              'segmentator = segmentator.__main__:main',
-              ]},
+        'console_scripts': ['segmentator = segmentator.__main__:main', ]},
       ext_modules=ext_modules,
       )
