@@ -7,10 +7,12 @@ To install for development, using the commandline do:
 
 from setuptools import setup
 from setuptools.extension import Extension
+import numpy
 
-ext_modules = [Extension("segmentator.deriche_3D",
-                         ['segmentator/deriche/deriche_3D.c'])
-               ]
+ext_modules = [Extension(
+    "segmentator.deriche_3D", ['segmentator/deriche/deriche_3D.c'],
+    include_dirs=[numpy.get_include()])
+    ]
 
 setup(name='segmentator',
       version='1.5.0',
