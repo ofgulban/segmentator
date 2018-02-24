@@ -40,8 +40,8 @@ ima = np.ndarray.flatten(orig)
 gra = np.ndarray.flatten(gra)
 
 counts, _, _, _, _, _ = prep_2D_hist(ima, gra, discard_zeros=cfg.discard_zeros)
-outName = '{}_volHist_pMax{}_pMin{}_sc{}'.format(basename, cfg.perc_max,
-                                                 cfg.perc_min, int(cfg.scale))
+outName = '{}_volHist_pcMax{}_pcMin{}_sc{}'.format(
+    basename, cfg.perc_max, cfg.perc_min, int(cfg.scale))
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
-print('    Image saved as:\n {}'.format(outName))
+print('  Image saved as:\n {}'.format(outName))
