@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import segmentator.config as cfg
 from segmentator.utils import map_2D_hist_to_ima
 from nibabel import save, Nifti1Image
+from scipy.ndimage.morphology import binary_erosion
 
 
 class responsiveObj:
@@ -115,19 +116,19 @@ class responsiveObj:
         """Determine what happens if key is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
-        elif event.key == 'q':
-            self.imaSlcMskIncr(-0.1)
-        elif event.key == 'w':
-            self.imaSlcMskTransSwitch()
-        elif event.key == 'h':
-            self.volHistHighlightTransSwitch()
-        elif event.key == 'e':
-            self.imaSlcMskIncr(0.1)
         elif event.key == '1':
+            self.imaSlcMskIncr(-0.1)
+        elif event.key == '2':
+            self.imaSlcMskTransSwitch()
+        elif event.key == '3':
+            self.imaSlcMskIncr(0.1)
+        elif event.key == '4':
+            self.volHistHighlightTransSwitch()
+        elif event.key == '5':
             self.borderSwitch = (self.borderSwitch + 1) % 2
             self.remapMsks()
-            self.updatePanels(update_slice=False, update_rotation=False,
-                              update_extent=False)
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=True)
 
         if self.segmType == 'main':
             if event.key == 'up':
@@ -148,7 +149,7 @@ class responsiveObj:
             elif event.key == 'left':
                 self.sectorObj.rotate(10.0)
                 self.remapMsks()
-                self.updatePanels(update_slice=False, update_rotation=True,
+                self.updatePanels(update_slice=True, update_rotation=True,
                                   update_extent=False)
             else:
                 return
@@ -567,8 +568,7 @@ class responsiveObj:
 
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
-        grad = np.gradient(self.imaSlcMsk)
-        return np.greater(np.abs(grad[0], 2) + np.abs(grad[1], 2), 0)
+        return self.imaSlcMsk - binary_erosion(self.imaSlcMsk)
 
 
 class sector_mask:
