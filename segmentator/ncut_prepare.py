@@ -114,7 +114,6 @@ if cfg.ncut_figs:
     plt.show()
 
 # save output
-outName = basename + '_ncut' + '_sp' + str(cfg.nr_sup_pix) \
-          + '_c' + str(cfg.compactness)
+outName = '{}_ncut_sp{}_c{}'.format(basename, cfg.nr_sup_pix, cfg.compactness)
 outName = outName.replace('.', 'pt')
 np.save(outName, ncut)

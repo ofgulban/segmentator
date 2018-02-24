@@ -117,9 +117,10 @@ def main():
     parser.add_argument(
         "--deriche_alpha", required=False, type=float,
         default=cfg.deriche_alpha, metavar=cfg.deriche_alpha, nargs='+',
-        help="This parameter controls smoothness of the Deriche filter \
-        gradients, lower is smoother. Multiple numbers can be passed \
-        when used in combination with '--deriche_prepare' flag \
+        help="Smaller alpha values suppress more noise but can dislocate \
+        edges. Useful when there is strong noise in the input image.\
+        Multiple numbers can be passed when used in combination with \
+        '--deriche_prepare' flag \
         (i.e --deriche_prepare --deriche_alpha 0.5 1.0 2.0)"
         )
 

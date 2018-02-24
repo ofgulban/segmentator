@@ -31,4 +31,4 @@ nr_sup_pix = 2500
 compactness = 2
 
 # used in Deriche gradient magnitude preparation
-deriche_alpha = [2.0]
+deriche_alpha = [3.0]
