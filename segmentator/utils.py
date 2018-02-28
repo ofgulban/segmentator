@@ -221,7 +221,7 @@ def prep_2D_hist(ima, gra, discard_zeros=True):
     return counts, volHistH, d_min, d_max, nr_bins, bin_edges
 
 
-def create_3D_kernel(operator='sobel'):
+def create_3D_kernel(operator='scharr'):
     """Create various 3D kernels.
 
     Parameters
@@ -253,13 +253,10 @@ def create_3D_kernel(operator='sobel'):
     operator = np.divide(operator, scale_normalization_factor)
 
     # create permutations operator that will be used in gradient computation
-    kernel = np.zeros([6, 3, 3, 3])
+    kernel = np.zeros([3, 3, 3, 3])
     kernel[0, ...] = operator
-    kernel[1, ...] = kernel[0, ::-1, ::-1, ::-1]
+    kernel[1, ...] = np.transpose(kernel[0, ...], [2, 0, 1])
     kernel[2, ...] = np.transpose(kernel[0, ...], [1, 2, 0])
-    kernel[3, ...] = kernel[2, ::-1, ::-1, ::-1]
-    kernel[4, ...] = np.transpose(kernel[0, ...], [2, 0, 1])
-    kernel[5, ...] = kernel[4, ::-1, ::-1, ::-1]
     return kernel
 
 
@@ -288,21 +285,21 @@ def compute_gradient_magnitude(ima, method='scharr'):
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1) * 2.)
     elif method.lower() == 'prewitt':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1) * 2.)
     elif method.lower() == 'scharr':
         kernel = create_3D_kernel(operator=method)
         gra = np.zeros(ima.shape + (kernel.shape[0],))
         for d in range(kernel.shape[0]):
             gra[..., d] = convolve(ima, kernel[d, ...])
         # compute generic gradient magnitude with normalization
-        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1))
+        gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=-1) * 2.)
     elif method.lower() == 'numpy':
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
