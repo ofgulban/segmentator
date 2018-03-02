@@ -20,7 +20,6 @@
 from __future__ import division
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
-import compoda.core as coda
 
 
 def self_outer_product(vector_field):
@@ -62,30 +61,30 @@ def divergence(vector_field):
 
 
 def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
-    """Vectorized computation diffusion weights."""
-    idx_pos = eigvals[:, 0] > 0  # positive indices
+    """Vectorized computation diffusion weights.
+
+    Reference
+    ---------
+    - Mirebeau, J.-M., Fehrenbach, J., Risser, L., & Tobji, S. (2015).
+    Anisotropic Diffusion in ITK, 1-9.
+    """
+    idx_pos_e2 = eigvals[:, 1] > 0  # positive indices of second eigen value
     c = (1. - ALPHA)  # related to matrix condition
 
     if mode in ['EED', 'cEED', 'iEED']:
-        mu = np.ones(eigvals.shape)
 
         if mode == 'EED':  # edge enhancing diffusion
-            term = LAMBDA / (eigvals[idx_pos, 1:] - eigvals[idx_pos, 0, None])
-            mu[idx_pos, 1:] = 1. - c * np.exp(-term**M)
+            mu = np.ones(eigvals.shape)
+            term1 = LAMBDA
+            term2 = eigvals[idx_pos_e2, 1:] - eigvals[idx_pos_e2, 0, None]
+            mu[idx_pos_e2, 1:] = 1. - c * np.exp(-(term1/term2)**M)
+            # weights for the non-positive eigen values
+            mu[~idx_pos_e2, 2] = ALPHA  # surely surfels
 
-        elif mode == 'cEED':  # conservative edge enhancing diffusion
-            term = LAMBDA / eigvals[idx_pos, :]
-            mu[idx_pos, :] = 1. - c * np.exp(-term**M)
-
-        elif mode == 'iEED':  # isometric version similar to Perona-Malik
-            term = LAMBDA / eigvals[idx_pos, 2]
-            mu[idx_pos, 0] = 1. - c * np.exp(-term**M)
-            mu[idx_pos, 1] = mu[idx_pos, 0]
-            mu[idx_pos, 2] = mu[idx_pos, 0]
-
-        # weights for the non-positive eigen values
-        mu[eigvals[:, 1] <= 0, 2] = ALPHA  # surely surfels
-        mu[eigvals[:, 0] <= 0, 1:] = ALPHA  # surely curvels
+        elif mode == 'cEED':  # FIXME: Not working at all, for now...
+            term1 = LAMBDA
+            term2 = eigvals
+            mu = 1. - c * np.exp(-(term1/term2)**M)
 
     elif mode in ['CED', 'cCED']:
 

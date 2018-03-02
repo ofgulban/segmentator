@@ -71,7 +71,7 @@ for t in range(NR_ITER):
     # Gaussian smoothing on tensor components
     struct = smooth_matrix_image(struct, RHO=RHO)
 
-    # # Unit trace rescaling
+    # # Unit trace rescaling  # FIXME: I am not sure I do this right
     # rescale = struct[:, 0, 0] + struct[:, 1, 1] + struct[:, 2, 2]
     # struct = struct / np.max(rescale)
     # print('    Trace rescaling factor: {}'.format(np.max(rescale)))
