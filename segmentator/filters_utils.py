@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 
@@ -62,19 +63,51 @@ def divergence(vector_field):
 
 def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
     """Vectorized computation diffusion weights."""
-    mu = np.ones(eigvals.shape)
     idx_pos = eigvals[:, 0] > 0  # positive indices
+    c = (1. - ALPHA)  # related to matrix condition
 
-    if mode is 'EED':  # edge enhancing diffusion
-        term = LAMBDA / (eigvals[idx_pos, 1:] - eigvals[idx_pos, 0, None])
-        mu[idx_pos, 1:] = 1. - (1. - ALPHA) * np.exp(-term**M)
-    elif mode is 'cEED':  # conservative edge enhancing diffusion
-        term = LAMBDA / eigvals[idx_pos, :]
-        mu[idx_pos, :] = 1. - (1. - ALPHA) * np.exp(-term**M)
+    if mode in ['EED', 'cEED', 'iEED']:
+        mu = np.ones(eigvals.shape)
 
-    # weights for the non-positive eigen values
-    mu[eigvals[:, 1] <= 0, 2] = ALPHA  # surely surfels
-    mu[eigvals[:, 0] <= 0, 1:] = ALPHA  # surely curvels
+        if mode == 'EED':  # edge enhancing diffusion
+            term = LAMBDA / (eigvals[idx_pos, 1:] - eigvals[idx_pos, 0, None])
+            mu[idx_pos, 1:] = 1. - c * np.exp(-term**M)
+
+        elif mode == 'cEED':  # conservative edge enhancing diffusion
+            term = LAMBDA / eigvals[idx_pos, :]
+            mu[idx_pos, :] = 1. - c * np.exp(-term**M)
+
+        elif mode == 'iEED':  # isometric version similar to Perona-Malik
+            term = LAMBDA / eigvals[idx_pos, 2]
+            mu[idx_pos, 0] = 1. - c * np.exp(-term**M)
+            mu[idx_pos, 1] = mu[idx_pos, 0]
+            mu[idx_pos, 2] = mu[idx_pos, 0]
+
+        # weights for the non-positive eigen values
+        mu[eigvals[:, 1] <= 0, 2] = ALPHA  # surely surfels
+        mu[eigvals[:, 0] <= 0, 1:] = ALPHA  # surely curvels
+
+    elif mode in ['CED', 'cCED']:
+        mu = np.ones(eigvals.shape) * ALPHA
+
+        if mode == 'CED':  # coherence enhancing diffusion
+            term1 = LAMBDA
+            term2 = eigvals[idx_pos, -1, None] - eigvals[idx_pos, :-1]
+            mu[idx_pos, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
+
+        elif mode == 'cCED':  # conservative coherence enhancing diffusion
+            term1 = LAMBDA + eigvals[idx_pos, :-1]
+            term2 = eigvals[idx_pos, -1, None] - eigvals[idx_pos, :-1]
+            mu[idx_pos, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
+
+        # weights for the non-positive eigen values
+        mu[eigvals[:, 0] <= 0, 0] = 1  # surely surfels or curvels
+        mu[eigvals[:, 1] <= 1, 1] = 1  # surely surfels
+
+    else:
+        mu = np.ones(eigvals.shape)
+        print('    Weights are all ones.')
+
     return mu
 
 
