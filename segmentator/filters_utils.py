@@ -20,6 +20,7 @@
 from __future__ import division
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
+import compoda.core as coda
 
 
 def self_outer_product(vector_field):
@@ -92,17 +93,13 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
 
         if mode == 'CED':  # coherence enhancing diffusion
             term1 = LAMBDA
-            term2 = eigvals[idx_pos, -1, None] - eigvals[idx_pos, :-1]
-            mu[idx_pos, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
+            term2 = eigvals[:, 2, None] - eigvals[:, :-1]
+            mu[:, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
 
         elif mode == 'cCED':  # conservative coherence enhancing diffusion
-            term1 = LAMBDA + eigvals[idx_pos, :-1]
-            term2 = eigvals[idx_pos, -1, None] - eigvals[idx_pos, :-1]
-            mu[idx_pos, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
-
-        # weights for the non-positive eigen values
-        mu[eigvals[:, 0] <= 0, 0] = 1  # surely surfels or curvels
-        mu[eigvals[:, 1] <= 1, 1] = 1  # surely surfels
+            term1 = LAMBDA + eigvals[:, :-1]
+            term2 = eigvals[:, 2, None] - eigvals[:, :-1]
+            mu = ALPHA + c * np.exp(-(term1/term2)**M)
 
     else:
         mu = np.ones(eigvals.shape)
@@ -127,7 +124,6 @@ def smooth_matrix_image(matrix_image, RHO=0):
         return matrix_image
     else:
         dims = matrix_image.shape
-        matrix_image = np.zeros(dims)
         for x in range(dims[-2]):
             for y in range(dims[-1]):
                 matrix_image[..., x, y] = gaussian_filter(
