@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
 """Common functions used in filters."""
+
 # Part of the Segmentator library
 # Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
 #
