@@ -103,7 +103,7 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
 
     else:
         mu = np.ones(eigvals.shape)
-        print('    Weights are all ones.')
+        print('    Invalid smoothing mesthod. Weights are all set to ones.')
 
     return mu
 
