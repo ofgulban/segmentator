@@ -37,7 +37,7 @@ def self_outer_product(vector_field):
     dims = vector_field.shape
     outer = np.repeat(vector_field, dims[-1], axis=-1)
     outer = outer * outer[..., [0, 3, 6, 1, 4, 7, 2, 5, 8]]
-    outer = outer.reshape((np.prod(dims[:-1]), dims[-1], dims[-1]))
+    outer = outer.reshape(dims[:-1] + (dims[-1], dims[-1]))
     return outer
 
 
@@ -46,7 +46,6 @@ def dot_product_matrix_vector(matrix_field, vector_field):
     dims = vector_field.shape
     dotp = np.repeat(vector_field, dims[-1], axis=-1)
     dotp = dotp.reshape(dims[:-1] + (dims[-1], dims[-1]))
-    dims = dotp.shape  # update dimensions
     idx_dims = tuple(range(dotp.ndim))
     dotp = dotp.transpose(idx_dims[:-2] + (idx_dims[-1], idx_dims[-2]))
     dotp = np.multiply(matrix_field, dotp)
@@ -89,17 +88,18 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
         mu[eigvals[:, 0] <= 0, 1:] = ALPHA  # surely curvels
 
     elif mode in ['CED', 'cCED']:
-        mu = np.ones(eigvals.shape) * ALPHA
 
         if mode == 'CED':  # coherence enhancing diffusion
+            mu = np.ones(eigvals.shape) * ALPHA
             term1 = LAMBDA
             term2 = eigvals[:, 2, None] - eigvals[:, :-1]
             mu[:, :-1] = ALPHA + c * np.exp(-(term1/term2)**M)
 
         elif mode == 'cCED':  # conservative coherence enhancing diffusion
-            term1 = LAMBDA + eigvals[:, :-1]
-            term2 = eigvals[:, 2, None] - eigvals[:, :-1]
-            mu = ALPHA + c * np.exp(-(term1/term2)**M)
+            mu = np.ones(eigvals.shape) * ALPHA
+            term1 = LAMBDA + eigvals[:, 0:2]
+            term2 = eigvals[:, 2, None] - eigvals[:, 0:2]
+            mu[:, 0:2] = ALPHA + c * np.exp(-(term1/term2)**M)
 
     else:
         mu = np.ones(eigvals.shape)
@@ -112,7 +112,7 @@ def construct_diffusion_tensors(eigvecs, weights):
     """Vectorized consruction of diffusion tensors."""
     dims = eigvecs.shape
     D = np.zeros(dims[:-2] + (dims[-1], dims[-1]))
-    for i in range(3):  # weight vectors
+    for i in range(dims[-1]):  # weight vectors
         temp = weights[:, i, None, None] * self_outer_product(eigvecs[..., i])
         D = D + temp
     return D
