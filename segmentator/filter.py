@@ -1,4 +1,21 @@
+#!/usr/bin/env python
 """Diffusion based image smoothing."""
+
+# Part of the Segmentator library
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division
 import os
@@ -37,7 +54,7 @@ ALPHA = 0.001
 M = 4
 
 # Export parameters
-identifier = MODE
+identifier = MODE + 'optim5'
 
 # Load data
 basename = file_name.split(os.extsep, 1)[0]
@@ -71,7 +88,8 @@ for t in range(NR_ITER):
     # Gaussian smoothing on tensor components
     struct = smooth_matrix_image(struct, RHO=RHO)
 
-    # # Unit trace rescaling  # FIXME: I am not sure I do this right
+    # # Unit trace rescaling
+    # FIXME: I am not sure I understand this right, or the expected effect
     # rescale = struct[:, 0, 0] + struct[:, 1, 1] + struct[:, 2, 2]
     # struct = struct / np.max(rescale)
     # print('    Trace rescaling factor: {}'.format(np.max(rescale)))
@@ -99,10 +117,11 @@ for t in range(NR_ITER):
     difft, gra = None, None
     # Weickert, 1998, eq. 1.2 (continuity equation)
     diffusion_difference = divergence(negative_flux)
+    negative_flux = None
 
     # Update image (diffuse image using the difference)
-    ima = ima + GAMMA*diffusion_difference
-    div = None
+    ima += GAMMA*diffusion_difference
+    diffusion_difference = None
 
     # Convenient exports for intermediate outputs
     if (t+1) % SAVE_EVERY == 0 and (t+1) != NR_ITER:
