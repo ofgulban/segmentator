@@ -54,7 +54,7 @@ ALPHA = 0.001
 M = 4
 
 # Export parameters
-identifier = MODE + 'optim5'
+identifier = MODE
 
 # Load data
 basename = file_name.split(os.extsep, 1)[0]
