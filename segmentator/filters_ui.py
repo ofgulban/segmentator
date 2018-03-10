@@ -26,6 +26,11 @@ def main():
         help="EED, cEED, CED, cCED."
         )
     parser.add_argument(
+        "--edge_threshold", metavar=str(cfg.edge_threshold), required=False,
+        type=float, default=cfg.edge_threshold,
+        help="Also known as lambda."
+        )
+    parser.add_argument(
         "--noise_scale", metavar=str(cfg.noise_scale), required=False,
         type=float, default=cfg.noise_scale,
         help="lower bound 0.5 for now"
@@ -50,6 +55,7 @@ def main():
     args = parser.parse_args()
     cfg.filename = args.filename
     cfg.smoothing = args.smoothing
+    cfg.edge_threshold = args.edge_threshold  # lambda
     cfg.noise_scale = args.noise_scale
     cfg.feature_scale = args.feature_scale
     cfg.nr_iterations = args.nr_iterations
