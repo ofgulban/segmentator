@@ -101,6 +101,11 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
             term2 = eigvals[:, 2, None] - eigvals[:, 0:2]
             mu[:, 0:2] = ALPHA + c * np.exp(-(term1/term2)**M)
 
+    elif mode == 'EXP':
+        import compoda.core as coda
+        mu = np.ones(eigvals.shape)
+        mu[idx_pos_e2, :] = 1. - coda.closure(eigvals[idx_pos_e2, :])
+
     else:
         mu = np.ones(eigvals.shape)
         print('    Invalid smoothing mesthod. Weights are all set to ones.')

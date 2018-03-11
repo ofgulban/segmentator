@@ -23,7 +23,7 @@ def main():
     parser.add_argument(
         "--smoothing", metavar=str(cfg.smoothing), required=False,
         default='EED',
-        help="EED, cEED, CED, cCED."
+        help="EED, cEED, CED, cCED, EXP."
         )
     parser.add_argument(
         "--edge_threshold", metavar=str(cfg.edge_threshold), required=False,
