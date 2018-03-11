@@ -41,6 +41,11 @@ def main():
         help="lower bound is 0.5 for now"
         )
     parser.add_argument(
+        "--gamma", metavar=str(cfg.gamma), required=False,
+        type=float, default=cfg.gamma,
+        help="Usually 0.5 or 1."
+        )
+    parser.add_argument(
         "--nr_iterations", metavar=str(cfg.nr_iterations), required=False,
         type=int, default=cfg.nr_iterations,
         help="Number of maximum iterations."
@@ -58,6 +63,7 @@ def main():
     cfg.edge_threshold = args.edge_threshold  # lambda
     cfg.noise_scale = args.noise_scale
     cfg.feature_scale = args.feature_scale
+    cfg.gamma = args.gamma
     cfg.nr_iterations = args.nr_iterations
     cfg.save_every = args.save_every
 

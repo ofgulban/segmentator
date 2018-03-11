@@ -10,4 +10,4 @@ feature_scale = 0.5
 nr_iterations = 20
 save_every = 10
 edge_threshold = 0.001
-diffusion_speed = 1
+gamma = 1  # NOTE: I might call this diffusion speed

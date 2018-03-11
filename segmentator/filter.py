@@ -49,7 +49,7 @@ SIGMA = cfg.feature_scale  # noise scale
 LAMBDA = cfg.edge_threshold
 
 # Secondary parameters
-GAMMA = cfg.diffusion_speed
+GAMMA = cfg.gamma
 ALPHA = 0.001
 M = 4
 
