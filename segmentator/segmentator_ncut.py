@@ -85,6 +85,7 @@ gra = np.ndarray.flatten(gra)
 
 #
 """Plots"""
+print("Preparing GUI...")
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)

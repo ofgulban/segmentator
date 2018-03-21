@@ -54,6 +54,7 @@ gra = gra.flatten()
 
 #
 """Plots"""
+print("Preparing GUI...")
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
@@ -123,6 +124,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
 flexFig.connect()
 ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
+ima, gra = None, None
 
 #
 """Sliders and Buttons"""
