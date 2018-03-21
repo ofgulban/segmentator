@@ -66,6 +66,8 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
 
     Reference
     ---------
+    - Weickert, J. (1998). Anisotropic diffusion in image processing.
+    Image Rochester NY, 256(3), 170.
     - Mirebeau, J.-M., Fehrenbach, J., Risser, L., & Tobji, S. (2015).
     Anisotropic Diffusion in ITK, 1-9.
     """
@@ -89,7 +91,7 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
 
     elif mode in ['CED', 'cCED']:
 
-        if mode == 'CED':  # coherence enhancing diffusion
+        if mode == 'CED':  # coherence enhancing diffusion (FIXME: not tested)
             mu = np.ones(eigvals.shape) * ALPHA
             term1 = LAMBDA
             term2 = eigvals[:, 2, None] - eigvals[:, :-1]
@@ -101,7 +103,7 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
             term2 = eigvals[:, 2, None] - eigvals[:, 0:2]
             mu[:, 0:2] = ALPHA + c * np.exp(-(term1/term2)**M)
 
-    elif mode == 'EXP':
+    elif mode == 'EXP':  # a very experimental version
         import compoda.core as coda
         mu = np.ones(eigvals.shape)
         mu[idx_pos_e2, :] = 1. - coda.closure(eigvals[idx_pos_e2, :])

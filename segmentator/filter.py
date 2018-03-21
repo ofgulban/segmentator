@@ -44,8 +44,8 @@ file_name = cfg.filename
 MODE = cfg.smoothing
 NR_ITER = cfg.nr_iterations
 SAVE_EVERY = cfg.save_every
-RHO = cfg.noise_scale  # feature scale
-SIGMA = cfg.feature_scale  # noise scale
+SIGMA = cfg.noise_scale
+RHO = cfg.feature_scale
 LAMBDA = cfg.edge_threshold
 
 # Secondary parameters

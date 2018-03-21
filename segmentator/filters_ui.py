@@ -23,37 +23,45 @@ def main():
     parser.add_argument(
         "--smoothing", metavar=str(cfg.smoothing), required=False,
         default='EED',
-        help="EED, cEED, CED, cCED, EXP."
+        help="Variants are EED, cCED, EXP. Use cCED to only enhance surfaces \
+        like gray-white matter or gray matter-cerebrospinal fluid. Use EXP \
+        with extra caution, it is highly experimental."
         )
     parser.add_argument(
-        "--edge_threshold", metavar=str(cfg.edge_threshold), required=False,
+        "--edge_thr", metavar=str(cfg.edge_threshold), required=False,
         type=float, default=cfg.edge_threshold,
-        help="Also known as lambda."
+        help="Lambda, edge threshold, lower values preserves more edges. Not \
+        used in EXP."
         )
     parser.add_argument(
         "--noise_scale", metavar=str(cfg.noise_scale), required=False,
         type=float, default=cfg.noise_scale,
-        help="lower bound 0.5 for now"
+        help="Sigma, determines the spatial scale of then noise that will be \
+        corrected. Recommended lower bound is 0.5."
         )
     parser.add_argument(
         "--feature_scale", metavar=str(cfg.feature_scale), required=False,
         type=float, default=cfg.noise_scale,
-        help="lower bound is 0.5 for now"
+        help="Rho, determines the spatial scale of the features that will be \
+        enhanced. Recommended lower bound is 0.5."
         )
     parser.add_argument(
         "--gamma", metavar=str(cfg.gamma), required=False,
         type=float, default=cfg.gamma,
-        help="Usually 0.5 or 1."
+        help="Effects strength of the updates in every iteration. Recommended \
+        range is 0.5 to 2."
         )
     parser.add_argument(
         "--nr_iterations", metavar=str(cfg.nr_iterations), required=False,
         type=int, default=cfg.nr_iterations,
-        help="Number of maximum iterations."
+        help="Number of maximum iterations. More iterations will produce \
+        smoother images."
         )
     parser.add_argument(
         "--save_every", metavar=str(cfg.save_every), required=False,
         type=int, default=cfg.save_every,
-        help="Save every Nth iterations."
+        help="Save every Nth iterations. Useful to track the effect of \
+        smoothing as it evolves."
         )
 
     # set cfg file variables to be accessed from other scripts
@@ -71,9 +79,12 @@ def main():
     welcome_decor = '=' * len(welcome_str)
     print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
     print('Filters initiated...')
+    print('  -------------------------------------------')
     print('  !!!WARNING | Highly experimental feature!!!')
+    print('  -------------------------------------------')
 
     import segmentator.filter
+
 
 if __name__ == "__main__":
     main()
