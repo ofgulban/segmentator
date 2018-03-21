@@ -29,9 +29,14 @@ def main():
         help="'scharr', 'deriche', 'sobel', 'prewitt', 'numpy' \
         or path to a gradient magnitude nifti."
         )
+    # used in Deriche filter gradient magnitude computation
     parser.add_argument(
-        "--ncut",  metavar='path', required=False,
-        help="Path to nyp file with ncut labels"
+        "--deriche_alpha", required=False, type=float,
+        default=cfg.deriche_alpha, metavar=cfg.deriche_alpha,
+        help="Used only in Deriche gradient magnitude option. Smaller alpha \
+        values suppress more noise but can dislocate edges. Useful when there \
+        is strong noise in the input image or the features of interest are at \
+        a different scale compared to original image resolution."
         )
     parser.add_argument(
         "--scale", metavar=str(cfg.scale), required=False, type=float,
@@ -58,6 +63,10 @@ def main():
         type=float, default=cfg.cbar_init,
         help="Initial value (power of 10) of the colorbar slider. \
               Also used with --ncut_prepare flag."
+        )
+    parser.add_argument(
+        "--ncut",  metavar='path', required=False,
+        help="Path to nyp file with ncut labels. Initiates N-cut GUI mode."
         )
     parser.add_argument(
         "--nogui", action='store_true',
@@ -108,22 +117,6 @@ def main():
         objects in the image."
         )
 
-    # used in Deriche filter gradient magnitude computation
-    parser.add_argument(
-        "--deriche_prepare", action='store_true',
-        help=("------------------(utility feature)------------------ \
-              Use this flag with the following arguments:")
-        )
-    parser.add_argument(
-        "--deriche_alpha", required=False, type=float,
-        default=cfg.deriche_alpha, metavar=cfg.deriche_alpha, nargs='+',
-        help="Smaller alpha values suppress more noise but can dislocate \
-        edges. Useful when there is strong noise in the input image.\
-        Multiple numbers can be passed when used in combination with \
-        '--deriche_prepare' flag \
-        (i.e --deriche_prepare --deriche_alpha 0.5 1.0 2.0)"
-        )
-
     # set cfg file variables to be accessed from other scripts
     args = parser.parse_args()
     # used in all
@@ -163,9 +156,6 @@ def main():
     elif args.ncut:
         print('N-cut GUI is selected.')
         import segmentator.segmentator_ncut
-    elif args.deriche_prepare:
-        from segmentator.deriche_prepare import export_deriche_gramag
-        export_deriche_gramag()
     else:
         print('Default GUI is selected.')
         import segmentator.segmentator_main

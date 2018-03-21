@@ -12,6 +12,7 @@ init_theta = (0, 360)
 # segmentator main command line variables
 filename = 'sample_filename_here'
 gramag = 'scharr'
+deriche_alpha = 3.0
 perc_min = 2.5
 perc_max = 97.5
 scale = 400
@@ -29,6 +30,3 @@ ncut = False
 max_rec = 8
 nr_sup_pix = 2500
 compactness = 2
-
-# used in Deriche gradient magnitude preparation
-deriche_alpha = [3.0]
