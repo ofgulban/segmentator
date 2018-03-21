@@ -28,6 +28,9 @@ setup(name='segmentator',
       keywords=['mri', 'segmentation', 'image', 'voxel'],
       zip_safe=True,
       entry_points={
-        'console_scripts': ['segmentator = segmentator.__main__:main', ]},
+        'console_scripts': [
+            'segmentator = segmentator.__main__:main',
+            'segmentator_filters = segmentator.filters_ui:main',
+            ]},
       ext_modules=ext_modules,
       )

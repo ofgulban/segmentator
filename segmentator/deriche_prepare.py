@@ -4,7 +4,7 @@ You can use --graMag flag to pass resulting nifti files from this script.
 """
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,12 +19,8 @@ You can use --graMag flag to pass resulting nifti files from this script.
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import segmentator.config as cfg
 from segmentator.deriche_3D import deriche_3D
-import os
 import numpy as np
-from nibabel import load, save, Nifti1Image
-from time import time
 
 
 def Deriche_Gradient_Magnitude(image, alpha, normalize=False,
@@ -60,30 +56,3 @@ def Deriche_Gradient_Magnitude(image, alpha, normalize=False,
 
             gra_mag = gra_mag * (range_ima / range_der)
         return gra_mag
-
-
-def export_deriche_gramag():
-    """Procedure for exporting Deriche gradient magnitude nifti images."""
-    print('-------------------------')
-    print('Deriche filter exporting initiated.')
-    for alpha in cfg.deriche_alpha:
-        # Load nifti
-        nii = load(cfg.filename)
-        basename = nii.get_filename().split(os.extsep, 1)[0]
-        image = nii.get_data()
-
-        # Compute gradient magnitude image with Deriche filter
-        start = time()
-        image = np.ascontiguousarray(image, dtype=np.float32)
-        print('  Computing gradients with alpha: {}'.format(alpha))
-        gra_mag = Deriche_Gradient_Magnitude(image, alpha=alpha)
-        end = time()
-        print('    Gradients are computed in: {} sec'.format(int(end-start)))
-        print('    Saving the gradient magnitude image...')
-
-        out = Nifti1Image(gra_mag, affine=nii.get_affine())
-        outName = '{}_GraMagDeriche_alpha{}'.format(basename, alpha)
-        outName = outName.replace('.', 'pt')
-        save(out, outName + '.nii.gz')
-        print('    Saved as: {}'.format(outName))
-    print('Finished.')

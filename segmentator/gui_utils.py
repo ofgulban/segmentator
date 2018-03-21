@@ -2,7 +2,7 @@
 """Functions covering the user interaction with the GUI."""
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
