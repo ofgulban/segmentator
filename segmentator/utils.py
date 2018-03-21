@@ -360,5 +360,6 @@ def export_gradient_magnitude_image(img, filename, filtername, affine):
     else:
         filtername = filtername.title()
     out_path = '{}_GraMag{}.nii.gz'.format(basename, filtername)
+    print("Exporting gradient magnitude image...")
     save(out_img, out_path)
-    print('Gradient magnitude image exported in this path:\n' + out_path)
+    print('  Gradient magnitude image exported in this path:\n  ' + out_path)
