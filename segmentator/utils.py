@@ -177,7 +177,7 @@ def check_data(data, force_original_precision=True):
     print('Input image data type is {}.'.format(data.dtype.name))
     if force_original_precision:
         pass
-    else:
+    elif data.dtype != 'float32':
         data = data.astype('float32')
         print('  Data type is casted to {}.'.format(data.dtype.name))
     return data, dims
