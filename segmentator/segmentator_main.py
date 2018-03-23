@@ -40,8 +40,14 @@ from segmentator.config_gui import palette, axcolor, hovcolor
 nii = load(cfg.filename)
 orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
 # Save min and max truncation thresholds to be used in axis labels
-orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
-                                  percMax=cfg.perc_max)
+if np.isnan(cfg.valmin) or np.isnan(cfg.valmax):
+    orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
+                                      percMax=cfg.perc_max)
+else:  # TODO: integrate this into truncate range function
+    orig[orig < cfg.valmin] = cfg.valmin
+    orig[orig > cfg.valmax] = cfg.valmax
+    pMin, pMax = cfg.valmin, cfg.valmax
+
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
@@ -117,7 +123,6 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         contains=volHistMaskH.contains,
                         counts=counts,
                         idxLasso=idxLasso,
-                        initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
                         lassoSwitchCount=lassoSwitchCount)
 
 # Make the figure responsive to clicks

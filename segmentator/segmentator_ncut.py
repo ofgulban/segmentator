@@ -161,7 +161,6 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         counterField=np.zeros((nr_bins, nr_bins)),
                         orig_ncut_labels=orig_ncut_labels,
                         ima_ncut_labels=ima_ncut_labels,
-                        initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
                         lMax=lMax)
 
 # Make the figure responsive to clicks

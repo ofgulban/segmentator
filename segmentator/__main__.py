@@ -54,6 +54,16 @@ def main():
         help="Maximum percentile used in truncation."
         )
     parser.add_argument(
+        "--valmin", metavar=str(cfg.valmin), required=False, type=float,
+        default=cfg.valmin,
+        help="Minimum value, overwrites percentile."
+        )
+    parser.add_argument(
+        "--valmax",  metavar=str(cfg.valmax), required=False,  type=float,
+        default=cfg.valmax,
+        help="Maximum value, overwrites percentile."
+        )
+    parser.add_argument(
         "--cbar_max",  metavar=str(cfg.cbar_max), required=False,  type=float,
         default=cfg.cbar_max,
         help="Maximum value (power of 10) of the colorbar slider."
@@ -126,6 +136,8 @@ def main():
     cfg.scale = args.scale
     cfg.perc_min = args.percmin
     cfg.perc_max = args.percmax
+    cfg.valmin = args.valmin
+    cfg.valmax = args.valmax
     cfg.cbar_max = args.cbar_max
     cfg.cbar_init = args.cbar_init
     if args.include_zeros:
