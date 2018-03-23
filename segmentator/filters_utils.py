@@ -142,6 +142,6 @@ def smooth_matrix_image(matrix_image, RHO=0):
         for x in range(dims[-2]):
             for y in range(dims[-1]):
                 gaussian_filter(matrix_image[..., x, y], sigma=RHO,
-                                mode='nearest',
+                                mode='constant', cval=0.0,
                                 output=matrix_image[..., x, y])
         return matrix_image

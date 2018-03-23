@@ -77,7 +77,7 @@ for t in range(NR_ITER):
     if SIGMA == 0:
         ima_temp = np.copy(ima)
     else:
-        ima_temp = gaussian_filter(ima, sigma=SIGMA, mode="nearest")
+        ima_temp = gaussian_filter(ima, sigma=SIGMA, mode='constant', cval=0.0)
 
     # Compute gradient
     gra = np.transpose(np.gradient(ima_temp), [1, 2, 3, 0])
@@ -116,7 +116,7 @@ for t in range(NR_ITER):
 
     # Update image (diffuse image using the difference)
     # NOTE: Indexing is done to prevent frame-edge error propagation
-    ima[1:-1, 1:-1, 1:-1] += GAMMA*diffusion_difference[1:-1, 1:-1, 1:-1]
+    ima += GAMMA*diffusion_difference
     diffusion_difference = None
 
     # Convenient exports for intermediate outputs
