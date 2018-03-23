@@ -1,5 +1,5 @@
-numpy==1.14
+numpy==1.14.2
 scipy==1.0.0
 matplotlib==2.2.2
-nibabel==2.2.0
+nibabel==2.2.1
 pytest-cov==2.5.1
