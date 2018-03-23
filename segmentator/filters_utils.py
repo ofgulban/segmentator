@@ -103,10 +103,19 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
             term2 = eigvals[:, 2, None] - eigvals[:, 0:2]
             mu[:, 0:2] = ALPHA + c * np.exp(-(term1/term2)**M)
 
-    elif mode == 'EXP':  # a very experimental version
+    elif mode == 'EXP':  # an experimental version
         import compoda.core as coda
         mu = np.ones(eigvals.shape)
         mu[idx_pos_e2, :] = 1. - coda.closure(eigvals[idx_pos_e2, :])
+
+    elif mode == 'EXP2':  # a very experimental version
+        import compoda.core as coda
+        mu = np.ones(eigvals.shape)
+        eigs = eigvals[idx_pos_e2, :]
+        term1 = coda.closure(eigs)
+        term2 = np.abs((np.max(term1, axis=-1) - np.min(term1, axis=-1)) - 0.5)
+        term2 += 0.5
+        mu[idx_pos_e2, :] = np.abs(term2[:, None] - term1)
 
     else:
         mu = np.ones(eigvals.shape)

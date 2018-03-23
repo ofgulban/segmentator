@@ -89,12 +89,6 @@ for t in range(NR_ITER):
     # Gaussian smoothing on tensor components
     struct = smooth_matrix_image(struct, RHO=RHO)
 
-    # # Unit trace rescaling
-    # FIXME: I am not sure I understand this right, or the expected effect
-    # rescale = struct[:, 0, 0] + struct[:, 1, 1] + struct[:, 2, 2]
-    # struct = struct / np.max(rescale)
-    # print('    Trace rescaling factor: {}'.format(np.max(rescale)))
-
     print('  Running eigen decomposition...')
     struct = struct.reshape([np.prod(dims), 3, 3])
     struct = struct[idx_msk_flat, :, :]
@@ -121,7 +115,8 @@ for t in range(NR_ITER):
     negative_flux = None
 
     # Update image (diffuse image using the difference)
-    ima += GAMMA*diffusion_difference
+    # NOTE: Indexing is done to prevent frame-edge error propagation
+    ima[1:-1, 1:-1, 1:-1] += GAMMA*diffusion_difference[1:-1, 1:-1, 1:-1]
     diffusion_difference = None
 
     # Convenient exports for intermediate outputs
