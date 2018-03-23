@@ -46,7 +46,7 @@ NR_ITER = cfg.nr_iterations
 SAVE_EVERY = cfg.save_every
 SIGMA = cfg.noise_scale
 RHO = cfg.feature_scale
-LAMBDA = cfg.edge_threshold
+LAMBDA = cfg.edge_thr
 
 # Secondary parameters
 GAMMA = cfg.gamma
@@ -71,6 +71,7 @@ for t in range(NR_ITER):
     # Update export parameters
     params = '{}_n{}_l{}_r{}_s{}_g{}'.format(
         identifier, iteration, LAMBDA, RHO, SIGMA, GAMMA)
+    params = params.replace('.', 'pt')
 
     # Smoothing
     if SIGMA == 0:

@@ -28,8 +28,8 @@ def main():
         with extra caution, it is highly experimental."
         )
     parser.add_argument(
-        "--edge_thr", metavar=str(cfg.edge_threshold), required=False,
-        type=float, default=cfg.edge_threshold,
+        "--edge_thr", metavar=str(cfg.edge_thr), required=False,
+        type=float, default=cfg.edge_thr,
         help="Lambda, edge threshold, lower values preserves more edges. Not \
         used in EXP."
         )
@@ -68,9 +68,9 @@ def main():
     args = parser.parse_args()
     cfg.filename = args.filename
     cfg.smoothing = args.smoothing
-    cfg.edge_threshold = args.edge_threshold  # lambda
-    cfg.noise_scale = args.noise_scale
-    cfg.feature_scale = args.feature_scale
+    cfg.edge_thr = args.edge_thr  # lambda
+    cfg.noise_scale = args.noise_scale  # sigma
+    cfg.feature_scale = args.feature_scale  # rho
     cfg.gamma = args.gamma
     cfg.nr_iterations = args.nr_iterations
     cfg.save_every = args.save_every
