@@ -339,6 +339,7 @@ def set_gradient_magnitude(image, gramag_option):
               + " interpreting as a file path...")
         gra_mag_nii = load(gramag_option)
         gra_mag = np.squeeze(gra_mag_nii.get_data())
+        gra_mag, _ = check_data(gra_mag, cfg.force_original_precision)
         gra_mag = truncate_range(gra_mag, percMin=cfg.perc_min,
                                  percMax=cfg.perc_max)
         gra_mag = scale_range(gra_mag, scale_factor=cfg.scale, delta=0.0001)

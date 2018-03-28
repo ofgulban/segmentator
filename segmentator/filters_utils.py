@@ -133,15 +133,18 @@ def construct_diffusion_tensors(eigvecs, weights):
     return D
 
 
-def smooth_matrix_image(matrix_image, RHO=0):
+def smooth_matrix_image(matrix_image, RHO=0, vres=None):
     """Gaussian smoothing applied to matrix image."""
+    if vres is None:
+        vres = [1., 1., 1.]
     if RHO == 0:
         return matrix_image
     else:
         dims = matrix_image.shape
         for x in range(dims[-2]):
             for y in range(dims[-1]):
-                gaussian_filter(matrix_image[..., x, y], sigma=RHO,
+                gaussian_filter(matrix_image[..., x, y],
+                                sigma=[RHO/vres[0], RHO/vres[1], RHO/vres[2]],
                                 mode='constant', cval=0.0,
                                 output=matrix_image[..., x, y])
         return matrix_image

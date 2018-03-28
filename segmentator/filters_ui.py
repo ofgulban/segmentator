@@ -23,27 +23,31 @@ def main():
     parser.add_argument(
         "--smoothing", metavar=str(cfg.smoothing), required=False,
         default='EED',
-        help="Variants are EED, cCED, EXP. Use cCED to only enhance surfaces \
-        like gray-white matter or gray matter-cerebrospinal fluid. Use EXP \
-        with extra caution, it is highly experimental."
+        help="Variants are EED, cCED, EXP, EXP2. Use cCED to only enhance \
+        surfaces like gray matter-cerebrospinal fluid. Use EXP and EXP2 with \
+        extra caution, they are highly experimental."
         )
     parser.add_argument(
         "--edge_thr", metavar=str(cfg.edge_thr), required=False,
         type=float, default=cfg.edge_thr,
         help="Lambda, edge threshold, lower values preserves more edges. Not \
-        used in EXP."
+        used in EXP and EXP2."
         )
     parser.add_argument(
         "--noise_scale", metavar=str(cfg.noise_scale), required=False,
         type=float, default=cfg.noise_scale,
-        help="Sigma, determines the spatial scale of then noise that will be \
-        corrected. Recommended lower bound is 0.5."
+        help="Sigma, determines the spatial scale of the noise that will be \
+        corrected. Recommended lower bound is 0.5. Adjusted for each axis \
+        to account for non-isotropic voxels. For example, if the selected \
+        value is 1 for an image with [0.7, 0.7, 1.4] mm voxels, sigma is \
+        adjusted to be [1, 1, 0.5] in the corresponding axes."
         )
     parser.add_argument(
         "--feature_scale", metavar=str(cfg.feature_scale), required=False,
         type=float, default=cfg.noise_scale,
         help="Rho, determines the spatial scale of the features that will be \
-        enhanced. Recommended lower bound is 0.5."
+        enhanced. Recommended lower bound is 0.5. Adjusted for each axis \
+        to account for non-isotropic voxels same way as in --noise_scale."
         )
     parser.add_argument(
         "--gamma", metavar=str(cfg.gamma), required=False,

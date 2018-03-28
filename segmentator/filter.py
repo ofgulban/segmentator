@@ -59,6 +59,8 @@ identifier = MODE
 # Load data
 basename = file_name.split(os.extsep, 1)[0]
 nii = load(file_name)
+vres = nii.header['pixdim'][1:4]  # voxel resolution x y z
+norm_vres = [r/min(vres) for r in vres]  # normalized voxel resolutions
 ima = (nii.get_data()).astype('float32')
 idx_msk_flat = ima.flatten() != 0
 dims = ima.shape
@@ -77,7 +79,9 @@ for t in range(NR_ITER):
     if SIGMA == 0:
         ima_temp = np.copy(ima)
     else:
-        ima_temp = gaussian_filter(ima, sigma=SIGMA, mode='constant', cval=0.0)
+        ima_temp = gaussian_filter(
+            ima, mode='constant', cval=0.0,
+            sigma=[SIGMA/norm_vres[0], SIGMA/norm_vres[1], SIGMA/norm_vres[2]])
 
     # Compute gradient
     gra = np.transpose(np.gradient(ima_temp), [1, 2, 3, 0])
@@ -87,7 +91,7 @@ for t in range(NR_ITER):
     struct = self_outer_product(gra)
 
     # Gaussian smoothing on tensor components
-    struct = smooth_matrix_image(struct, RHO=RHO)
+    struct = smooth_matrix_image(struct, RHO=RHO, vres=norm_vres)
 
     print('  Running eigen decomposition...')
     struct = struct.reshape([np.prod(dims), 3, 3])
