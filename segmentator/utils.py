@@ -304,9 +304,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
     elif method.lower() == 'deriche':
-        if len(cfg.deriche_alpha) > 1:  # TODO: may have multiple in the future
-            print("    Multiple alpha values detected, using the first one.")
-        alpha = cfg.deriche_alpha[0]
+        alpha = cfg.deriche_alpha
         print('    Selected alpha: {}'.format(alpha))
         ima = np.ascontiguousarray(ima, dtype=np.float32)
         gra_mag = Deriche_Gradient_Magnitude(ima, alpha, normalize=True)
