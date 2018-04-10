@@ -29,6 +29,7 @@ from segmentator.filters_utils import (
     self_outer_product, dot_product_matrix_vector, divergence,
     compute_diffusion_weights, construct_diffusion_tensors,
     smooth_matrix_image)
+from scipy.ndimage.interpolation import zoom
 
 
 def QC_export(image, basename, identifier):
@@ -62,6 +63,14 @@ nii = load(file_name)
 vres = nii.header['pixdim'][1:4]  # voxel resolution x y z
 norm_vres = [r/min(vres) for r in vres]  # normalized voxel resolutions
 ima = (nii.get_data()).astype('float32')
+
+if cfg.downsampling > 1:
+    print('  Applying initial downsampling...')
+    ima = zoom(ima, 1./cfg.downsampling)
+    orig = np.copy(ima)
+else:
+    pass
+
 idx_msk_flat = ima.flatten() != 0
 dims = ima.shape
 
@@ -129,6 +138,15 @@ for t in range(NR_ITER):
         duration = time() - start
         mins, secs = int(duration / 60), int(duration % 60)
         print('  Image saved (took {} min {} sec)'.format(mins, secs))
+
+if cfg.downsampling > 1:
+    print('  Final upsampling...')
+    residual = ima - orig
+    residual = zoom(residual, cfg.downsampling)
+    ima = (nii.get_data()).astype('float32') + residual
+else:
+    pass
+
 
 print('Saving final image...')
 QC_export(ima, basename, params)

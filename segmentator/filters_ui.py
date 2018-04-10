@@ -67,6 +67,12 @@ def main():
         help="Save every Nth iterations. Useful to track the effect of \
         smoothing as it evolves."
         )
+    parser.add_argument(
+        "--downsampling", metavar=str(cfg.downsampling), required=False,
+        type=int, default=cfg.downsampling,
+        help="Downsampling factor, use integers > 1. E.g. factor of 2 \
+        reduces the amount of voxels 8 times."
+        )
 
     # set cfg file variables to be accessed from other scripts
     args = parser.parse_args()
@@ -78,6 +84,7 @@ def main():
     cfg.gamma = args.gamma
     cfg.nr_iterations = args.nr_iterations
     cfg.save_every = args.save_every
+    cfg.downsampling = args.downsampling
 
     welcome_str = 'Segmentator {}'.format(__version__)
     welcome_decor = '=' * len(welcome_str)
