@@ -3,7 +3,7 @@
 filename = 'sample_filename_here'
 
 # filter defult parameters
-smoothing = 'EED'
+smoothing = 'STEDI'
 noise_scale = 0.5
 feature_scale = 0.5
 nr_iterations = 20

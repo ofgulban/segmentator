@@ -64,8 +64,8 @@ def divergence(vector_field):
 def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
     """Vectorized computation diffusion weights.
 
-    Reference
-    ---------
+    References
+    ----------
     - Weickert, J. (1998). Anisotropic diffusion in image processing.
     Image Rochester NY, 256(3), 170.
     - Mirebeau, J.-M., Fehrenbach, J., Risser, L., & Tobji, S. (2015).
@@ -74,7 +74,7 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
     idx_pos_e2 = eigvals[:, 1] > 0  # positive indices of second eigen value
     c = (1. - ALPHA)  # related to matrix condition
 
-    if mode in ['EED', 'cEED', 'iEED']:
+    if mode in ['EED', 'cEED', 'iEED']:  # TODO: I might remove these.
 
         if mode == 'EED':  # edge enhancing diffusion
             mu = np.ones(eigvals.shape)
@@ -103,12 +103,12 @@ def compute_diffusion_weights(eigvals, mode, LAMBDA=0.001, ALPHA=0.001, M=4):
             term2 = eigvals[:, 2, None] - eigvals[:, 0:2]
             mu[:, 0:2] = ALPHA + c * np.exp(-(term1/term2)**M)
 
-    elif mode == 'EXP':  # an experimental version
+    elif mode == 'CURED':  # NOTE: Somewhat experimental
         import compoda.core as coda
         mu = np.ones(eigvals.shape)
         mu[idx_pos_e2, :] = 1. - coda.closure(eigvals[idx_pos_e2, :])
 
-    elif mode == 'EXP2':  # a very experimental version
+    elif mode == 'STEDI':  # NOTE: Somewhat more experimental
         import compoda.core as coda
         mu = np.ones(eigvals.shape)
         eigs = eigvals[idx_pos_e2, :]

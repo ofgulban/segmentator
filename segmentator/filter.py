@@ -80,8 +80,8 @@ for t in range(NR_ITER):
     iteration = str(t+1).zfill(len(str(NR_ITER)))
     print("Iteration: " + iteration)
     # Update export parameters
-    params = '{}_n{}_l{}_r{}_s{}_g{}'.format(
-        identifier, iteration, LAMBDA, RHO, SIGMA, GAMMA)
+    params = '{}_n{}_s{}_r{}_g{}'.format(
+        identifier, iteration, SIGMA, RHO, GAMMA)
     params = params.replace('.', 'pt')
 
     # Smoothing
