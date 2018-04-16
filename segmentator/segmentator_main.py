@@ -112,6 +112,7 @@ volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
 # Initiate a flexible figure object, pass to it useful properties
 idxLasso = np.zeros(nr_bins*nr_bins, dtype=bool)
 lassoSwitchCount = 0
+lassoDrawErase = 1  # 1 for drawing, 0 for erasing
 flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         segmType='main', orig=orig, nii=nii,
                         sectorObj=sectorObj,
@@ -123,7 +124,8 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         contains=volHistMaskH.contains,
                         counts=counts,
                         idxLasso=idxLasso,
-                        lassoSwitchCount=lassoSwitchCount)
+                        lassoSwitchCount=lassoSwitchCount,
+                        lassoDrawErase=lassoDrawErase)
 
 # Make the figure responsive to clicks
 flexFig.connect()
@@ -229,7 +231,6 @@ def lassoSwitch(event):
         lasso = LassoSelector(ax, onselect)
         bLasso.label.set_text("Lasso\nOn")
     else:  # disable lasso
-        # lasso = []  # I am not sure we want to reset lasso with this button
         flexFig.connect()  # enable drag function of sector mask
         bLasso.label.set_text("Lasso\nOff")
 
@@ -244,10 +245,9 @@ def onselect(verts):
     """Lasso related."""
     global pix
     p = path.Path(verts)
-    newLasIdx = p.contains_points(pix, radius=1.5)  # new lasso indices
-    flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
-    # Update volume histogram mask
-    flexFig.remapMsks()
+    newLasIdx = p.contains_points(pix, radius=1.5)  # New lasso indices
+    flexFig.idxLasso[newLasIdx] = flexFig.lassoDrawErase  # Update lasso indices
+    flexFig.remapMsks()  # Update volume histogram mask
     flexFig.updatePanels(update_slice=False, update_rotation=True,
                          update_extent=True)
 

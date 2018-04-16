@@ -59,8 +59,7 @@ class responsiveObj:
         """
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
-            self.volHistMask = self.lassoArr(self.volHistMask,
-                                             self.idxLasso)
+            self.volHistMask = self.lassoArr(self.volHistMask, self.idxLasso)
             self.volHistMaskH.set_data(self.volHistMask)
         elif self.segmType == 'ncut':
             self.labelContours()
@@ -113,7 +112,7 @@ class responsiveObj:
             'key_release_event', self.on_key_release)
 
     def on_key_press(self, event):
-        """Determine what happens if key is pressed."""
+        """Determine what happens when a keyboard button is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
         elif event.key == '1':
@@ -129,6 +128,8 @@ class responsiveObj:
             self.remapMsks()
             self.updatePanels(update_slice=False, update_rotation=True,
                               update_extent=True)
+        elif event.key == '0':  # switch between lasso draw/erase
+            self.lassoDrawErase = (self.lassoDrawErase + 1) % 2
 
         if self.segmType == 'main':
             if event.key == 'up':
@@ -242,7 +243,7 @@ class responsiveObj:
                 else:
                     return
         elif self.segmType == 'ncut':
-            if event.button == 1:  # left button
+            if event.button == 1:  # left mouse button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
                     xbin = int(np.floor(event.xdata))
                     ybin = int(np.floor(event.ydata))
@@ -271,7 +272,7 @@ class responsiveObj:
                     self.findVoxInHist(event)
                 else:
                     return
-            elif event.button == 3:  # right button
+            elif event.button == 3:  # right mouse button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
                     xbin = int(np.floor(event.xdata))
                     ybin = int(np.floor(event.ydata))
@@ -554,10 +555,10 @@ class responsiveObj:
         self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
 
     def lassoArr(self, array, indices):
-        """Lasso related."""
+        """Update lasso volume histogram mask."""
         lin = np.arange(array.size)
         newArray = array.flatten()
-        newArray[lin[indices]] = 1
+        newArray[lin[indices]] = True
         return newArray.reshape(array.shape)
 
     def calcImaMaskBrd(self):
