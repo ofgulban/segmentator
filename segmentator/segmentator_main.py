@@ -112,7 +112,7 @@ volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
 # Initiate a flexible figure object, pass to it useful properties
 idxLasso = np.zeros(nr_bins*nr_bins, dtype=bool)
 lassoSwitchCount = 0
-lassoDrawErase = 1  # 1 for drawing, 0 for erasing
+lassoErase = 1  # 1 for drawing, 0 for erasing
 flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         segmType='main', orig=orig, nii=nii,
                         sectorObj=sectorObj,
@@ -125,7 +125,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         counts=counts,
                         idxLasso=idxLasso,
                         lassoSwitchCount=lassoSwitchCount,
-                        lassoDrawErase=lassoDrawErase)
+                        lassoErase=lassoErase)
 
 # Make the figure responsive to clicks
 flexFig.connect()
@@ -163,6 +163,10 @@ rotateax = plt.axes([0.55, bottom-0.285, 0.075, 0.0375])
 flexFig.bRotate = Button(rotateax, 'Rotate',
                          color=axcolor, hovercolor=hovcolor)
 
+# Reset button
+resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
+flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
+
 # Export nii button
 exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
 flexFig.bExport = Button(exportax, 'Export\nNifti',
@@ -172,11 +176,6 @@ flexFig.bExport = Button(exportax, 'Export\nNifti',
 exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
 flexFig.bExportNyp = Button(exportax, 'Export\nHist',
                             color=axcolor, hovercolor=hovcolor)
-
-# Reset button
-resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
-flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
-
 
 #
 """Updates"""
@@ -220,6 +219,14 @@ fig.canvas.mpl_connect('resize_event', update_axis_labels)
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nOff', color=axcolor, hovercolor=hovcolor)
 
+# Lasso draw/erase
+lassoEraseAx = plt.axes([0.25, bottom-0.285, 0.075, 0.075])
+bLassoErase = Button(lassoEraseAx, 'Erase\nOff', color=axcolor,
+                     hovercolor=hovcolor)
+bLassoErase.ax.patch.set_visible(False)
+bLassoErase.label.set_visible(False)
+bLassoErase.ax.axis('off')
+
 
 def lassoSwitch(event):
     """Enable disable lasso tool."""
@@ -230,10 +237,18 @@ def lassoSwitch(event):
         flexFig.disconnect()  # disable drag function of sector mask
         lasso = LassoSelector(ax, onselect)
         bLasso.label.set_text("Lasso\nOn")
+        # Make erase button appear on in lasso mode
+        bLassoErase.ax.patch.set_visible(True)
+        bLassoErase.label.set_visible(True)
+        bLassoErase.ax.axis('on')
+
     else:  # disable lasso
         flexFig.connect()  # enable drag function of sector mask
         bLasso.label.set_text("Lasso\nOff")
-
+        # Make erase button disappear
+        bLassoErase.ax.patch.set_visible(False)
+        bLassoErase.label.set_visible(False)
+        bLassoErase.ax.axis('off')
 
 # Pixel coordinates
 pix = np.arange(nr_bins)
@@ -246,13 +261,23 @@ def onselect(verts):
     global pix
     p = path.Path(verts)
     newLasIdx = p.contains_points(pix, radius=1.5)  # New lasso indices
-    flexFig.idxLasso[newLasIdx] = flexFig.lassoDrawErase  # Update lasso indices
+    flexFig.idxLasso[newLasIdx] = flexFig.lassoErase  # Update lasso indices
     flexFig.remapMsks()  # Update volume histogram mask
     flexFig.updatePanels(update_slice=False, update_rotation=True,
                          update_extent=True)
 
 
-bLasso.on_clicked(lassoSwitch)
+def lassoEraseSwitch(event):
+    """Enable disable lasso erase function."""
+    flexFig.lassoErase = (flexFig.lassoErase + 1) % 2
+    if flexFig.lassoErase is 1:
+        bLassoErase.label.set_text("Erase\nOff")
+    elif flexFig.lassoErase is 0:
+        bLassoErase.label.set_text("Erase\nOn")
+
+
+bLasso.on_clicked(lassoSwitch)  # lasso on/off
+bLassoErase.on_clicked(lassoEraseSwitch)  # lasso erase on/off
 flexFig.remapMsks()
 flexFig.updatePanels(update_slice=True, update_rotation=False,
                      update_extent=False)

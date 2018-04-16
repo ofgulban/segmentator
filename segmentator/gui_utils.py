@@ -128,8 +128,6 @@ class responsiveObj:
             self.remapMsks()
             self.updatePanels(update_slice=False, update_rotation=True,
                               update_extent=True)
-        elif event.key == '0':  # switch between lasso draw/erase
-            self.lassoDrawErase = (self.lassoDrawErase + 1) % 2
 
         if self.segmType == 'main':
             if event.key == 'up':
