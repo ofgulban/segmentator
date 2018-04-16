@@ -3,3 +3,4 @@ scipy==1.0.0
 matplotlib==2.2.2
 nibabel==2.2.1
 pytest-cov==2.5.1
+compoda>=0.3
