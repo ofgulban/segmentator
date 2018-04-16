@@ -64,7 +64,7 @@ vres = nii.header['pixdim'][1:4]  # voxel resolution x y z
 norm_vres = [r/min(vres) for r in vres]  # normalized voxel resolutions
 ima = (nii.get_data()).astype('float32')
 
-if cfg.downsampling > 1:
+if cfg.downsampling > 1:  # TODO: work in progress
     print('  Applying initial downsampling...')
     ima = zoom(ima, 1./cfg.downsampling)
     orig = np.copy(ima)
@@ -128,7 +128,6 @@ for t in range(NR_ITER):
     negative_flux = None
 
     # Update image (diffuse image using the difference)
-    # NOTE: Indexing is done to prevent frame-edge error propagation
     ima += GAMMA*diffusion_difference
     diffusion_difference = None
 
@@ -139,7 +138,7 @@ for t in range(NR_ITER):
         mins, secs = int(duration / 60), int(duration % 60)
         print('  Image saved (took {} min {} sec)'.format(mins, secs))
 
-if cfg.downsampling > 1:
+if cfg.downsampling > 1:  # TODO: work in progress
     print('  Final upsampling...')
     residual = ima - orig
     residual = zoom(residual, cfg.downsampling)

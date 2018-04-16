@@ -70,7 +70,7 @@ def main():
     parser.add_argument(
         "--downsampling", metavar=str(cfg.downsampling), required=False,
         type=int, default=cfg.downsampling,
-        help="Downsampling factor, use integers > 1. E.g. factor of 2 \
+        help="(!WIP!) Downsampling factor, use integers > 1. E.g. factor of 2 \
         reduces the amount of voxels 8 times."
         )
 
