@@ -2,7 +2,7 @@
 """Functions covering the user interaction with the GUI."""
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,21 +17,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
+from __future__ import division, print_function
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import map_2D_hist_to_ima
+import segmentator.config as cfg
+from segmentator.utils import map_2D_hist_to_ima
 from nibabel import save, Nifti1Image
-import config as cfg
+from scipy.ndimage.morphology import binary_erosion
 
 
 class responsiveObj:
     """Stuff to interact in the user interface."""
 
     def __init__(self, **kwargs):
+        """Initialize variables used acros functions here."""
         if kwargs is not None:
-            for key, value in kwargs.iteritems():
+            for key, value in kwargs.items():
                 setattr(self, key, value)
         self.basename = self.nii.get_filename().split(os.extsep, 1)[0]
         self.press = None
@@ -40,7 +42,6 @@ class responsiveObj:
         self.imaSlcMskSwitch, self.volHistHighlightSwitch = 0, 0
         self.TranspVal = 0.5
         self.nrExports = 0
-        self.entropWin = 0
         self.borderSwitch = 0
         self.imaSlc = self.orig[:, :, self.sliceNr]  # selected slice
         self.cycleCount = 0
@@ -58,8 +59,7 @@ class responsiveObj:
         """
         if self.segmType == 'main':
             self.volHistMask = self.sectorObj.binaryMask()
-            self.volHistMask = self.lassoArr(self.volHistMask,
-                                             self.idxLasso)
+            self.volHistMask = self.lassoArr(self.volHistMask, self.idxLasso)
             self.volHistMaskH.set_data(self.volHistMask)
         elif self.segmType == 'ncut':
             self.labelContours()
@@ -112,22 +112,22 @@ class responsiveObj:
             'key_release_event', self.on_key_release)
 
     def on_key_press(self, event):
-        """Determine what happens if key is pressed."""
+        """Determine what happens when a keyboard button is pressed."""
         if event.key == 'control':
             self.ctrlHeld = True
-        elif event.key == 'q':
-            self.imaSlcMskIncr(-0.1)
-        elif event.key == 'w':
-            self.imaSlcMskTransSwitch()
-        elif event.key == 'h':
-            self.volHistHighlightTransSwitch()
-        elif event.key == 'e':
-            self.imaSlcMskIncr(0.1)
         elif event.key == '1':
+            self.imaSlcMskIncr(-0.1)
+        elif event.key == '2':
+            self.imaSlcMskTransSwitch()
+        elif event.key == '3':
+            self.imaSlcMskIncr(0.1)
+        elif event.key == '4':
+            self.volHistHighlightTransSwitch()
+        elif event.key == '5':
             self.borderSwitch = (self.borderSwitch + 1) % 2
             self.remapMsks()
-            self.updatePanels(update_slice=False, update_rotation=False,
-                              update_extent=False)
+            self.updatePanels(update_slice=False, update_rotation=True,
+                              update_extent=True)
 
         if self.segmType == 'main':
             if event.key == 'up':
@@ -148,7 +148,7 @@ class responsiveObj:
             elif event.key == 'left':
                 self.sectorObj.rotate(10.0)
                 self.remapMsks()
-                self.updatePanels(update_slice=False, update_rotation=True,
+                self.updatePanels(update_slice=True, update_rotation=True,
                                   update_extent=False)
             else:
                 return
@@ -241,7 +241,7 @@ class responsiveObj:
                 else:
                     return
         elif self.segmType == 'ncut':
-            if event.button == 1:  # left button
+            if event.button == 1:  # left mouse button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
                     xbin = int(np.floor(event.xdata))
                     ybin = int(np.floor(event.ydata))
@@ -270,7 +270,7 @@ class responsiveObj:
                     self.findVoxInHist(event)
                 else:
                     return
-            elif event.button == 3:  # right button
+            elif event.button == 3:  # right mouse button
                 if event.inaxes == self.axes:  # cursor in left plot (hist)
                     xbin = int(np.floor(event.xdata))
                     ybin = int(np.floor(event.ydata))
@@ -388,7 +388,7 @@ class responsiveObj:
 
     def exportNifti(self, event):
         """Export labels in the image browser as a nifti file."""
-        print("Start exporting labels...")
+        print("  Exporting nifti file...")
         # put the permuted indices back to their original format
         cycBackPerm = (self.cycleCount, (self.cycleCount+1) % 3,
                        (self.cycleCount+2) % 3)
@@ -414,14 +414,14 @@ class responsiveObj:
         new_image = Nifti1Image(out_nii, header=self.nii.get_header(),
                                 affine=self.nii.get_affine())
         # get new flex file name and check for overwriting
-        self.nrExports = 0
-        self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        while os.path.isfile(self.basename + self.flexfilename):
+        labels_out = '{}_labels_{}.nii.gz'.format(
+            self.basename, self.nrExports)
+        while os.path.isfile(labels_out):
             self.nrExports += 1
-            self.flexfilename = '_labels_' + str(self.nrExports) + '.nii.gz'
-        save(new_image, self.basename + self.flexfilename)
-        print("successfully exported image labels as: \n"
-              + self.basename + self.flexfilename)
+            labels_out = '{}_labels_{}.nii.gz'.format(
+                self.basename, self.nrExports)
+        save(new_image, labels_out)
+        print("    Saved as: {}".format(labels_out))
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""
@@ -493,30 +493,24 @@ class responsiveObj:
 
     def exportNyp(self, event):
         """Export histogram counts as a numpy array."""
-        outFileName = self.basename + '_identifier' \
-            + '_pcMax' + str(self.initTpl[0]) \
-            + '_pcMin' + str(self.initTpl[1]) \
-            + '_sc' + str(int(self.initTpl[2]))
+        print("  Exporting numpy file...")
+        outFileName = '{}_identifier_pcMax{}_pcMin{}_sc{}'.format(
+            self.basename, cfg.perc_max, cfg.perc_min, int(cfg.scale))
         if self.segmType == 'ncut':
             outFileName = outFileName.replace('identifier', 'volHistLabels')
-            outFileName = outFileName.replace('.', 'pt')
-            np.save(outFileName, self.volHistMask)
-            print("Successfully exported histogram colors as: \n"
-                  + outFileName)
+            out_data = self.volHistMask
         elif self.segmType == 'main':
             outFileName = outFileName.replace('identifier', 'volHist')
-            outFileName = outFileName.replace('.', 'pt')
-            np.save(outFileName, self.counts)
-            print("successfully exported histogram counts as: \n"
-                  + outFileName)
-        else:
-            return
+            out_data = self.counts
+        outFileName = outFileName.replace('.', 'pt')
+        np.save(outFileName, out_data)
+        print("    Saved as: {}{}".format(outFileName, '.npy'))
 
     def updateLabels(self, val):
         """Update labels in volume histogram with slider."""
         if self.segmType == 'ncut':
             self.labelNr = self.sLabelNr.val
-        else:
+        else:  # NOTE: might be used in the future
             return
 
     def imaSlcMskIncr(self, incr):
@@ -559,16 +553,15 @@ class responsiveObj:
         self.pltMapH.set_extent((0, self.nrBins, self.nrBins, 0))
 
     def lassoArr(self, array, indices):
-        """Lasso related."""
+        """Update lasso volume histogram mask."""
         lin = np.arange(array.size)
         newArray = array.flatten()
-        newArray[lin[indices]] = 1
+        newArray[lin[indices]] = True
         return newArray.reshape(array.shape)
 
     def calcImaMaskBrd(self):
         """Calculate borders of image mask slice."""
-        grad = np.gradient(self.imaSlcMsk)
-        return np.greater(np.abs(grad[0], 2) + np.abs(grad[1], 2), 0)
+        return self.imaSlcMsk - binary_erosion(self.imaSlcMsk)
 
 
 class sector_mask:
@@ -582,20 +575,20 @@ class sector_mask:
     """
 
     def __init__(self, shape, centre, radius, angle_range):
-        self.radius = radius
-        self.shape = shape
+        """Initialize variables used acros functions here."""
+        self.radius, self.shape = radius, shape
         self.x, self.y = np.ogrid[:shape[0], :shape[1]]
         self.cx, self.cy = centre
         self.tmin, self.tmax = np.deg2rad(angle_range)
         # ensure stop angle > start angle
         if self.tmax < self.tmin:
-            self.tmax += 2*np.pi
-        # convert cartesian --> polar coordinates
-        self.r2 = (self.x-self.cx)*(self.x-self.cx) + (
-            self.y-self.cy)*(self.y-self.cy)
-        self.theta = np.arctan2(self.x-self.cx, self.y-self.cy) - self.tmin
+            self.tmax += 2 * np.pi
+        # convert cartesian to polar coordinates
+        self.r2 = (self.x - self.cx) * (self.x - self.cx) + (
+            self.y-self.cy) * (self.y - self.cy)
+        self.theta = np.arctan2(self.x - self.cx, self.y - self.cy) - self.tmin
         # wrap angles between 0 and 2*pi
-        self.theta %= (2*np.pi)
+        self.theta %= 2 * np.pi
 
     def set_polCrd(self):
         """Convert cartesian to polar coordinates."""

@@ -2,7 +2,7 @@
 """Save 2D histogram image without displaying GUI."""
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 import os
 import numpy as np
-import config as cfg
-from segmentator.utils import truncate_range, scale_range
+import segmentator.config as cfg
+from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude, prep_2D_hist
 from nibabel import load
 
@@ -29,7 +30,7 @@ nii = load(cfg.filename)
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # data processing
-orig = np.squeeze(nii.get_data())
+orig, _ = check_data(nii.get_data(), cfg.force_original_precision)
 orig, _, _ = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
@@ -39,10 +40,8 @@ ima = np.ndarray.flatten(orig)
 gra = np.ndarray.flatten(gra)
 
 counts, _, _, _, _, _ = prep_2D_hist(ima, gra, discard_zeros=cfg.discard_zeros)
-outName = (basename + '_volHist'
-           + '_pMax' + str(cfg.perc_max) + '_pMin' + str(cfg.perc_min)
-           + '_sc' + str(int(cfg.scale))
-           )
+outName = '{}_volHist_pcMax{}_pcMin{}_sc{}'.format(
+    basename, cfg.perc_max, cfg.perc_min, int(cfg.scale))
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
-print('----Image saved as:\n ' + outName)
+print('  Image saved as:\n {}'.format(outName))

@@ -5,13 +5,11 @@ Mostly following this example:
 https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-and-scripts/
 
 Use config.py to hold arguments to be accessed by imported scripts.
-
-TODO: Argument parsing can be better structured, maybe by using parents. help
-looks a bit messy as is.
 """
 
+from __future__ import print_function
 import argparse
-import config as cfg
+import segmentator.config as cfg
 from segmentator import __version__
 
 
@@ -28,12 +26,17 @@ def main():
     parser.add_argument(
         "--gramag", metavar=str(cfg.gramag), required=False,
         default=cfg.gramag,
-        help="'scharr', 'sobel', 'prewitt', 'numpy' \
+        help="'scharr', 'deriche', 'sobel', 'prewitt', 'numpy' \
         or path to a gradient magnitude nifti."
         )
+    # used in Deriche filter gradient magnitude computation
     parser.add_argument(
-        "--ncut",  metavar='path', required=False,
-        help="Path to nyp file with ncut labels"
+        "--deriche_alpha", required=False, type=float,
+        default=cfg.deriche_alpha, metavar=cfg.deriche_alpha,
+        help="Used only in Deriche gradient magnitude option. Smaller alpha \
+        values suppress more noise but can dislocate edges. Useful when there \
+        is strong noise in the input image or the features of interest are at \
+        a different scale compared to original image resolution."
         )
     parser.add_argument(
         "--scale", metavar=str(cfg.scale), required=False, type=float,
@@ -51,6 +54,16 @@ def main():
         help="Maximum percentile used in truncation."
         )
     parser.add_argument(
+        "--valmin", metavar=str(cfg.valmin), required=False, type=float,
+        default=cfg.valmin,
+        help="Minimum value, overwrites percentile."
+        )
+    parser.add_argument(
+        "--valmax",  metavar=str(cfg.valmax), required=False,  type=float,
+        default=cfg.valmax,
+        help="Maximum value, overwrites percentile."
+        )
+    parser.add_argument(
         "--cbar_max",  metavar=str(cfg.cbar_max), required=False,  type=float,
         default=cfg.cbar_max,
         help="Maximum value (power of 10) of the colorbar slider."
@@ -60,6 +73,10 @@ def main():
         type=float, default=cfg.cbar_init,
         help="Initial value (power of 10) of the colorbar slider. \
               Also used with --ncut_prepare flag."
+        )
+    parser.add_argument(
+        "--ncut",  metavar='path', required=False,
+        help="Path to nyp file with ncut labels. Initiates N-cut GUI mode."
         )
     parser.add_argument(
         "--nogui", action='store_true',
@@ -73,8 +90,13 @@ def main():
         "--export_gramag", action='store_true',
         help="Export the gradient magnitude image. Not used by default."
         )
+    parser.add_argument(
+        "--force_original_precision", action='store_true',
+        help="Do not change the data type of the input image. Can be useful \
+        for very large images. Off by default."
+        )
 
-    # used in ncut preparation  (TODO: not yet tested after restructuring.)
+    # used in ncut preparation
     parser.add_argument(
         "--ncut_prepare", action='store_true',
         help=("------------------(utility feature)------------------ \
@@ -114,11 +136,14 @@ def main():
     cfg.scale = args.scale
     cfg.perc_min = args.percmin
     cfg.perc_max = args.percmax
+    cfg.valmin = args.valmin
+    cfg.valmax = args.valmax
     cfg.cbar_max = args.cbar_max
     cfg.cbar_init = args.cbar_init
     if args.include_zeros:
         cfg.discard_zeros = False
     cfg.export_gramag = args.export_gramag
+    cfg.force_original_precision = args.force_original_precision
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec
@@ -126,23 +151,26 @@ def main():
     cfg.compactness = args.ncut_compactness
     # used in ncut
     cfg.ncut = args.ncut
+    # used in deriche filter
+    cfg.deriche_alpha = args.deriche_alpha
 
-    welcome_str = 'Segmentator ' + __version__
-    welcome_decoration = '=' * len(welcome_str)
-    print(welcome_decoration + '\n' + welcome_str + '\n' + welcome_decoration)
+    welcome_str = 'Segmentator {}'.format(__version__)
+    welcome_decor = '=' * len(welcome_str)
+    print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:
-        print('--No GUI option is selected. Saving 2D histogram image...')
-        import hist2d_counts
+        print('No GUI option is selected. Saving 2D histogram image...')
+        import segmentator.hist2d_counts
     elif args.ncut_prepare:
-        print('--Preparing N-cut related files...')
-        import ncut_prepare
+        print('Preparing N-cut file...')
+        import segmentator.ncut_prepare
     elif args.ncut:
-        print('--Experimental N-cut feature is selected.')
-        import segmentator_ncut
+        print('N-cut GUI is selected.')
+        import segmentator.segmentator_ncut
     else:
-        import segmentator_main
+        print('Default GUI is selected.')
+        import segmentator.segmentator_main
 
 
 if __name__ == "__main__":

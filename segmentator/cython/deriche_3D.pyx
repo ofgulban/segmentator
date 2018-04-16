@@ -1,18 +1,7 @@
-"""3D Deriche filter implementation.
-
-Before using this run:
-python deriche_setup.py build_ext --inplace
-
-It is my first time using cython, so probably this is not very optimal for now.
-Probably there are some redundant stuff, will be cleaned up in time.
-
-Note: Tested with images having  around 300x300x300 voxels, already gained
-massive speedup. Which decreased the computation time from ~590 to ~13 seconds.
-- Faruk
-"""
+"""3D Deriche filter implementation."""
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

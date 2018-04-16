@@ -2,7 +2,7 @@
 """Processing input and plotting."""
 
 # Part of the Segmentator library
-# Copyright (C) 2016  Omer Faruk Gulban and Marian Schneider
+# Copyright (C) 2018  Omer Faruk Gulban and Marian Schneider
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as np
-import config as cfg
+import segmentator.config as cfg
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -29,38 +29,38 @@ from matplotlib.widgets import Slider, Button, LassoSelector
 from matplotlib import path
 from nibabel import load
 from segmentator.utils import map_ima_to_2D_hist, prep_2D_hist
-from segmentator.utils import truncate_range, scale_range
+from segmentator.utils import truncate_range, scale_range, check_data
 from segmentator.utils import set_gradient_magnitude
 from segmentator.utils import export_gradient_magnitude_image
-from gui_utils import sector_mask, responsiveObj
+from segmentator.gui_utils import sector_mask, responsiveObj
+from segmentator.config_gui import palette, axcolor, hovcolor
 
 #
 """Data Processing"""
 nii = load(cfg.filename)
-orig = np.squeeze(nii.get_data())
-dims = orig.shape
-orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
-                                  percMax=cfg.perc_max)
+orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
 # Save min and max truncation thresholds to be used in axis labels
-orig_range = [pMin, pMax]
+if np.isnan(cfg.valmin) or np.isnan(cfg.valmax):
+    orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
+                                      percMax=cfg.perc_max)
+else:  # TODO: integrate this into truncate range function
+    orig[orig < cfg.valmin] = cfg.valmin
+    orig[orig > cfg.valmax] = cfg.valmax
+    pMin, pMax = cfg.valmin, cfg.valmax
+
 # Continue with scaling the original truncated image and recomputing gradient
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)
 if cfg.export_gramag:
-    export_gradient_magnitude_image(gra, nii.get_filename(), nii.affine)
-
+    export_gradient_magnitude_image(gra, nii.get_filename(), cfg.gramag,
+                                    nii.affine)
 # Reshape for voxel-wise operations
 ima = np.copy(orig.flatten())
 gra = gra.flatten()
 
 #
 """Plots"""
-# Set up a colormap:
-palette = plt.cm.Reds
-palette.set_over('r', 1.0)
-palette.set_under('w', 0)
-palette.set_bad('m', 1.0)
-
+print("Preparing GUI...")
 # Plot 2D histogram
 fig = plt.figure(facecolor='0.775')
 ax = fig.add_subplot(121)
@@ -104,7 +104,7 @@ sectorObj = sector_mask((nr_bins, nr_bins), cfg.init_centre, cfg.init_radius,
                         cfg.init_theta)
 
 # Draw sector mask for the first time
-volHistMaskH, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2,
+volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
                                            vmin=0.1, interpolation='nearest',
                                            origin='lower',
                                            extent=[0, nr_bins, 0, nr_bins])
@@ -112,6 +112,7 @@ volHistMaskH, volHistMask = sectorObj.draw(ax, cmap='Reds', alpha=0.2,
 # Initiate a flexible figure object, pass to it useful properties
 idxLasso = np.zeros(nr_bins*nr_bins, dtype=bool)
 lassoSwitchCount = 0
+lassoErase = 1  # 1 for drawing, 0 for erasing
 flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         segmType='main', orig=orig, nii=nii,
                         sectorObj=sectorObj,
@@ -123,18 +124,18 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         contains=volHistMaskH.contains,
                         counts=counts,
                         idxLasso=idxLasso,
-                        initTpl=(cfg.perc_min, cfg.perc_max, cfg.scale),
-                        lassoSwitchCount=lassoSwitchCount)
+                        lassoSwitchCount=lassoSwitchCount,
+                        lassoErase=lassoErase)
 
 # Make the figure responsive to clicks
 flexFig.connect()
 ima2volHistMap = map_ima_to_2D_hist(xinput=ima, yinput=gra, bins_arr=bin_edges)
 flexFig.invHistVolume = np.reshape(ima2volHistMap, dims)
+ima, gra = None, None
 
 #
 """Sliders and Buttons"""
 # Colorbar slider
-axcolor, hovcolor = '0.875', '0.975'
 axHistC = plt.axes([0.15, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
 flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
@@ -162,6 +163,10 @@ rotateax = plt.axes([0.55, bottom-0.285, 0.075, 0.0375])
 flexFig.bRotate = Button(rotateax, 'Rotate',
                          color=axcolor, hovercolor=hovcolor)
 
+# Reset button
+resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
+flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
+
 # Export nii button
 exportax = plt.axes([0.75, bottom-0.285, 0.075, 0.075])
 flexFig.bExport = Button(exportax, 'Export\nNifti',
@@ -171,11 +176,6 @@ flexFig.bExport = Button(exportax, 'Export\nNifti',
 exportax = plt.axes([0.85, bottom-0.285, 0.075, 0.075])
 flexFig.bExportNyp = Button(exportax, 'Export\nHist',
                             color=axcolor, hovercolor=hovcolor)
-
-# Reset button
-resetax = plt.axes([0.65, bottom-0.285, 0.075, 0.075])
-flexFig.bReset = Button(resetax, 'Reset', color=axcolor, hovercolor=hovcolor)
-
 
 #
 """Updates"""
@@ -194,10 +194,10 @@ flexFig.bReset.on_clicked(flexFig.resetGlobal)
 def update_axis_labels(event):
     """Swap histogram bin indices with original values."""
     xlabels = [item.get_text() for item in ax.get_xticklabels()]
-    orig_range_labels = np.linspace(orig_range[0], orig_range[1], len(xlabels))
+    orig_range_labels = np.linspace(pMin, pMax, len(xlabels))
 
     # Adjust displayed decimals based on data range
-    data_range = orig_range[1] - orig_range[0]
+    data_range = pMax - pMin
     if data_range > 200:  # arbitrary value
         xlabels = [('%i' % i) for i in orig_range_labels]
     elif data_range > 20:
@@ -214,10 +214,18 @@ def update_axis_labels(event):
 fig.canvas.mpl_connect('resize_event', update_axis_labels)
 
 #
-"""New stuff: Lasso (Experimental)"""
+"""Lasso selection"""
 # Lasso button
 lassoax = plt.axes([0.15, bottom-0.285, 0.075, 0.075])
 bLasso = Button(lassoax, 'Lasso\nOff', color=axcolor, hovercolor=hovcolor)
+
+# Lasso draw/erase
+lassoEraseAx = plt.axes([0.25, bottom-0.285, 0.075, 0.075])
+bLassoErase = Button(lassoEraseAx, 'Erase\nOff', color=axcolor,
+                     hovercolor=hovcolor)
+bLassoErase.ax.patch.set_visible(False)
+bLassoErase.label.set_visible(False)
+bLassoErase.ax.axis('off')
 
 
 def lassoSwitch(event):
@@ -229,11 +237,18 @@ def lassoSwitch(event):
         flexFig.disconnect()  # disable drag function of sector mask
         lasso = LassoSelector(ax, onselect)
         bLasso.label.set_text("Lasso\nOn")
+        # Make erase button appear on in lasso mode
+        bLassoErase.ax.patch.set_visible(True)
+        bLassoErase.label.set_visible(True)
+        bLassoErase.ax.axis('on')
+
     else:  # disable lasso
-        # lasso = []  # I am not sure we want to reset lasso with this button
         flexFig.connect()  # enable drag function of sector mask
         bLasso.label.set_text("Lasso\nOff")
-
+        # Make erase button disappear
+        bLassoErase.ax.patch.set_visible(False)
+        bLassoErase.label.set_visible(False)
+        bLassoErase.ax.axis('off')
 
 # Pixel coordinates
 pix = np.arange(nr_bins)
@@ -245,17 +260,27 @@ def onselect(verts):
     """Lasso related."""
     global pix
     p = path.Path(verts)
-    newLasIdx = p.contains_points(pix, radius=1.5)  # new lasso indices
-    flexFig.idxLasso[newLasIdx] = True  # updated old lasso indices
-    # Update volume histogram mask
-    flexFig.remapMsks()
+    newLasIdx = p.contains_points(pix, radius=1.5)  # New lasso indices
+    flexFig.idxLasso[newLasIdx] = flexFig.lassoErase  # Update lasso indices
+    flexFig.remapMsks()  # Update volume histogram mask
     flexFig.updatePanels(update_slice=False, update_rotation=True,
                          update_extent=True)
 
 
-bLasso.on_clicked(lassoSwitch)
+def lassoEraseSwitch(event):
+    """Enable disable lasso erase function."""
+    flexFig.lassoErase = (flexFig.lassoErase + 1) % 2
+    if flexFig.lassoErase is 1:
+        bLassoErase.label.set_text("Erase\nOff")
+    elif flexFig.lassoErase is 0:
+        bLassoErase.label.set_text("Erase\nOn")
+
+
+bLasso.on_clicked(lassoSwitch)  # lasso on/off
+bLassoErase.on_clicked(lassoEraseSwitch)  # lasso erase on/off
 flexFig.remapMsks()
 flexFig.updatePanels(update_slice=True, update_rotation=False,
                      update_extent=False)
 
+print("GUI is ready.")
 plt.show()
