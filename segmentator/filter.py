@@ -34,7 +34,7 @@ from scipy.ndimage.interpolation import zoom
 
 def QC_export(image, basename, identifier, nii):
     """Quality control exports."""
-    out = Nifti1Image(image, affine=nii.affine, header=nii.header)
+    out = Nifti1Image(image, affine=nii.affine)
     save(out, '{}_{}.nii.gz'.format(basename, identifier))
 
 
