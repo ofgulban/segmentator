@@ -16,7 +16,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 <img src="visuals/animation_01.gif" width=840 align="center" />
 
 ## Core dependencies
-**[Python 2.7](https://www.python.org/download/releases/2.7/)** or **[Python 3.6](https://www.python.org/downloads/release/python-363/)** (compatible with both).
+**[Python 3.6](https://www.python.org/downloads/release/python-363/)** (compatible with both) or **[Python 2.7](https://www.python.org/download/releases/2.7/)**.
 
 | Package                                        | Tested version |
 |------------------------------------------------|----------------|
@@ -27,7 +27,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 | [Compoda](https://github.com/ofgulban/compoda) | 0.3.3          |
 
 ## Installation & Quick Start
-- Make sure you have [**Python 2.7**](https://www.python.org/download/releases/2.7/) and [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed.
+- Make sure you have [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed if you are using [**Python 2.7**](https://www.python.org/download/releases/2.7/).
 - Download [the latest release](https://github.com/ofgulban/segmentator/releases) and unzip it.
 - Change directory in your command line:
 ```
@@ -56,7 +56,7 @@ Check out __[our wiki](https://github.com/ofgulban/segmentator/wiki)__ for furth
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
 
 ## License
-Copyright © 2016, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
+Copyright © 2018, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
 Released under [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
 
 ## References

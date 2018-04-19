@@ -16,7 +16,7 @@ ext_modules = [Extension(
     ]
 
 setup(name='segmentator',
-      version='1.5.0',
+      version='1.5.2',
       description=('Multi-dimensional data exploration and segmentation for 3D \
                    images.'),
       url='https://github.com/ofgulban/segmentator',
