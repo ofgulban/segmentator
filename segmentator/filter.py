@@ -32,7 +32,7 @@ from segmentator.filters_utils import (
 from scipy.ndimage.interpolation import zoom
 
 
-def QC_export(image, basename, identifier):
+def QC_export(image, basename, identifier, nii):
     """Quality control exports."""
     out = Nifti1Image(image, affine=nii.affine)
     save(out, '{}_{}.nii.gz'.format(basename, identifier))
@@ -133,7 +133,7 @@ for t in range(NR_ITER):
 
     # Convenient exports for intermediate outputs
     if (t+1) % SAVE_EVERY == 0 and (t+1) != NR_ITER:
-        QC_export(ima, basename, params)
+        QC_export(ima, basename, params, nii)
         duration = time() - start
         mins, secs = int(duration / 60), int(duration % 60)
         print('  Image saved (took {} min {} sec)'.format(mins, secs))
@@ -148,7 +148,7 @@ else:
 
 
 print('Saving final image...')
-QC_export(ima, basename, params)
+QC_export(ima, basename, params, nii)
 
 duration = time() - start
 mins, secs = int(duration / 60), int(duration % 60)

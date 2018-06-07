@@ -7,16 +7,16 @@
 Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation for 3D images. This application is mainly developed and tested using ultra-high field magnetic resonance imaging (MRI) brain data.
 
 
-The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages (FSL, Freesurfer, SPM, Brainvoyager, itk-SNAP, etc.).
+The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages ([FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/), [CBS-Tools](https://www.cbs.mpg.de/institute/software/cbs-tools), [ITK-SNAP](http://www.itksnap.org/pmwiki/pmwiki.php), [Freesurfer](https://surfer.nmr.mgh.harvard.edu/), [SPM](http://www.fil.ion.ucl.ac.uk/spm/software/spm12/), [Brainvoyager](http://www.brainvoyager.com/), etc.).
 
 ### Citation:
-- Our preprint can be accessed from __[this link.](https://doi.org/10.1101/245738)__
+- Our paper can be accessed from __[this link.](https://doi.org/10.1371/journal.pone.0198335)__
 - Released versions of this package can be cited by using our __[Zenodo DOI](https://zenodo.org/badge/latestdoi/59303623).__
 
 <img src="visuals/animation_01.gif" width=840 align="center" />
 
 ## Core dependencies
-**[Python 2.7](https://www.python.org/download/releases/2.7/)** or **[Python 3.6](https://www.python.org/downloads/release/python-363/)** (compatible with both).
+**[Python 3.6](https://www.python.org/downloads/release/python-363/)** or **[Python 2.7](https://www.python.org/download/releases/2.7/)** (compatible with both).
 
 | Package                                        | Tested version |
 |------------------------------------------------|----------------|
@@ -27,7 +27,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 | [Compoda](https://github.com/ofgulban/compoda) | 0.3.3          |
 
 ## Installation & Quick Start
-- Make sure you have [**Python 2.7**](https://www.python.org/download/releases/2.7/) and [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed.
+- Make sure you have [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed if you are using [**Python 2.7**](https://www.python.org/download/releases/2.7/).
 - Download [the latest release](https://github.com/ofgulban/segmentator/releases) and unzip it.
 - Change directory in your command line:
 ```
@@ -56,7 +56,7 @@ Check out __[our wiki](https://github.com/ofgulban/segmentator/wiki)__ for furth
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
 
 ## License
-Copyright © 2016, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
+Copyright © 2018, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
 Released under [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
 
 ## References

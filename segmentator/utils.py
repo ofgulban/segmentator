@@ -354,7 +354,7 @@ def export_gradient_magnitude_image(img, filename, filtername, affine):
     out_img = Nifti1Image(img, affine=affine)
     if filtername == 'deriche':  # add alpha as suffix for extra information
         filtername = '{}_alpha{}'.format(filtername.title(),
-                                         cfg.deriche_alpha[0])
+                                         cfg.deriche_alpha)
         filtername = filtername.replace('.', 'pt')
     else:
         filtername = filtername.title()
