@@ -10,7 +10,7 @@ Segmentator is a free and open-source package for multi-dimensional data explora
 The goal is to provide a complementary tool to the already available brain tissue segmentation methods (to the best of our knowledge) in other software packages ([FSL](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/), [CBS-Tools](https://www.cbs.mpg.de/institute/software/cbs-tools), [ITK-SNAP](http://www.itksnap.org/pmwiki/pmwiki.php), [Freesurfer](https://surfer.nmr.mgh.harvard.edu/), [SPM](http://www.fil.ion.ucl.ac.uk/spm/software/spm12/), [Brainvoyager](http://www.brainvoyager.com/), etc.).
 
 ### Citation:
-- Our preprint can be accessed from __[this link.](https://doi.org/10.1101/245738)__
+- Our paper can be accessed from __[this link.](https://doi.org/10.1371/journal.pone.0198335)__
 - Released versions of this package can be cited by using our __[Zenodo DOI](https://zenodo.org/badge/latestdoi/59303623).__
 
 <img src="visuals/animation_01.gif" width=840 align="center" />
