@@ -74,7 +74,7 @@ def main():
         reduces the amount of voxels 8 times."
         )
     parser.add_argument(
-        "--no_nonpositive_mask", action='store_false',
+        "--no_nonpositive_mask", action='store_true',
         help="(!WIP!) Do not mask out non-positive values."
         )
 
