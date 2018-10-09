@@ -71,7 +71,11 @@ if cfg.downsampling > 1:  # TODO: work in progress
 else:
     pass
 
-idx_msk_flat = ima.flatten() != 0
+if cfg.no_nonpositive_mask:  # TODO: work in progress
+    idx_msk_flat = np.ones(ima.size, dtype=bool)
+else:  # mask out non positive voxels
+    idx_msk_flat = ima.flatten() > 0
+
 dims = ima.shape
 
 # The main loop

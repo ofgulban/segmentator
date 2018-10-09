@@ -11,3 +11,4 @@ save_every = 10
 edge_thr = 0.001
 gamma = 1
 downsampling = 0
+no_nonpositive_mask = False
