@@ -7,3 +7,5 @@ omit =
     *config*
     *tests/*
     segmentator/future/*
+    segmentator/cython/*
+    *ui.py
