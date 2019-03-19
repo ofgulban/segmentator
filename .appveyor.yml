@@ -16,6 +16,7 @@ install:
   - conda info -a
   - "conda env create -q -n segmentator python=%PYTHON_VERSION% --file requirements.txt"
   - activate segmentator
+  - pip install compoda
   - python setup.py install
 
 test_script:
