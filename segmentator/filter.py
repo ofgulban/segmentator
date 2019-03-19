@@ -20,7 +20,7 @@
 from __future__ import division
 import os
 import numpy as np
-import config_filters as cfg
+import segmentator.config_filters as cfg
 from nibabel import load, Nifti1Image, save
 from numpy.linalg import eigh
 from scipy.ndimage import gaussian_filter
