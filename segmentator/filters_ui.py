@@ -73,6 +73,10 @@ def main():
         help="(!WIP!) Downsampling factor, use integers > 1. E.g. factor of 2 \
         reduces the amount of voxels 8 times."
         )
+    parser.add_argument(
+        "--no_nonpositive_mask", action='store_true',
+        help="(!WIP!) Do not mask out non-positive values."
+        )
 
     # set cfg file variables to be accessed from other scripts
     args = parser.parse_args()
@@ -85,6 +89,7 @@ def main():
     cfg.nr_iterations = args.nr_iterations
     cfg.save_every = args.save_every
     cfg.downsampling = args.downsampling
+    cfg.no_nonpositive_mask = args.no_nonpositive_mask
 
     welcome_str = 'Segmentator {}'.format(__version__)
     welcome_decor = '=' * len(welcome_str)

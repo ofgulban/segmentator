@@ -25,7 +25,6 @@ import segmentator.config as cfg
 from nibabel import load, Nifti1Image, save
 from scipy.ndimage import convolve
 from time import time
-from segmentator.deriche_prepare import Deriche_Gradient_Magnitude
 
 
 def sub2ind(array_shape, rows, cols):
@@ -304,6 +303,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
         gra = np.asarray(np.gradient(ima))
         gra_mag = np.sqrt(np.sum(np.power(gra, 2.), axis=0))
     elif method.lower() == 'deriche':
+        from segmentator.deriche_prepare import Deriche_Gradient_Magnitude
         alpha = cfg.deriche_alpha
         print('    Selected alpha: {}'.format(alpha))
         ima = np.ascontiguousarray(ima, dtype=np.float32)

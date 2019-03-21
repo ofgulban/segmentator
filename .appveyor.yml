@@ -2,7 +2,7 @@ build: false
 
 environment:
   matrix:
-    - PYTHON_VERSION: 3.6
+    - PYTHON_VERSION: 3.7
       MINICONDA: C:\Miniconda
 
 init:
@@ -12,8 +12,11 @@ install:
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - "conda env create --force -f environment.yml python=3.6"
+  - conda config --add channels conda-forge
+  - conda info -a
+  - "conda env create -q -n segmentator python=%PYTHON_VERSION% --file requirements.txt"
   - activate segmentator
+  - pip install compoda
   - python setup.py install
 
 test_script:

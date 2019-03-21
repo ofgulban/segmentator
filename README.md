@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623) [![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator) [![codecov](https://codecov.io/gh/ofgulban/segmentator/branch/master/graph/badge.svg)](https://codecov.io/gh/ofgulban/segmentator) [![Code Health](https://landscape.io/github/ofgulban/segmentator/master/landscape.svg?style=flat)](https://landscape.io/github/ofgulban/segmentator/master) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
+[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623) [![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator) [![codecov](https://codecov.io/gh/ofgulban/segmentator/branch/master/graph/badge.svg)](https://codecov.io/gh/ofgulban/segmentator) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
 
 # Segmentator
 
@@ -27,7 +27,6 @@ The goal is to provide a complementary tool to the already available brain tissu
 | [Compoda](https://github.com/ofgulban/compoda) | 0.3.3          |
 
 ## Installation & Quick Start
-- Make sure you have [**pip**](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed if you are using [**Python 2.7**](https://www.python.org/download/releases/2.7/).
 - Download [the latest release](https://github.com/ofgulban/segmentator/releases) and unzip it.
 - Change directory in your command line:
 ```
