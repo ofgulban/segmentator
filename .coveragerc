@@ -8,4 +8,5 @@ omit =
     *tests/*
     segmentator/future/*
     segmentator/cython/*
+    segmentator/sample_data/*
     *ui.py
