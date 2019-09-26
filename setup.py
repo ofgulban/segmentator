@@ -24,7 +24,7 @@ setup(name='segmentator',
       author_email='faruk.gulban@maastrichtuniversity.nl',
       license='BSD-3-clause',
       packages=['segmentator'],
-      install_requires=['numpy>=1.17', 'matplotlib>=3.1', 'scipy>=1.3'],
+      install_requires=['numpy>=1.17', 'matplotlib>=3.1', 'scipy>=1.3', 'compoda>=0.3'],
       keywords=['mri', 'segmentation', 'image', 'voxel'],
       zip_safe=True,
       entry_points={
