@@ -653,11 +653,11 @@ class sector_mask:
         else:
             return False
 
-    def draw(self, ax, cmap='Reds', alpha=0.2, vmin=0.1,
+    def draw(self, ax, cmap='Reds', alpha=0.2, vmin=0.1, zorder=0,
              interpolation='nearest', origin='lower', extent=[0, 100, 0, 100]):
         """Draw sector mask."""
         BinMask = self.binaryMask()
         FigObj = ax.imshow(BinMask, cmap=cmap, alpha=alpha, vmin=vmin,
                            interpolation=interpolation, origin=origin,
-                           extent=extent)
+                           extent=extent, zorder=zorder)
         return (FigObj, BinMask)

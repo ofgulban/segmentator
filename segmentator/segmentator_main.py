@@ -67,12 +67,12 @@ ax2 = fig.add_subplot(122)
 sliceNr = int(0.5*dims[2])
 imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray, vmin=ima.min(),
                      vmax=ima.max(), interpolation='none',
-                     extent=[0, dims[1], dims[0], 0])
+                     extent=[0, dims[1], dims[0], 0], zorder=0)
 
 imaSlcMsk = np.ones(dims[0:2])
 imaSlcMskH = ax2.imshow(imaSlcMsk, cmap=palette, vmin=0.1,
                         interpolation='none', alpha=0.5,
-                        extent=[0, dims[1], dims[0], 0])
+                        extent=[0, dims[1], dims[0], 0], zorder=1)
 
 # Adjust subplots on figure
 bottom = 0.30
@@ -89,7 +89,7 @@ sectorObj = sector_mask((nr_bins, nr_bins), cfg.init_centre, cfg.init_radius,
 # Draw sector mask for the first time
 volHistMaskH, volHistMask = sectorObj.draw(ax, cmap=palette, alpha=0.2,
                                            vmin=0.1, interpolation='nearest',
-                                           origin='lower',
+                                           origin='lower', zorder=1,
                                            extent=[0, nr_bins, 0, nr_bins])
 
 # Initiate a flexible figure object, pass to it useful properties
