@@ -16,15 +16,15 @@ ext_modules = [Extension(
     ]
 
 setup(name='segmentator',
-      version='1.5.3',
+      version='1.5.4',
       description=('Multi-dimensional data exploration and segmentation for 3D \
                    images.'),
       url='https://github.com/ofgulban/segmentator',
       author='Omer Faruk Gulban',
       author_email='faruk.gulban@maastrichtuniversity.nl',
-      license='GNU General Public License Version 3',
+      license='BSD-3-clause',
       packages=['segmentator'],
-      install_requires=['numpy>=1.14', 'matplotlib>=2.1', 'scipy>=1.0.0'],
+      install_requires=['numpy==1.14', 'matplotlib==2.2', 'scipy==1.0.0'],
       keywords=['mri', 'segmentation', 'image', 'voxel'],
       zip_safe=True,
       entry_points={

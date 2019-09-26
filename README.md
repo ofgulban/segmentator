@@ -55,8 +55,8 @@ Check out __[our wiki](https://github.com/ofgulban/segmentator/wiki)__ for furth
 Please use [GitHub issues](https://github.com/ofgulban/segmentator/issues) for questions, bug reports or feature requests.
 
 ## License
-Copyright © 2018, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
-Released under [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
+Copyright © 2019, [Omer Faruk Gulban](https://github.com/ofgulban) and [Marian Schneider](https://github.com/MSchnei).
+This project is licensed under [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause).
 
 ## References
 This application is mainly based on the following work:
