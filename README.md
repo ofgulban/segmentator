@@ -20,11 +20,11 @@ The goal is to provide a complementary tool to the already available brain tissu
 
 | Package                                        | Tested version |
 |------------------------------------------------|----------------|
-| [matplotlib](http://matplotlib.org/)           | 2.0.2          |
-| [NumPy](http://www.numpy.org/)                 | 1.13.1         |
-| [NiBabel](http://nipy.org/nibabel/)            | 2.1.0          |
-| [SciPy](http://scipy.org/)                     | 0.19.1         |
-| [Compoda](https://github.com/ofgulban/compoda) | 0.3.3          |
+| [matplotlib](http://matplotlib.org/)           | 3.1.1          |
+| [NumPy](http://www.numpy.org/)                 | 1.17.2         |
+| [NiBabel](http://nipy.org/nibabel/)            | 2.5.1          |
+| [SciPy](http://scipy.org/)                     | 1.3.1          |
+| [Compoda](https://github.com/ofgulban/compoda) | 0.3.5          |
 
 ## Installation & Quick Start
 - Download [the latest release](https://github.com/ofgulban/segmentator/releases) and unzip it.
@@ -62,5 +62,3 @@ This project is licensed under [BSD-3-Clause](https://opensource.org/licenses/BS
 This application is mainly based on the following work:
 
 * Kniss, J., Kindlmann, G., & Hansen, C. D. (2005). Multidimensional transfer functions for volume rendering. Visualization Handbook, 189–209. <http://doi.org/10.1016/B978-012387582-2/50011-3>
-* Jianbo Shi, & Malik, J. (2000). Normalized cuts and image segmentation. IEEE Transactions on Pattern Analysis and Machine Intelligence, 22(8), 888–905. <http://doi.org/10.1109/34.868688>
-* Ip, C. Y., Varshney, A., & Jaja, J. (2012). Hierarchical exploration of volumes using multilevel segmentation of the intensity-gradient histograms. IEEE Transactions on Visualization and Computer Graphics, 18(12), 2355–2363. <http://doi.org/10.1109/TVCG.2012.231>
