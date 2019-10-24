@@ -5,7 +5,8 @@ from __future__ import division, print_function
 import numpy as np
 import segmentator.config as cfg
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use(cfg.matplotlib_backend)
+print("Matplotlib backend: {}".format(matplotlib.rcParams['backend']))
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.widgets import Slider, Button, LassoSelector
