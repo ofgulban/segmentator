@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Some utility functions."""
 
-from __future__ import division, print_function
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -157,12 +156,12 @@ def check_data(data, force_original_precision=True):
     """Do type casting here."""
     data = np.squeeze(data)  # to prevent singular dimension error
     dims = data.shape
-    print('Input image data type is {}.'.format(data.dtype.name))
+    print(f'Input image data type is {data.dtype.name}.')
     if force_original_precision:
         pass
     elif data.dtype != 'float32':
         data = data.astype('float32')
-        print('  Data type is casted to {}.'.format(data.dtype.name))
+        print(f'  Data type is casted to {data.dtype.name}.')
     return data, dims
 
 
@@ -289,7 +288,7 @@ def compute_gradient_magnitude(ima, method='scharr'):
     elif method.lower() == 'deriche':
         from segmentator.deriche_prepare import Deriche_Gradient_Magnitude
         alpha = cfg.deriche_alpha
-        print('    Selected alpha: {}'.format(alpha))
+        print(f'    Selected alpha: {alpha}')
         ima = np.ascontiguousarray(ima, dtype=np.float32)
         gra_mag = Deriche_Gradient_Magnitude(ima, alpha, normalize=True)
     else:
@@ -327,7 +326,7 @@ def set_gradient_magnitude(image, gramag_option):
         gra_mag = scale_range(gra_mag, scale_factor=cfg.scale, delta=0.0001)
 
     else:
-        print('{} gradient method is selected.'.format(gramag_option.title()))
+        print(f'{gramag_option.title()} gradient method is selected.')
         gra_mag = compute_gradient_magnitude(image, method=gramag_option)
     return gra_mag
 
@@ -342,7 +341,7 @@ def export_gradient_magnitude_image(img, filename, filtername, affine):
         filtername = filtername.replace('.', 'pt')
     else:
         filtername = filtername.title()
-    out_path = '{}_GraMag{}.nii.gz'.format(basename, filtername)
+    out_path = f'{basename}_GraMag{filtername}.nii.gz'
     print("Exporting gradient magnitude image...")
     save(out_img, out_path)
     print('  Gradient magnitude image exported in this path:\n  ' + out_path)

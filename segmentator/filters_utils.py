@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Common functions used in filters."""
 
-from __future__ import division
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 

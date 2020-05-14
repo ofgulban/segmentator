@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Processing input and plotting."""
 
-from __future__ import division, print_function
 import numpy as np
 import segmentator.config as cfg
 import matplotlib
@@ -253,9 +252,9 @@ def onselect(verts):
 def lassoEraseSwitch(event):
     """Enable disable lasso erase function."""
     flexFig.lassoErase = (flexFig.lassoErase + 1) % 2
-    if flexFig.lassoErase is 1:
+    if flexFig.lassoErase == 1:
         bLassoErase.label.set_text("Erase\nOff")
-    elif flexFig.lassoErase is 0:
+    elif flexFig.lassoErase == 0:
         bLassoErase.label.set_text("Erase\nOn")
 
 

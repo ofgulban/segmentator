@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Functions covering the user interaction with the GUI."""
 
-from __future__ import division, print_function
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -405,7 +404,7 @@ class responsiveObj:
             labels_out = '{}_labels_{}.nii.gz'.format(
                 self.basename, self.nrExports)
         save(new_image, labels_out)
-        print("    Saved as: {}".format(labels_out))
+        print(f"    Saved as: {labels_out}")
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""

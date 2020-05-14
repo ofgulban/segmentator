@@ -114,7 +114,7 @@ if cfg.ncut_figs:
     plt.show()
 
 # save output
-outName = '{}_ncut_sp{}_c{}'.format(basename, cfg.nr_sup_pix, cfg.compactness)
+outName = f'{basename}_ncut_sp{cfg.nr_sup_pix}_c{cfg.compactness}'
 outName = outName.replace('.', 'pt')
 np.save(outName, ncut)
 print("    Saved as: {}{}".format(outName, '.npy'))

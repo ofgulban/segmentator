@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Diffusion based image smoothing."""
 
-from __future__ import division
 import os
 import numpy as np
 import segmentator.config_filters as cfg
@@ -19,7 +18,7 @@ from scipy.ndimage.interpolation import zoom
 def QC_export(image, basename, identifier, nii):
     """Quality control exports."""
     out = Nifti1Image(image, affine=nii.affine, header=nii.header)
-    save(out, '{}_{}.nii.gz'.format(basename, identifier))
+    save(out, f'{basename}_{identifier}.nii.gz')
 
 
 # Input
@@ -124,7 +123,7 @@ for t in range(NR_ITER):
         QC_export(ima, basename, params, nii)
         duration = time() - start
         mins, secs = int(duration / 60), int(duration % 60)
-        print('  Image saved (took {} min {} sec)'.format(mins, secs))
+        print(f'  Image saved (took {mins} min {secs} sec)')
 
 if cfg.downsampling > 1:  # TODO: work in progress
     print('  Final upsampling...')
@@ -140,4 +139,4 @@ QC_export(ima, basename, params, nii)
 
 duration = time() - start
 mins, secs = int(duration / 60), int(duration % 60)
-print('  Finished (Took: {} min {} sec).'.format(mins, secs))
+print(f'  Finished (Took: {mins} min {secs} sec).')
