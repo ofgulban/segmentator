@@ -126,13 +126,18 @@ flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # Image browser slider
-axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
+axSliceNr = plt.axes([0.6, bottom-0.10, 0.25, 0.025], facecolor=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
                           valfmt='%0.2f')
 
 # Image brightness slider
 axBright = plt.axes([0.6, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
 flexFig.sBright = Slider(axBright, 'Brightness', -1, 1, valinit=0,
+                          valfmt='%0.2f')
+
+# Mask alpha slider
+axMskAlph = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
+flexFig.sMskAlph = Slider(axMskAlph, 'Mask α', 0, 1, valinit=.5,
                           valfmt='%0.2f')
 
 # Theta sliders
@@ -172,6 +177,7 @@ flexFig.bExportNyp = Button(exportax, 'Export\nHist',
 flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
 flexFig.sBright.on_changed(flexFig.updateBrightness)
+flexFig.sMskAlph.on_changed(flexFig.updateMaskAlpha)
 flexFig.sThetaMin.on_changed(flexFig.updateThetaMin)
 flexFig.sThetaMax.on_changed(flexFig.updateThetaMax)
 flexFig.bCycle.on_clicked(flexFig.cycleView)

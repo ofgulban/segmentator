@@ -333,6 +333,10 @@ class responsiveObj:
             self.imaSlcBgH.set_visible(True)
         self.imaSlcH.set_alpha(-abs(val))
 
+    def updateMaskAlpha(self, val):
+        """Update alpha channel of mask."""
+        self.imaSlcMskH.set_alpha(val)
+
     def updateImaExtent(self):
         """Update both image and mask extent in image browser."""
         self.imaSlcH.set_extent((0, self.imaSlc.shape[1],
