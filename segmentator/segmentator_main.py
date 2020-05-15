@@ -56,6 +56,7 @@ ax.set_ylim(d_min, d_max)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
+ax.patch.set_facecolor('lightgray')  # improves visibility of 2D histogram
 
 # Plot colorbar for 2D hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
@@ -79,6 +80,7 @@ imaSlcMskH = ax2.imshow(imaSlcMsk, cmap=palette, vmin=0.1,
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
 fig.canvas.set_window_title(nii.get_filename())
+plt.subplots_adjust(left=.1, bottom=.3, right=.9, top=.95, wspace=.2, hspace=.2)
 plt.axis('off')
 
 #
