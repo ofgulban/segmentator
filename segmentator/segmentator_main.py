@@ -63,6 +63,8 @@ fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical scaling
 
 # Plot 3D ima by default
 ax2 = fig.add_subplot(122)
+# Black background image for brightness slider
+imaSlcBgH = ax2.imshow(np.zeros_like(orig[:, :, 0]), cmap=plt.cm.gray, zorder=-1)
 sliceNr = int(0.5*dims[2])
 imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray, vmin=ima.min(),
                      vmax=ima.max(), interpolation='none',
@@ -101,6 +103,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         nrBins=nr_bins,
                         sliceNr=sliceNr,
                         imaSlcH=imaSlcH,
+                        imaSlcBgH=imaSlcBgH,
                         imaSlcMsk=imaSlcMsk, imaSlcMskH=imaSlcMskH,
                         volHistMask=volHistMask, volHistMaskH=volHistMaskH,
                         contains=volHistMaskH.contains,
@@ -129,7 +132,7 @@ flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
 
 # Image brightness slider
 axBright = plt.axes([0.6, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
-flexFig.sBright = Slider(axBright, 'Brightness', 0, 1, valinit=1,
+flexFig.sBright = Slider(axBright, 'Brightness', -1, 1, valinit=0,
                           valfmt='%0.2f')
 
 # Theta sliders

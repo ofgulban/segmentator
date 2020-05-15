@@ -326,8 +326,12 @@ class responsiveObj:
                           update_extent=True)
 
     def updateBrightness(self, val):
-        """Update image brightness"""
-        self.imaSlcH.set_alpha(val)
+        """Update image brightness."""
+        if val > 0:
+            self.imaSlcBgH.set_visible(False)
+        else:
+            self.imaSlcBgH.set_visible(True)
+        self.imaSlcH.set_alpha(-abs(val))
 
     def updateImaExtent(self):
         """Update both image and mask extent in image browser."""
