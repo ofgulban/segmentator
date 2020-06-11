@@ -62,3 +62,7 @@ This project is licensed under [BSD-3-Clause](https://opensource.org/licenses/BS
 This application is mainly based on the following work:
 
 * Kniss, J., Kindlmann, G., & Hansen, C. D. (2005). Multidimensional transfer functions for volume rendering. Visualization Handbook, 189–209. <http://doi.org/10.1016/B978-012387582-2/50011-3>
+
+## Acknowledgements
+Since early 2020, development and maintenance of this project is being actively supported by [BrainInnovation](https://www.brainvoyager.com/) as the main developer ([Omer Faruk Gulban](https://github.com/ofgulban)) works there.
+
