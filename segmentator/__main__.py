@@ -95,6 +95,12 @@ def main():
         help="Do not change the data type of the input image. Can be useful \
         for very large images. Off by default."
         )
+    parser.add_argument(
+        "--matplotlib_backend", metavar=str(cfg.matplotlib_backend),
+        default=cfg.matplotlib_backend, required=False,
+        help="Change in case of issues during startup or visual glitches. \
+        Some options are: qt5agg, qt4agg, wxagg, webagg."
+        )
 
     # used in ncut preparation
     parser.add_argument(
@@ -144,6 +150,7 @@ def main():
         cfg.discard_zeros = False
     cfg.export_gramag = args.export_gramag
     cfg.force_original_precision = args.force_original_precision
+    cfg.matplotlib_backend = args.matplotlib_backend
     # used in ncut preparation
     cfg.ncut_figs = args.ncut_figs
     cfg.max_rec = args.ncut_maxRec

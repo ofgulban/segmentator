@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623) [![Build Status](https://travis-ci.org/ofgulban/segmentator.svg?branch=master)](https://travis-ci.org/ofgulban/segmentator) [![Build status](https://ci.appveyor.com/api/projects/status/lkxp4y5ahssqv6ng?svg=true)](https://ci.appveyor.com/project/ofgulban/segmentator)  [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/segmentator/Lobby)
+[![DOI](https://zenodo.org/badge/59303623.svg)](https://zenodo.org/badge/latestdoi/59303623)
 
 # Segmentator
 
@@ -62,3 +62,6 @@ This project is licensed under [BSD-3-Clause](https://opensource.org/licenses/BS
 This application is mainly based on the following work:
 
 * Kniss, J., Kindlmann, G., & Hansen, C. D. (2005). Multidimensional transfer functions for volume rendering. Visualization Handbook, 189–209. <http://doi.org/10.1016/B978-012387582-2/50011-3>
+
+## Acknowledgements
+Since early 2020, development and maintenance of this project is being actively supported by [Brain Innovation](https://www.brainvoyager.com/) as the main developer ([Omer Faruk Gulban](https://github.com/ofgulban)) works there.
