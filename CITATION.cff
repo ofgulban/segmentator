@@ -1,0 +1,27 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Gulban
+    given-names: Omer Faruk
+    orcid: https://orcid.org/0000-0001-7761-3727
+
+  - family-names: Schneider
+    given-names: Marian
+    orcid: http://orcid.org/0000-0003-3192-5316
+
+  - family-names: Marquardt
+    given-names: Ingo
+    orcid: http://orcid.org/0000-0001-5178-9951
+
+  - family-names: Haast
+    given-names: Roy
+    orcid: http://orcid.org/0000-0001-8543-2467
+
+  - family-names: De Martino
+    given-names: Federico
+    orcid: https://orcid.org/0000-0002-0352-0648
+
+title: "A scalable method to improve gray matter segmentation at ultra high field MRI"
+version: 1.6.0
+doi: https://doi.org/10.1371/journal.pone.0198335
+date-released: 2019-09-26
