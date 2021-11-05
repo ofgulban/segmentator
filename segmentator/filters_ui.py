@@ -4,7 +4,6 @@
 Use config_filters.py to hold parameters.
 """
 
-from __future__ import print_function
 import argparse
 import segmentator.config_filters as cfg
 from segmentator import __version__
@@ -91,9 +90,9 @@ def main():
     cfg.downsampling = args.downsampling
     cfg.no_nonpositive_mask = args.no_nonpositive_mask
 
-    welcome_str = 'Segmentator {}'.format(__version__)
+    welcome_str = f'Segmentator {__version__}'
     welcome_decor = '=' * len(welcome_str)
-    print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
+    print(f'{welcome_decor}\n{welcome_str}\n{welcome_decor}')
     print('Filters initiated...')
 
     import segmentator.filter

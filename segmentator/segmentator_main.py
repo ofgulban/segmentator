@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Processing input and plotting."""
 
-from __future__ import division, print_function
 import numpy as np
 import segmentator.config as cfg
 import matplotlib
@@ -58,6 +57,7 @@ ax.set_ylim(d_min, d_max)
 ax.set_xlabel("Intensity f(x)")
 ax.set_ylabel("Gradient Magnitude f'(x)")
 ax.set_title("2D Histogram")
+ax.patch.set_facecolor('lightgray')  # improves visibility of 2D histogram
 
 # Plot colorbar for 2D hist
 volHistH.set_norm(LogNorm(vmax=np.power(10, cfg.cbar_init)))
@@ -65,6 +65,8 @@ fig.colorbar(volHistH, fraction=0.046, pad=0.04)  # magical scaling
 
 # Plot 3D ima by default
 ax2 = fig.add_subplot(122)
+# Black background image for brightness slider
+imaSlcBgH = ax2.imshow(np.zeros_like(orig[:, :, 0]), cmap=plt.cm.gray, zorder=-1)
 sliceNr = int(0.5*dims[2])
 imaSlcH = ax2.imshow(orig[:, :, sliceNr], cmap=plt.cm.gray, vmin=ima.min(),
                      vmax=ima.max(), interpolation='none',
@@ -79,6 +81,7 @@ imaSlcMskH = ax2.imshow(imaSlcMsk, cmap=palette, vmin=0.1,
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
 fig.canvas.set_window_title(nii.get_filename())
+plt.subplots_adjust(left=.1, bottom=.3, right=.9, top=.95, wspace=.2, hspace=.2)
 plt.axis('off')
 
 #
@@ -103,6 +106,7 @@ flexFig = responsiveObj(figure=ax.figure, axes=ax.axes, axes2=ax2.axes,
                         nrBins=nr_bins,
                         sliceNr=sliceNr,
                         imaSlcH=imaSlcH,
+                        imaSlcBgH=imaSlcBgH,
                         imaSlcMsk=imaSlcMsk, imaSlcMskH=imaSlcMskH,
                         volHistMask=volHistMask, volHistMaskH=volHistMaskH,
                         contains=volHistMaskH.contains,
@@ -125,8 +129,18 @@ flexFig.sHistC = Slider(axHistC, 'Colorbar', 1, cfg.cbar_max,
                         valinit=cfg.cbar_init, valfmt='%0.1f')
 
 # Image browser slider
-axSliceNr = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
+axSliceNr = plt.axes([0.6, bottom-0.10, 0.25, 0.025], facecolor=axcolor)
 flexFig.sSliceNr = Slider(axSliceNr, 'Slice', 0, 0.999, valinit=0.5,
+                          valfmt='%0.2f')
+
+# Image brightness slider
+axBright = plt.axes([0.6, bottom-0.20, 0.25, 0.025], facecolor=axcolor)
+flexFig.sBright = Slider(axBright, 'Brightness', -1, 1, valinit=0,
+                          valfmt='%0.2f')
+
+# Mask alpha slider
+axMskAlph = plt.axes([0.6, bottom-0.15, 0.25, 0.025], facecolor=axcolor)
+flexFig.sMskAlph = Slider(axMskAlph, 'Mask α', 0, 1, valinit=.5,
                           valfmt='%0.2f')
 
 # Theta sliders
@@ -165,6 +179,8 @@ flexFig.bExportNyp = Button(exportax, 'Export\nHist',
 """Updates"""
 flexFig.sHistC.on_changed(flexFig.updateColorBar)
 flexFig.sSliceNr.on_changed(flexFig.updateImaBrowser)
+flexFig.sBright.on_changed(flexFig.updateBrightness)
+flexFig.sMskAlph.on_changed(flexFig.updateMaskAlpha)
 flexFig.sThetaMin.on_changed(flexFig.updateThetaMin)
 flexFig.sThetaMax.on_changed(flexFig.updateThetaMax)
 flexFig.bCycle.on_clicked(flexFig.cycleView)
@@ -254,9 +270,9 @@ def onselect(verts):
 def lassoEraseSwitch(event):
     """Enable disable lasso erase function."""
     flexFig.lassoErase = (flexFig.lassoErase + 1) % 2
-    if flexFig.lassoErase is 1:
+    if flexFig.lassoErase == 1:
         bLassoErase.label.set_text("Erase\nOff")
-    elif flexFig.lassoErase is 0:
+    elif flexFig.lassoErase == 0:
         bLassoErase.label.set_text("Erase\nOn")
 
 

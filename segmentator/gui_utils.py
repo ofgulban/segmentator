@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Functions covering the user interaction with the GUI."""
 
-from __future__ import division, print_function
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -326,6 +325,18 @@ class responsiveObj:
         self.updatePanels(update_slice=True, update_rotation=True,
                           update_extent=True)
 
+    def updateBrightness(self, val):
+        """Update image brightness."""
+        if val > 0:
+            self.imaSlcBgH.set_visible(False)
+        else:
+            self.imaSlcBgH.set_visible(True)
+        self.imaSlcH.set_alpha(-abs(val))
+
+    def updateMaskAlpha(self, val):
+        """Update alpha channel of mask."""
+        self.imaSlcMskH.set_alpha(val)
+
     def updateImaExtent(self):
         """Update both image and mask extent in image browser."""
         self.imaSlcH.set_extent((0, self.imaSlc.shape[1],
@@ -405,7 +416,7 @@ class responsiveObj:
             labels_out = '{}_labels_{}.nii.gz'.format(
                 self.basename, self.nrExports)
         save(new_image, labels_out)
-        print("    Saved as: {}".format(labels_out))
+        print(f"    Saved as: {labels_out}")
 
     def clearOverlays(self):
         """Clear overlaid items such as circle highlights."""

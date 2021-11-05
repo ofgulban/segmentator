@@ -4,7 +4,6 @@
 TODO: Lots of code repetition, will be integrated better in the future.
 """
 
-from __future__ import division, print_function
 import numpy as np
 import segmentator.config as cfg
 import matplotlib
@@ -39,7 +38,7 @@ for ind in np.arange(ncut_labels.shape[2]):
     nrUniqueVals = len(uniqueVals)
     newInd = np.arange(nrUniqueVals) + counter
     newVals = total_labels[newInd]
-    tmp2 = np.zeros((tmp.shape))
+    tmp2 = np.zeros(tmp.shape)
     for ind2, val in enumerate(uniqueVals):
         tmp2[tmp == val] = newVals[ind2]
     counter = counter + nrUniqueVals

@@ -7,7 +7,6 @@ https://chriswarrick.com/blog/2014/09/15/python-apps-the-right-way-entry_points-
 Use config.py to hold arguments to be accessed by imported scripts.
 """
 
-from __future__ import print_function
 import argparse
 import segmentator.config as cfg
 from segmentator import __version__
@@ -161,9 +160,9 @@ def main():
     # used in deriche filter
     cfg.deriche_alpha = args.deriche_alpha
 
-    welcome_str = 'Segmentator {}'.format(__version__)
+    welcome_str = f'Segmentator {__version__}'
     welcome_decor = '=' * len(welcome_str)
-    print('{}\n{}\n{}'.format(welcome_decor, welcome_str, welcome_decor))
+    print(f'{welcome_decor}\n{welcome_str}\n{welcome_decor}')
 
     # Call other scripts with import method (couldn't find a better way).
     if args.nogui:

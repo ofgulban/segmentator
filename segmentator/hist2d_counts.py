@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Save 2D histogram image without displaying GUI."""
 
-from __future__ import print_function
 import os
 import numpy as np
 import segmentator.config as cfg
@@ -28,4 +27,4 @@ outName = '{}_volHist_pcMax{}_pcMin{}_sc{}'.format(
     basename, cfg.perc_max, cfg.perc_min, int(cfg.scale))
 outName = outName.replace('.', 'pt')
 np.save(outName, counts)
-print('  Image saved as:\n {}'.format(outName))
+print(f'  Image saved as:\n {outName}')
