@@ -395,8 +395,8 @@ class responsiveObj:
                                          out_volHistMask)
             out_nii = out_nii.reshape(volume_image.shape)
         # save mask image as nii
-        new_image = Nifti1Image(out_nii, header=self.nii.get_header(),
-                                affine=self.nii.get_affine())
+        new_image = Nifti1Image(out_nii, header=self.nii.header,
+                                affine=self.nii.affine)
         # get new flex file name and check for overwriting
         labels_out = '{}_labels_{}.nii.gz'.format(
             self.basename, self.nrExports)
