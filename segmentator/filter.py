@@ -46,7 +46,7 @@ basename = file_name.split(os.extsep, 1)[0]
 nii = load(file_name)
 vres = nii.header['pixdim'][1:4]  # voxel resolution x y z
 norm_vres = [r/min(vres) for r in vres]  # normalized voxel resolutions
-ima = (nii.get_data()).astype('float32')
+ima = (nii.get_fdata()).astype('float32')
 
 if cfg.downsampling > 1:  # TODO: work in progress
     print('  Applying initial downsampling...')
@@ -130,7 +130,7 @@ if cfg.downsampling > 1:  # TODO: work in progress
     print('  Final upsampling...')
     residual = ima - orig
     residual = zoom(residual, cfg.downsampling)
-    ima = (nii.get_data()).astype('float32') + residual
+    ima = (nii.get_fdata()).astype('float32') + residual
 else:
     pass
 

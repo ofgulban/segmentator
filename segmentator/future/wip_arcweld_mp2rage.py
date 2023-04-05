@@ -17,7 +17,7 @@ from segmentator.utils import compute_gradient_magnitude, aniso_diff_3D
 
 # load
 nii = load('/home/faruk/gdrive/Segmentator/data/faruk/arcweld/mp2rage_S001_restore.nii.gz')
-ima = nii.get_data()
+ima = nii.get_fdata()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # non-zero mask

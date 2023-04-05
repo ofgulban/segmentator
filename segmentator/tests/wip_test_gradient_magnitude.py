@@ -10,7 +10,7 @@ from segmentator.utils import compute_gradient_magnitude
 
 # load
 nii = load('/home/faruk/gdrive/Segmentator/data/faruk/gramag_test/mprage_S02_restore.nii.gz')
-ima = nii.get_data()
+ima = nii.get_fdata()
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # 3D Scharr gradient magnitude

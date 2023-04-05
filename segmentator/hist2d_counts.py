@@ -14,7 +14,7 @@ nii = load(cfg.filename)
 basename = nii.get_filename().split(os.extsep, 1)[0]
 
 # data processing
-orig, _ = check_data(nii.get_data(), cfg.force_original_precision)
+orig, _ = check_data(nii.get_fdata(), cfg.force_original_precision)
 orig, _, _ = truncate_range(orig, percMin=cfg.perc_min, percMax=cfg.perc_max)
 orig = scale_range(orig, scale_factor=cfg.scale, delta=0.0001)
 gra = set_gradient_magnitude(orig, cfg.gramag)

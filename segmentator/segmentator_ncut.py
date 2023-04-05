@@ -52,7 +52,7 @@ ima_ncut_labels = ncut_labels.copy()
 
 #
 """Data Processing"""
-orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
+orig, dims = check_data(nii.get_fdata(), cfg.force_original_precision)
 # Save min and max truncation thresholds to be used in axis labels
 orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
                                   percMax=cfg.perc_max)

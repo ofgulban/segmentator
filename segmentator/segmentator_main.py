@@ -22,7 +22,7 @@ from segmentator.config_gui import palette, axcolor, hovcolor
 #
 """Data Processing"""
 nii = load(cfg.filename)
-orig, dims = check_data(nii.get_data(), cfg.force_original_precision)
+orig, dims = check_data(nii.get_fdata(), cfg.force_original_precision)
 # Save min and max truncation thresholds to be used in axis labels
 if np.isnan(cfg.valmin) or np.isnan(cfg.valmax):
     orig, pMin, pMax = truncate_range(orig, percMin=cfg.perc_min,
@@ -78,7 +78,7 @@ imaSlcMskH = ax2.imshow(imaSlcMsk, cmap=palette, vmin=0.1,
 # Adjust subplots on figure
 bottom = 0.30
 fig.subplots_adjust(bottom=bottom)
-fig.canvas.set_window_title(nii.get_filename())
+fig.canvas.manager.set_window_title(nii.get_filename())
 plt.axis('off')
 
 #
@@ -254,9 +254,9 @@ def onselect(verts):
 def lassoEraseSwitch(event):
     """Enable disable lasso erase function."""
     flexFig.lassoErase = (flexFig.lassoErase + 1) % 2
-    if flexFig.lassoErase is 1:
+    if flexFig.lassoErase == 1:
         bLassoErase.label.set_text("Erase\nOff")
-    elif flexFig.lassoErase is 0:
+    elif flexFig.lassoErase == 0:
         bLassoErase.label.set_text("Erase\nOn")
 
 
