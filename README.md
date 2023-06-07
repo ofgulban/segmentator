@@ -21,7 +21,7 @@ The goal is to provide a complementary tool to the already available brain tissu
 | Package                                        | Tested version |
 |------------------------------------------------|----------------|
 | [matplotlib](http://matplotlib.org/)           | 3.1.1          |
-| [NumPy](http://www.numpy.org/)                 | 1.17.2         |
+| [NumPy](http://www.numpy.org/)                 | 1.22.0         |
 | [NiBabel](http://nipy.org/nibabel/)            | 2.5.1          |
 | [SciPy](http://scipy.org/)                     | 1.3.1          |
 | [Compoda](https://github.com/ofgulban/compoda) | 0.3.5          |
